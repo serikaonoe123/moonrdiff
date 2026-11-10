@@ -120,3 +120,12 @@ Commit `b445b562730cc415987263ab6cf6fc1e13793cac` passed [run 42777120731](https
 - Local Native compilation in results/package-323251c015e245d7b82a5ee20c0c0b80 failed with MSVC D8050 while recording compiler debug information. Cause remains unconfirmed. No permission/compiler substitution or repeated native local attempt followed. Explicit partial runs skip Native and packaged CLI, with false status recorded; this is not claimed as full acceptance.
 - Default Windows/Linux CI runs all three consumer backends and the native file update/manifest flow from extracted archive, without partial flags. Core CI also checks generated public interface drift. Those outcomes require the new run.
 - Local archive/workspace validation deliberately does not prove a registry installation. Representative benchmarks/large-file acceptance, concrete version selection and publication/registry acceptance remain outstanding.
+
+Commit `43431964aeb121d23ff33f9b96fca22e77a3ce6d` passed [run 42778789797](https://github.com/serikaonoe123/moonrdiff/actions/runs/42778789797). Saved official logs confirm both platforms accepted the 34-file archive, each consumer backend ran its two tests, and packaged native CLI flow passed. Existing Windows 77 / Linux 78 controls and 330 reference cases also passed. Local MSVC failure remains preserved rather than erased by cloud success.
+
+## 2026-11-10: representative workloads and Linux 128 MiB controls
+
+- Added a separate benchmark workflow with 15 scheduled cases (1/16/128 MiB × identical/modified/insert-delete/random/compressed). It records per-process RSS/elapsed time for both tools, exact signature equality, target/restore hashes, first-exchange and delta-only byte counts.
+- Default 64 MiB input/output limits are checked negatively for each 128 MiB case, while successful large-file commands explicitly use a 512 MiB budget. This is Linux sample acceptance, not unlimited file support.
+- Local generation-only validation completed all five 1 MiB fixture types. No local performance or rdiff measurement is claimed; full measurements require the new Linux run. Raw test data is generated solely under results and is not part of the package.
+- Benchmark comparison covers end-to-end command work, including MoonRdiff's additional preflight; fixed-order warm-cache single samples cannot establish statistical algorithm superiority or network performance.

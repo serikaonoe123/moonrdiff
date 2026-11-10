@@ -12,6 +12,7 @@ __pycache__/
 /docs/UPSTREAM-BLAKE2-REPRO.md
 /docs/STATUS.md
 /docs/PACKAGING.md
+/docs/BENCHMARKS.md
 /CHANGELOG.md
 /README.md
 /packaging/

@@ -1,0 +1,43 @@
+name: Benchmark MoonRdiff
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/benchmark.py', '.github/workflows/benchmark.yml']
+permissions:
+  contents: read
+jobs:
+  benchmark:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f
+        with:
+          version: '0.10.17+d971670cd'
+          core-version: '0.10.17+d971670cd'
+      - run: moon update
+      - run: moon build cmd/moonrdiff --target native --deny-warn
+      - name: Install reference and measurement tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rdiff time
+          mkdir -p results
+          lscpu > results/cpu.txt
+          dpkg-query -W rdiff time > results/benchmark-tools.txt
+      - name: Benchmark and verify 1 16 128 MiB workloads
+        run: python scripts/benchmark.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-reports
+          path: |
+            results/**/report.json
+            results/**/commands.log
+            results/cpu.txt
+            results/benchmark-tools.txt
