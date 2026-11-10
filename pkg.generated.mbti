@@ -2,6 +2,8 @@
 package "serikaonoe123/moonrdiff"
 
 // Values
+pub fn delta(Signature, Bytes, basis_size~ : Int32, max_candidate_checks? : Int32, max_delta_size? : Int32) -> Bytes raise DeltaError
+
 pub fn encode(Array[Instruction]) -> Bytes raise DeltaError
 
 pub fn parse_signature(Bytes, max_blocks? : Int32) -> Signature raise DeltaError

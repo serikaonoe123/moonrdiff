@@ -1,6 +1,6 @@
 # Initial format contract
 
-Status: signature generation/reading and explicit-instruction codec; automatic delta matching is pending.
+Status: signature generation/reading and explicit-instruction codec; automatic in-memory delta matching is available.
 
 ## Supported delta data
 
@@ -32,3 +32,11 @@ Dependency: a minimal vendored correction of cc06b/mooncry 0.71.0 BLAKE2b (Apach
 - [Opcode definitions](https://github.com/librsync/librsync/blob/v2.3.4/src/prototab.c)
 
 These describe the format; this repository does not vendor or translate librsync implementation files.
+
+## Automatic matcher contract
+
+`delta(signature, target, basis_size, max_candidate_checks=1000000, max_delta_size=16777216)` accepts the validated signature object, target bytes and explicit nonnegative basis size. It verifies the expected signature block count. It cannot verify the supplied size within the last block or authenticate a signature; applications must bind metadata and result hashes.
+
+Full windows are matched by seeded rolling polynomial and then truncated BLAKE2b-256. Short basis tails can match anywhere in the target using their own window. Candidate order is deterministic, full blocks are preferred, and consecutive basis ranges are coalesced. The comparison budget counts candidate strong-digest comparisons; exhaustion emits the remaining target bytes literally. Output size includes header and END; exceeding the explicit budget throws before further output is appended.
+
+The signature index scales with block count. Basis offsets are Int32-bounded by caller-supplied basis size; whole target and delta are resident. This is not a network or streaming implementation, and the resulting patch is not necessarily minimal or smaller than the target. Default 32-byte strong hashes are recommended; short hashes inherit the format's collision risk.

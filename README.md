@@ -2,9 +2,9 @@
 
 纯 MoonBit 远程差量基础库，处于早期开发阶段。
 
-目标是让备份、同步和资源更新程序通过旧文件摘要计算差量，再利用旧文件还原新版。目前实现 **RK/BLAKE2 分块摘要生成、读写，以及 rdiff 补丁格式的内存编解码原型**：编码器接收显式的复制与插入指令，解码器支持 literal/copy/end 指令及其全部参数宽度，并检查截断、范围和输出预算。
+目标是让备份、同步和资源更新程序通过旧文件摘要计算差量，再利用旧文件还原新版。目前实现 **RK/BLAKE2 分块摘要生成、读写，自动差量匹配，以及 rdiff 补丁格式的内存编解码**；支持从旧文件摘要与新文件自动生成补丁，也保留显式指令编码接口。解码器支持 literal/copy/end 指令及其全部参数宽度，并检查截断、范围和输出预算。
 
-**尚未实现自动块匹配、分块输入或正式文件 CLI。当前不能作为完整远程同步库使用。**
+**目前仍在内存中处理完整输入，分块输入和正式文件 CLI 尚未实现。**
 
 ## 构建与测试
 
@@ -25,7 +25,7 @@ Linux 安装参考工具 rdiff 2.3.4 后：
 python scripts/interop.py
 ```
 
-脚本验证 MoonBit 显式指令补丁由 rdiff 还原，以及 rdiff 生成的补丁由 MoonBit 还原。结果保存在忽略提交的 `results/` 中。另验证摘要与 rdiff 逐字节一致、参考摘要可解析，以及 MoonBit 摘要能用于 rdiff 计算差量。MoonBit 自动差量匹配仍属于后续里程碑。
+脚本验证 MoonBit 显式指令补丁由 rdiff 还原，以及 rdiff 生成的补丁由 MoonBit 还原。结果保存在忽略提交的 `results/` 中。另验证摘要与 rdiff 逐字节一致、参考摘要可解析，以及 MoonBit 摘要能用于 rdiff 计算差量。自动匹配测试在不含旧文件的发送端目录执行，覆盖两种摘要来源、两种补丁生成器和两种还原器。
 
 ## 库示例
 
@@ -48,3 +48,9 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 原创代码采用 MIT；`third_party/mooncry_blake2/` 保留 Apache-2.0 许可。格式参考 [librsync 格式说明](https://librsync.github.io/page_formats.html)及其公开指令定义；[librsync](https://github.com/librsync/librsync) 为 LGPL-2.1 项目，作为独立测试工具，不随包分发。本仓库不包含其代码翻译或复制的指令表。
 
 详细范围及开发安排见 [项目计划](docs/PROJECT-PLAN.md)，当前证据见 [验证记录](docs/VALIDATION.md)。
+
+## 自动差量匹配
+
+调用 `parse_signature` 读取摘要，再调用 `delta(signature, target, basis_size=旧文件字节数)`。计算端只需摘要、新文件和调用方提供的旧文件大小。默认最多比较 1,000,000 个候选，达到上限后改用字面数据；默认补丁上限 16 MiB，超过则报错。
+
+块数与旧文件大小必须一致，但这不能证明摘要来自正确文件。生产集成还需绑定旧文件和预期结果的可信摘要；建议保留默认 32 字节强校验。当前不承诺所有数据都能缩小，重复块选择与预算可能影响补丁大小。

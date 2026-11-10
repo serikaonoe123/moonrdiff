@@ -58,6 +58,22 @@ fn main {
       _ => abort("Invalid signature input")
     }
     println(hex(signature.to_bytes()))
+  } else if args.length() == 6 && args[2] == "delta" {
+    let signature = @rdiff.parse_signature(unhex(args[3])) catch {
+      _ => abort("Invalid signature")
+    }
+    let size_bytes = unhex(args[5])
+    let mut basis_size = 0
+    for byte in size_bytes {
+      basis_size = basis_size * 256 + byte.to_int()
+    }
+    println(
+      hex(
+        @rdiff.delta(signature, unhex(args[4]), basis_size~) catch {
+          _ => abort("Invalid delta input")
+        },
+      ),
+    )
   } else if args.length() == 5 && args[2] == "patch" {
     println(
       hex(

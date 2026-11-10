@@ -11,18 +11,18 @@ OUT = ROOT / 'results' / 'interop'
 OUT.mkdir(parents=True, exist_ok=True)
 
 
-def run(args):
-    result = subprocess.run(args, cwd=ROOT, capture_output=True, text=True)
+def run(args, cwd=ROOT):
+    result = subprocess.run(args, cwd=cwd, capture_output=True, text=True)
     if result.returncode:
         raise RuntimeError(f'{args[0]} failed: {result.stdout}\n{result.stderr}')
     return result.stdout.strip()
 
 
-def probe(*args):
+def probe(*args, cwd=ROOT):
     executable = ROOT / '_build/js/debug/build/cmd/probe/probe.js'
     if not executable.is_file():
         run(['moon', 'build', 'cmd/probe', '--target', 'js'])
-    return bytes.fromhex(run(['node', str(executable), *args]))
+    return bytes.fromhex(run(['node', str(executable), *args], cwd=cwd))
 
 
 version = subprocess.run(['rdiff', '--version'], capture_output=True, text=True)
@@ -95,7 +95,54 @@ assert probe('patch', basis.read_bytes().hex(), reference_delta.read_bytes().hex
 assert len(reference_delta.read_bytes()) < len(target.read_bytes()), 'Expected actual block reuse'
 records.append({'case': 'moon-signature-reference-delta-both-decoders', 'passed': True})
 
+sender = OUT / 'sender'
+sender.mkdir(exist_ok=True)
+assert not (sender / 'basis.bin').exists()
+matching_cases = cases + [
+    (b'abcdefghijk', b'ijkabcdefgh'),
+    (b'abcdefghijk', b''),
+    (b'a' * 512, b'a' * 128 + b'!' + b'a' * 128),
+    (bytes(range(256)) * 2, b'x' + bytes(range(256)) + b'y'),
+]
+for case_index, (old, new) in enumerate(matching_cases):
+    basis.write_bytes(old)
+    target.write_bytes(new)
+    for block_size in [1, 4, 32, 128]:
+        reference_sig = OUT / 'reference.sig'
+        run(['rdiff', '-f', '-H', 'blake2', '-R', 'rabinkarp', '-b', str(block_size),
+             '-S', '32', 'signature', str(basis), str(reference_sig)])
+        moon_sig = probe('signature', old.hex(), f'{block_size:02x}', '20')
+        assert moon_sig == reference_sig.read_bytes()
+        for signature_source, signature_bytes in [('moon', moon_sig), ('rdiff', reference_sig.read_bytes())]:
+            supplied_sig = sender / 'basis.sig'
+            supplied_sig.write_bytes(signature_bytes)
+            (sender / 'target.bin').write_bytes(new)
+            for generator in ['moon', 'rdiff']:
+                generated = sender / 'generated.delta'
+                if generator == 'moon':
+                    generated.write_bytes(probe('delta', signature_bytes.hex(), new.hex(),
+                                                len(old).to_bytes(4, 'big').hex(), cwd=sender))
+                else:
+                    run(['rdiff', '-f', 'delta', str(supplied_sig), str(sender / 'target.bin'),
+                         str(generated)], cwd=sender)
+                restored_bytes = probe('patch', old.hex(), generated.read_bytes().hex())
+                assert restored_bytes == new, (case_index, block_size, signature_source, generator, 'moon decoder')
+                run(['rdiff', '-f', 'patch', str(basis), str(generated), str(restored)])
+                assert restored.read_bytes() == new, (case_index, block_size, signature_source, generator, 'rdiff decoder')
+                records.append({'case': f'match-{case_index}-{block_size}-{signature_source}-{generator}',
+                                'passed': True, 'target_bytes': len(new), 'delta_bytes': generated.stat().st_size})
+
+# One shifted, block-reusing example must actually save bytes with MoonBit matching.
+old = bytes(range(256)) * 4
+new = b'prefix' + old + b'end'
+delta_bytes = probe('delta', probe('signature', old.hex(), '20', '20').hex(),
+                    new.hex(), len(old).to_bytes(4, 'big').hex(), cwd=sender)
+assert len(delta_bytes) < len(new)
+assert probe('patch', old.hex(), delta_bytes.hex()) == new
+records.append({'case': 'moon-matcher-reuses-shifted-blocks', 'passed': True,
+                'target_bytes': len(new), 'delta_bytes': len(delta_bytes)})
+
 report = {'reference': version_text.strip(), 'tests': records,
-          'scope': 'RK/BLAKE2 signature interoperability and explicit delta codec; MoonBit matching still pending'}
+          'scope': 'in-memory RK/BLAKE2 signature, automatic delta matching, both decoders; sender has no basis file'}
 (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf8')
 print(f'Passed {len(records)} independent rdiff smoke tests.')
