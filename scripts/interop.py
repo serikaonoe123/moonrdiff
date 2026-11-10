@@ -5,6 +5,8 @@ from pathlib import Path
 import subprocess
 import sys
 import struct
+import os
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'results' / 'interop'
@@ -143,6 +145,27 @@ assert len(delta_bytes) < len(new)
 assert probe('patch', old.hex(), delta_bytes.hex()) == new
 records.append({'case': 'moon-matcher-reuses-shifted-blocks', 'passed': True,
                 'target_bytes': len(new), 'delta_bytes': len(delta_bytes)})
+
+# Exercise actual native file I/O across the same format boundary.
+cli = ROOT / '_build/native/debug/build/cmd/moonrdiff' / ('moonrdiff.exe' if os.name == 'nt' else 'moonrdiff')
+native_dir = OUT / ('native-' + uuid.uuid4().hex)
+native_dir.mkdir()
+basis.write_bytes(old)
+target.write_bytes(new)
+native_sig, native_delta, native_restore = [native_dir / name for name in ['basis.sig', 'update.delta', 'restored.bin']]
+run([str(cli), 'signature', str(basis), str(native_sig), '--block-size', '32'])
+assert native_sig.read_bytes() == probe('signature', old.hex(), '20', '20')
+records.append({'case': 'native-cli-signature', 'passed': True})
+run([str(cli), 'delta', str(native_sig), str(target), str(native_delta), '--basis-size', str(len(old))])
+run(['rdiff', '-f', 'patch', str(basis), str(native_delta), str(restored)])
+assert restored.read_bytes() == new
+records.append({'case': 'native-cli-delta-to-rdiff', 'passed': True})
+run(['rdiff', '-f', 'delta', str(native_sig), str(target), str(reference_delta)])
+run([str(cli), 'patch', str(basis), str(reference_delta), str(native_restore)])
+assert native_restore.read_bytes() == new
+records.append({'case': 'rdiff-delta-to-native-cli', 'passed': True})
+assert json.loads(run([str(cli), 'verify', str(target), str(native_restore)]))['matched']
+records.append({'case': 'native-cli-verify', 'passed': True})
 
 report = {'reference': version_text.strip(), 'tests': records,
           'scope': 'in-memory RK/BLAKE2 signature, automatic delta matching, both decoders; sender has no basis file'}

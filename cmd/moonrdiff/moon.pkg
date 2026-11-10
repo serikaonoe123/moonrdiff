@@ -1,0 +1,11 @@
+import {
+  "serikaonoe123/moonrdiff" @rdiff,
+  "moonbitlang/core/env",
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/stdio",
+}
+
+pkgtype(kind: "executable")
+
+supported_targets = "native"

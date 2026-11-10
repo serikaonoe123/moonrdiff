@@ -4,15 +4,18 @@
 
 目标是让备份、同步和资源更新程序通过旧文件摘要计算差量，再利用旧文件还原新版。目前实现 **RK/BLAKE2 分块摘要生成、读写，自动差量匹配，以及 rdiff 补丁格式的内存编解码**；支持从旧文件摘要与新文件自动生成补丁，也保留显式指令编码接口。解码器支持 literal/copy/end 指令及其全部参数宽度，并检查截断、范围和输出预算。
 
-**目前仍在内存中处理完整输入，分块输入和正式文件 CLI 尚未实现。**
+**已提供 Windows/Linux 原生文件命令行；当前仍完整读入文件，分块输入尚未实现。**
 
 ## 构建与测试
 
 BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-2.0 许可、来源与修改记录，见 [第三方说明](third_party/mooncry_blake2/NOTICE.md)。其整块边界修复经过 Python hashlib 与 rdiff 对照验证；当前无需外部注册表依赖。
 
+原生文件 CLI 另使用 `moonbitlang/async@0.19.3`（Apache-2.0），从官方注册表安装。
+
 固定环境：MoonBit `0.10.17+d971670cd`，Node.js 22，测试辅助 Python 3.12+。
 
 ```sh
+moon update
 python scripts/check.py
 moon run cmd/probe --target js -- encode-fixture
 ```
@@ -54,3 +57,7 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 调用 `parse_signature` 读取摘要，再调用 `delta(signature, target, basis_size=旧文件字节数)`。计算端只需摘要、新文件和调用方提供的旧文件大小。默认最多比较 1,000,000 个候选，达到上限后改用字面数据；默认补丁上限 16 MiB，超过则报错。
 
 块数与旧文件大小必须一致，但这不能证明摘要来自正确文件。生产集成还需绑定旧文件和预期结果的可信摘要；建议保留默认 32 字节强校验。当前不承诺所有数据都能缩小，重复块选择与预算可能影响补丁大小。
+
+## 文件命令行
+
+见 [文件命令行使用说明](docs/CLI.md)。执行 `moon build cmd/moonrdiff --target native` 后，可运行 `python scripts/demo.py` 完成虚构数据的摘要、补丁、还原及逐字节校验。已有输出一律拒绝覆盖，默认每个输入和结果限制为 64 MiB。

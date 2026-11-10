@@ -11,3 +11,7 @@ description = "MoonBit remote delta primitives; early rdiff format interoperabil
 preferred_target = "js"
 
 supported_targets = [ "js", "native", "wasm-gc" ]
+
+import {
+  "moonbitlang/async@0.19.3",
+}
