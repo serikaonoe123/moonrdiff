@@ -23,7 +23,7 @@ API: signature(basis, block_size=2048, strong_length=32, max_blocks=1000000); pa
 
 The format contains no record count, original length, or end marker. Removing an entire record yields another structurally valid signature; the parser cannot detect this. The record count cannot determine the original last block length. File binding and expected size must be supplied at the application layer.
 
-Dependency: cc06b/mooncry 0.71.0 (Apache-2.0), registry package. Original polynomial-checksum code expresses the format equation; no librsync source routines were copied or translated.
+Dependency: a minimal vendored correction of cc06b/mooncry 0.71.0 BLAKE2b (Apache-2.0), with license and provenance in third_party/mooncry_blake2. The exact-block finalization fix is covered by hashlib and rdiff regressions. Original polynomial-checksum code expresses the format equation; no librsync source routines were copied or translated.
 
 ## References
 

@@ -11,7 +11,3 @@ description = "MoonBit remote delta primitives; early rdiff format interoperabil
 preferred_target = "js"
 
 supported_targets = [ "js", "native", "wasm-gc" ]
-
-import {
-  "cc06b/mooncry@0.71.0",
-}

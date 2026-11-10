@@ -1,4 +1,4 @@
 import {
   "moonbitlang/core/buffer",
-  "cc06b/mooncry/lib" @crypto,
+  "serikaonoe123/moonrdiff/third_party/mooncry_blake2" @crypto,
 }

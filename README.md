@@ -8,12 +8,11 @@
 
 ## 构建与测试
 
-固定依赖：`cc06b/mooncry@0.71.0`（Apache-2.0），用于 BLAKE2b-256；其他密码算法不属于 MoonRdiff 的 API。
+BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-2.0 许可、来源与修改记录，见 [第三方说明](third_party/mooncry_blake2/NOTICE.md)。其整块边界修复经过 Python hashlib 与 rdiff 对照验证；当前无需外部注册表依赖。
 
 固定环境：MoonBit `0.10.17+d971670cd`，Node.js 22，测试辅助 Python 3.12+。
 
 ```sh
-moon update
 python scripts/check.py
 moon run cmd/probe --target js -- encode-fixture
 ```
@@ -46,6 +45,6 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 
 ## 参考与许可
 
-原创代码采用 MIT。格式参考 [librsync 格式说明](https://librsync.github.io/page_formats.html)及其公开指令定义；[librsync](https://github.com/librsync/librsync) 为 LGPL-2.1 项目，作为独立测试工具，不随包分发。本仓库不包含其代码翻译或复制的指令表。
+原创代码采用 MIT；`third_party/mooncry_blake2/` 保留 Apache-2.0 许可。格式参考 [librsync 格式说明](https://librsync.github.io/page_formats.html)及其公开指令定义；[librsync](https://github.com/librsync/librsync) 为 LGPL-2.1 项目，作为独立测试工具，不随包分发。本仓库不包含其代码翻译或复制的指令表。
 
 详细范围及开发安排见 [项目计划](docs/PROJECT-PLAN.md)，当前证据见 [验证记录](docs/VALIDATION.md)。

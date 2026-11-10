@@ -63,7 +63,7 @@ for index, (old, new) in enumerate(cases):
                     'target_sha256': hashlib.sha256(new).hexdigest(),
                     'delta_sha256': hashlib.sha256(reference_delta.read_bytes()).hexdigest()})
 
-for size in [0, 1, 4, 31, 32, 33, 127, 128, 129, 257]:
+for size in [0, 1, 4, 31, 32, 33, 127, 128, 129, 255, 256, 257, 384, 512]:
     old = bytes((i * 73 + 255) % 256 for i in range(size))
     basis.write_bytes(old)
     for block_size, strong_length in [(1, 1), (4, 16), (32, 32), (128, 16)]:

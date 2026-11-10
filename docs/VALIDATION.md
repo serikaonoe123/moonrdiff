@@ -35,3 +35,11 @@ The Linux artifact was downloaded and its `interop/report.json` inspected locall
 - Linux interop suite now contains 40 exact-signature comparison/parse-roundtrip cases, in addition to the previous 7 delta cases, and one complete MoonBit-signature → rdiff-delta → both-decoders case with actual size reduction asserted. These are pending execution for this milestone until its CI run completes.
 - Automatic MoonBit matching, rolling-window update optimization, streaming, production file CLI, basis/result binding and full four-path interoperability remain pending.
 - First cloud run [42745061247](https://github.com/serikaonoe123/moonrdiff/actions/runs/42745061247) failed before compilation because the clean runner's registry index did not contain the new dependency. CI now explicitly runs `moon update` against the official index before resolving dependencies. No compatibility test result is inferred from that failed run.
+
+### Independent test discovered a dependency bug
+
+Run [42745250255](https://github.com/serikaonoe123/moonrdiff/actions/runs/42745250255) passed Windows checks and Linux core checks, then failed exact signature comparison at basis size 128 / block size 128 / strong length 16. Artifact was downloaded. Weak checksum and header matched; the BLAKE2 result differed. Python hashlib agreed with rdiff, identifying an exact-block finalization error in the dependency.
+
+The needed BLAKE2 file is now retained as a minimal Apache-2.0 adaptation under third_party/mooncry_blake2, with original source SHA-256, full license and explicit modification notice. The final full block is retained for final compression. The rest of mooncry is not bundled. Runtime registry dependency has been removed, so the index-refresh step added above is no longer needed. The earlier failed runs remain part of this record.
+
+Local formatting, checks, builds and 9 test groups pass on each of JS, Native and Wasm-GC after the correction. A prepared upstream reproduction is in UPSTREAM-BLAKE2-REPRO.md; nothing has been sent externally. The expanded Linux suite has 56 signature configurations plus the previous 7 codec cases and one signature-to-update case, totaling 64 cases; final cloud status is recorded by the next run.
