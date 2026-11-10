@@ -32,6 +32,8 @@ jobs:
         run: moon update
       - name: Check, build and test
         run: python scripts/check.py
+      - name: Archive policy and independent consumers
+        run: python scripts/check_package.py
       - name: Install reference tool from Ubuntu signed repository
         if: runner.os == 'Linux'
         run: |

@@ -1,0 +1,4 @@
+import {
+  "serikaonoe123/moonrdiff" @rdiff,
+  "moonbitlang/core/buffer",
+} for "test"

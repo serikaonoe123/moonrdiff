@@ -1,0 +1,17 @@
+/_build/
+/.mooncakes/
+/results/
+/.env
+__pycache__/
+*.pyc
+/scripts/
+/cmd/probe/
+/examples/
+/docs/PROJECT-PLAN.md
+/docs/VALIDATION.md
+/docs/UPSTREAM-BLAKE2-REPRO.md
+/docs/STATUS.md
+/docs/PACKAGING.md
+/CHANGELOG.md
+/README.md
+/packaging/

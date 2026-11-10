@@ -2,11 +2,15 @@ name = "serikaonoe123/moonrdiff"
 
 version = "0.0.1"
 
-license = "MIT"
+license = "MIT AND Apache-2.0"
 
-readme = "README.md"
+readme = "README.mooncakes.md"
 
-description = "MoonBit remote delta primitives; early rdiff format interoperability prototype."
+description = "Incremental rdiff-compatible signatures, deltas and patch decoding in MoonBit."
+
+repository = "https://github.com/serikaonoe123/moonrdiff"
+
+keywords = [ "rdiff", "delta", "sync", "incremental", "binary" ]
 
 preferred_target = "js"
 
