@@ -13,6 +13,7 @@
 固定环境：MoonBit `0.10.17+d971670cd`，Node.js 22，测试辅助 Python 3.12+。
 
 ```sh
+moon update
 python scripts/check.py
 moon run cmd/probe --target js -- encode-fixture
 ```

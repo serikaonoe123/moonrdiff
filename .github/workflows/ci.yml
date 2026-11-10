@@ -28,6 +28,8 @@ jobs:
         with:
           version: '0.10.17+d971670cd'
           core-version: '0.10.17+d971670cd'
+      - name: Refresh official package index
+        run: moon update
       - name: Check, build and test
         run: python scripts/check.py
       - name: Install reference tool from Ubuntu signed repository
