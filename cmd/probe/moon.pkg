@@ -2,6 +2,7 @@ import {
   "serikaonoe123/moonrdiff" @rdiff,
   "moonbitlang/core/env",
   "moonbitlang/core/buffer",
+  "moonbitlang/core/json",
 }
 
 pkgtype(kind: "executable")

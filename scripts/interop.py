@@ -11,8 +11,8 @@ OUT = ROOT / 'results' / 'interop'
 OUT.mkdir(parents=True, exist_ok=True)
 
 
-def run(args, cwd=ROOT):
-    result = subprocess.run(args, cwd=cwd, capture_output=True, text=True)
+def run(args, cwd=ROOT, input_text=None):
+    result = subprocess.run(args, cwd=cwd, input=input_text, capture_output=True, text=True)
     if result.returncode:
         raise RuntimeError(f'{args[0]} failed: {result.stdout}\n{result.stderr}')
     return result.stdout.strip()
@@ -22,7 +22,9 @@ def probe(*args, cwd=ROOT):
     executable = ROOT / '_build/js/debug/build/cmd/probe/probe.js'
     if not executable.is_file():
         run(['moon', 'build', 'cmd/probe', '--target', 'js'])
-    return bytes.fromhex(run(['node', str(executable), *args], cwd=cwd))
+    # Hex signatures can exceed OS argument limits with many small blocks.
+    return bytes.fromhex(run(['node', str(executable), '--stdin'], cwd=cwd,
+                             input_text=json.dumps(args)))
 
 
 version = subprocess.run(['rdiff', '--version'], capture_output=True, text=True)

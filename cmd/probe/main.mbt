@@ -27,8 +27,24 @@ fn hex(value : Bytes) -> String {
 }
 
 ///|
+extern "js" fn read_stdin() -> String =
+  #| () => require('node:fs').readFileSync(0, 'utf8')
+
+///|
 fn main {
-  let args = @env.args()
+  let actual = @env.args()
+  let args = if actual.length() == 3 && actual[2] == "--stdin" {
+    let values : Array[String] = @json.from_json(@json.parse(read_stdin())) catch {
+      _ => abort("Invalid developer probe request")
+    }
+    let expanded = [actual[0], actual[1]]
+    for value in values {
+      expanded.push(value)
+    }
+    expanded
+  } else {
+    actual
+  }
   if args.length() == 3 && args[2] == "encode-fixture" {
     println(
       hex(
