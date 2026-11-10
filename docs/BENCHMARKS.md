@@ -30,7 +30,7 @@ The 128 MiB tier explicitly raises CLI budgets to 512 MiB. Each case then confir
 
 The script saves per-case progress after correctness checks and preserves failed-case data on the runner. The benchmark workflow uploads reports, command logs, hardware and tool records, not redundant large generated files. Inputs can be reconstructed with the committed generator and hashes. Archive/package inventory remains unchanged.
 
-The workflow runs the fixed baseline first, then the candidate, so cloud-host variation and ordering remain limitations. Its comparison script requires matching input, signature and delta hashes for all 15 cases, successful restores, all 20 default-limit controls per version and equal compiler/configuration metadata. It records regressions too, without a timing pass/fail threshold. Results from that workflow must be inspected before making code-speedup claims.
+The workflow runs the fixed baseline first, then the candidate, so cloud-host variation and ordering remain limitations. Its comparison script requires matching input, signature and delta hashes for all 15 cases, successful restores, all 20 default-limit controls per version and equal compiler/configuration metadata. The historical release baseline only prints opaque error constructors: its checks require the expected constructor, exit 2, empty stdout and no output file. The candidate additionally must print the specific budget reason; reports explicitly distinguish those diagnostic checks. It records regressions too, without a timing pass/fail threshold. Results from that workflow must be inspected before making code-speedup claims.
 
 ## Verified Linux baseline: 2026-11-10
 

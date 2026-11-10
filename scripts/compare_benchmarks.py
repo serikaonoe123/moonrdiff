@@ -35,6 +35,9 @@ def index(report):
                 assert metric['peak_rss_kib']==max(x['peak_rss_kib'] for x in metric['samples'])
     return records
 old,new=index(before),index(after)
+assert len(before['rejection_diagnostics'])==len(after['rejection_diagnostics'])==20
+assert all(not x['specific_reason_verified'] for x in before['rejection_diagnostics'])
+assert all(x['specific_reason_verified'] for x in after['rejection_diagnostics'])
 records=[]
 for key in sorted(expected):
     a,b=old[key],new[key]
@@ -53,6 +56,7 @@ report={'schema_version':1,'status':'success','profile':'release','repetitions':
         'baseline_commit':before['source_commit'],'candidate_commit':after['source_commit'],
         'baseline_executable_sha256':before['executable_sha256'],
         'candidate_executable_sha256':after['executable_sha256'],
+        'rejection_diagnostics':'Historical baseline verifies opaque error constructors; candidate verifies specific budget reasons. Both require exit 2, empty stdout and no output file.',
         'limitations':'Fixed order on one runner, median of three; no confidence intervals or isolated algorithm ranking. Ratios near timer resolution are not meaningful.',
         'records':records}
 path=ROOT/'results/performance-comparison.json'

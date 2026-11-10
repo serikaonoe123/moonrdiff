@@ -63,11 +63,11 @@ for value in ['-1', '1e3', '2147483648', '']:
     invoke('signature', basis, absent, '--max-input', value, code=2)
 invoke('signature', basis, absent, '--unknown', '1', code=2)
 invoke('signature', basis, absent, '--max-input', '1', '--max-input', '2', code=2)
-invoke('signature', basis, absent, '--max-input', '1', code=2)
+assert 'Input byte limit exceeded' in invoke('signature', basis, absent, '--max-input', '1', code=2).stderr
 invoke('signature', basis, absent, '--max-output', '1', code=2)
 invoke('signature', OUT / 'missing', absent, code=2)
 invoke('signature', OUT, absent, code=2)
-invoke('patch', basis, delta, absent, '--max-output', '1', code=2)
+assert 'Output budget exceeded' in invoke('patch', basis, delta, absent, '--max-output', '1', code=2).stderr
 bad = OUT / 'invalid.delta'
 bad.write_bytes(b'bad format')
 invoke('patch', basis, bad, absent, code=2)

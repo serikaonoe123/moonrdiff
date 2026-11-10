@@ -10,5 +10,6 @@
 - Independent rdiff interoperability, file controls, synthetic memory measurements and archive-consumer acceptance workflow.
 - Verified Linux 1/16/128 MiB representative synthetic workloads, transfer costs, per-command time/RSS and default-budget rejection controls; archived report includes slow paths and random-data overhead.
 - Reuse bounded BLAKE2 compression workspaces/local lanes and reduce ring-index arithmetic; add same-runner release comparisons and full release CLI acceptance alongside debug CI.
+- Preserve usage/format/budget error messages in release CLI builds through explicit diagnostic formatting.
 
 Not yet a Mooncakes release. API stabilization, performance improvements and registry-consumer validation remain pending.

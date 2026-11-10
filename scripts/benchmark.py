@@ -126,7 +126,13 @@ def rejected(command,output,reason):
     result=subprocess.run(command,capture_output=True,text=True,timeout=60)
     with (OUT/'commands.log').open('a',encoding='utf8') as stream:
         stream.write(json.dumps(command)+'\n'+result.stdout+result.stderr+'\n')
-    assert result.returncode==2 and reason in result.stderr and not result.stdout and not output.exists(),(command,result.returncode,result.stderr)
+    legacy=report['source_commit']=='79b18247f0b30438c0474cfe80f60fd406554558' and args.label=='baseline' and args.profile=='release'
+    # The fixed historical release CLI interpolates Error and loses its payload.
+    # Do not rewrite that baseline. Record/check its exact constructor instead;
+    # the candidate must emit the specific reason, plus exit 2 and no output.
+    expected=('moonrdiff.DeltaError.Invalid' if reason=='Output budget exceeded' else 'moonrdiff.CliError.Usage') if legacy else reason
+    assert result.returncode==2 and expected in result.stderr and not result.stdout and not output.exists(),(command,result.returncode,result.stderr)
+    report.setdefault('rejection_diagnostics',[]).append({'reason':reason,'specific_reason_verified':not legacy,'expected_diagnostic':expected})
     return True
 
 try:

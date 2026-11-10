@@ -186,11 +186,21 @@ async fn execute(args : Array[String]) -> Int32 {
 }
 
 ///|
+/// Release builds need explicit payload formatting for these public diagnostics.
+fn diagnostic(error : Error) -> String {
+  match error {
+    Usage(message) => message
+    @rdiff.Invalid(message) => message
+    _ => error.to_string()
+  }
+}
+
+///|
 async fn main {
   let code = execute(@env.args()) catch {
     error => {
       @stdio.stderr.write(
-        "moonrdiff: \{error}\nNo existing output was overwritten. A partial new file may remain if writing failed.\n",
+        "moonrdiff: \{diagnostic(error)}\nNo existing output was overwritten. A partial new file may remain if writing failed.\n",
       )
       2
     }
