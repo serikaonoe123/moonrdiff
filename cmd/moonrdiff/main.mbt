@@ -54,10 +54,10 @@ async fn write_new(path : String, data : Bytes) -> Unit {
 
 ///|
 fn help() -> String {
-  "MoonRdiff (incremental signatures; in-memory delta/patch)\n" +
+  "MoonRdiff (incremental signature/patch; in-memory delta)\n" +
   "  signature BASIS SIGNATURE [--block-size N] [--strong-length N] [--chunk-size N]\n" +
   "  delta SIGNATURE TARGET DELTA --basis-size N [--max-checks N]\n" +
-  "  patch BASIS DELTA OUTPUT\n" +
+  "  patch BASIS DELTA OUTPUT [--chunk-size N] [--max-instructions N]\n" +
   "  verify EXPECTED ACTUAL\n" +
   "Options: --max-input N and --max-output N (bytes, default 67108864).\n" +
   "Outputs must be new files. Exit: 0 success, 1 verify mismatch, 2 error.\n"
@@ -96,6 +96,10 @@ async fn execute(args : Array[String]) -> Int32 {
           name == "--chunk-size"
         )
       ) ||
+      (
+        command == "patch" &&
+        (name == "--chunk-size" || name == "--max-instructions")
+      ) ||
       (command == "delta" && (name == "--basis-size" || name == "--max-checks"))
     guard allowed && !options.contains(name) else {
       raise Usage("Unknown or repeated option: " + name)
@@ -118,6 +122,18 @@ async fn execute(args : Array[String]) -> Int32 {
       options.get("--block-size").unwrap_or(2048),
       options.get("--strong-length").unwrap_or(32),
       options.get("--chunk-size").unwrap_or(65536),
+    )
+    return 0
+  }
+  if command == "patch" {
+    patch_file(
+      args[2],
+      args[3],
+      args[4],
+      input_limit,
+      output_limit,
+      options.get("--chunk-size").unwrap_or(65536),
+      options.get("--max-instructions").unwrap_or(1000000),
     )
     return 0
   }

@@ -23,6 +23,13 @@ pub(all) enum Instruction {
   Copy(offset~ : Int32, length~ : Int32)
 }
 
+pub struct PatchDecoder {
+  // private fields
+}
+pub fn PatchDecoder::finish(Self) -> Unit raise DeltaError
+pub fn PatchDecoder::new(basis_size~ : Int32, max_output~ : Int32, max_instructions? : Int32) -> Self raise DeltaError
+pub fn PatchDecoder::push(Self, BytesView) -> Array[Instruction] raise DeltaError
+
 pub struct Signature {
   // private fields
 }

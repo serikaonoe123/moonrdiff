@@ -176,6 +176,12 @@ for block_size in [1, 32, 128]:
         assert streamed.read_bytes() == expected_signature
         records.append({'case': f'native-incremental-{block_size}-{chunk_size}', 'passed': True})
 
+for chunk_size in [1, 7, 65536]:
+    partitioned = native_dir / f'patch-chunk-{chunk_size}.bin'
+    run([str(cli), 'patch', str(basis), str(reference_delta), str(partitioned), '--chunk-size', str(chunk_size)])
+    assert partitioned.read_bytes() == new
+    records.append({'case': f'native-incremental-patch-{chunk_size}', 'passed': True})
+
 report = {'reference': version_text.strip(), 'tests': records,
           'scope': 'in-memory RK/BLAKE2 signature, automatic delta matching, both decoders; sender has no basis file'}
 (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf8')

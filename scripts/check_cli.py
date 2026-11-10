@@ -141,6 +141,28 @@ record = struct.pack('>I', weak) + hashlib.blake2b(block, digest_size=32).digest
 assert large_sig.read_bytes() == struct.pack('>III', 0x72730147, 4096, 32) + record * 2048
 assert info['basis_size'] == 8388608
 
+small_basis, small_delta = OUT / 'small-basis.bin', OUT / 'small.delta'
+small_basis.write_bytes(b'abcdefghijk')
+small_delta.write_bytes(b'rs\x02\x36\x45\x08\x03\x03NEW\x45\x00\x08\x00')
+for chunk_size in [1, 2, 7, 65536]:
+    result_path = OUT / f'patch-chunk-{chunk_size}.bin'
+    info = json.loads(invoke('patch', small_basis, small_delta, result_path,
+                             '--chunk-size', chunk_size).stdout)
+    assert info['incremental'] and result_path.read_bytes() == b'ijkNEWabcdefgh'
+invoke('patch', small_basis, small_delta, absent, '--max-instructions', '2', code=2)
+invoke('patch', small_basis, small_delta, absent, '--chunk-size', '0', code=2)
+invoke('patch', small_basis, small_delta, absent, '--chunk-size', '65537', code=2)
+for index, data in enumerate([small_delta.read_bytes()[:-1], b'rs\x02\x36\x45\xff\x01\x00', small_delta.read_bytes() + b'x']):
+    broken = OUT / f'broken-{index}.delta'
+    broken.write_bytes(data)
+    invoke('patch', small_basis, broken, absent, '--chunk-size', '1', code=2)
+assert not absent.exists()
+large_patch = OUT / 'large-copy.delta'
+large_restored = OUT / 'large-copy.bin'
+large_patch.write_bytes(b'rs\x02\x36\x4f' + struct.pack('>II', 0, 8388608) + b'\x00')
+invoke('patch', large_basis, large_patch, large_restored)
+assert hashlib.sha256(large_restored.read_bytes()).digest() == hashlib.sha256(large_basis.read_bytes()).digest()
+
 report = {'platform': os.name, 'checks': checks, 'passed': True,
           'link_checks_skipped': skip_links,
           'scope': 'native CLI, byte verification, limits and exclusive file creation; all generated data'}
