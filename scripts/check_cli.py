@@ -111,6 +111,36 @@ invoke('patch', empty, empty_delta, empty_restore, '--max-output', '0')
 assert empty_restore.read_bytes() == b''
 assert basis.read_bytes() == old and target.read_bytes() == new
 
+# Incremental signature output must be independent of IO chunk boundaries.
+for chunk_size in [1, 7, 128, 65536]:
+    chunk_sig = OUT / f'chunk-{chunk_size}.sig'
+    info = json.loads(invoke('signature', basis, chunk_sig, '--block-size', '32',
+                             '--chunk-size', chunk_size).stdout)
+    assert info['incremental'] and info['chunk_size'] == chunk_size
+    assert chunk_sig.read_bytes() == sig.read_bytes()
+for chunk_size in ['0', '65537']:
+    invoke('signature', basis, absent, '--chunk-size', chunk_size, code=2)
+invoke('signature', basis, absent, '--block-size', '1048577', code=2)
+assert not absent.exists()
+
+# Multi-chunk input and output; compare with an independent hashlib signature.
+import hashlib
+import struct
+large_basis = OUT / 'multi-chunk.bin'
+large_sig = OUT / 'multi-chunk.sig'
+block = bytes(range(256)) * 16
+with large_basis.open('xb') as stream:
+    for _ in range(2048):
+        stream.write(block)
+info = json.loads(invoke('signature', large_basis, large_sig, '--block-size', '4096',
+                         '--chunk-size', '8191').stdout)
+weak = 1
+for byte in block:
+    weak = (weak * 0x08104225 + byte) & 0xffffffff
+record = struct.pack('>I', weak) + hashlib.blake2b(block, digest_size=32).digest()
+assert large_sig.read_bytes() == struct.pack('>III', 0x72730147, 4096, 32) + record * 2048
+assert info['basis_size'] == 8388608
+
 report = {'platform': os.name, 'checks': checks, 'passed': True,
           'link_checks_skipped': skip_links,
           'scope': 'native CLI, byte verification, limits and exclusive file creation; all generated data'}

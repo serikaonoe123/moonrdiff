@@ -29,6 +29,15 @@ pub struct Signature {
 pub fn Signature::block_count(Self) -> Int32
 pub fn Signature::to_bytes(Self) -> Bytes
 
+pub struct SignatureEncoder {
+  // private fields
+}
+pub fn SignatureEncoder::buffered_bytes(Self) -> Int32
+pub fn SignatureEncoder::finish(Self) -> Bytes raise DeltaError
+pub fn SignatureEncoder::new(block_size? : Int32, strong_length? : Int32, max_blocks? : Int32, max_output? : Int32) -> Self raise DeltaError
+pub fn SignatureEncoder::output_bytes(Self) -> Int32
+pub fn SignatureEncoder::push(Self, BytesView) -> Bytes raise DeltaError
+
 // Type aliases
 
 // Traits

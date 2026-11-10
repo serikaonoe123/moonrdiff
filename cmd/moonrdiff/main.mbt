@@ -54,8 +54,8 @@ async fn write_new(path : String, data : Bytes) -> Unit {
 
 ///|
 fn help() -> String {
-  "MoonRdiff (in-memory file CLI)\n" +
-  "  signature BASIS SIGNATURE [--block-size N] [--strong-length N]\n" +
+  "MoonRdiff (incremental signatures; in-memory delta/patch)\n" +
+  "  signature BASIS SIGNATURE [--block-size N] [--strong-length N] [--chunk-size N]\n" +
   "  delta SIGNATURE TARGET DELTA --basis-size N [--max-checks N]\n" +
   "  patch BASIS DELTA OUTPUT\n" +
   "  verify EXPECTED ACTUAL\n" +
@@ -90,7 +90,11 @@ async fn execute(args : Array[String]) -> Int32 {
       (command != "verify" && name == "--max-output") ||
       (
         command == "signature" &&
-        (name == "--block-size" || name == "--strong-length")
+        (
+          name == "--block-size" ||
+          name == "--strong-length" ||
+          name == "--chunk-size"
+        )
       ) ||
       (command == "delta" && (name == "--basis-size" || name == "--max-checks"))
     guard allowed && !options.contains(name) else {
@@ -105,28 +109,19 @@ async fn execute(args : Array[String]) -> Int32 {
   if command == "delta" && options.get("--basis-size") is None {
     raise Usage("delta requires --basis-size")
   }
-  let first = read_regular(args[2], input_limit)
   if command == "signature" {
-    let result = @rdiff.signature(
-      first,
-      block_size=options.get("--block-size").unwrap_or(2048),
-      strong_length=options.get("--strong-length").unwrap_or(32),
-    )
-    guard result.length() <= output_limit else {
-      raise Usage("Output byte limit exceeded")
-    }
-    write_new(args[3], result)
-    @stdio.stdout.write(
-      (
-        {
-          "command": "signature",
-          "basis_size": first.length(),
-          "signature_bytes": result.length(),
-        } : Json).stringify() +
-      "\n",
+    signature_file(
+      args[2],
+      args[3],
+      input_limit,
+      output_limit,
+      options.get("--block-size").unwrap_or(2048),
+      options.get("--strong-length").unwrap_or(32),
+      options.get("--chunk-size").unwrap_or(65536),
     )
     return 0
   }
+  let first = read_regular(args[2], input_limit)
   let second = read_regular(args[3], input_limit)
   if command == "verify" {
     let matched = first == second

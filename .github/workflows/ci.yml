@@ -36,12 +36,15 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y rdiff
+          sudo apt-get install -y rdiff time
           mkdir -p results
           dpkg-query -W rdiff librsync2 > results/oracle-packages.txt
       - name: Independent rdiff 2.3.4 interoperability
         if: runner.os == 'Linux'
         run: python scripts/interop.py
+      - name: Measure incremental signature memory
+        if: runner.os == 'Linux'
+        run: python scripts/measure_signature.py
       - name: Keep verification evidence
         if: always()
         uses: actions/upload-artifact@v4

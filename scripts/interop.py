@@ -167,6 +167,15 @@ records.append({'case': 'rdiff-delta-to-native-cli', 'passed': True})
 assert json.loads(run([str(cli), 'verify', str(target), str(native_restore)]))['matched']
 records.append({'case': 'native-cli-verify', 'passed': True})
 
+for block_size in [1, 32, 128]:
+    expected_signature = probe('signature', old.hex(), f'{block_size:02x}', '20')
+    for chunk_size in [1, 7, 128, 65536]:
+        streamed = native_dir / f'chunk-{block_size}-{chunk_size}.sig'
+        run([str(cli), 'signature', str(basis), str(streamed), '--block-size', str(block_size),
+             '--chunk-size', str(chunk_size)])
+        assert streamed.read_bytes() == expected_signature
+        records.append({'case': f'native-incremental-{block_size}-{chunk_size}', 'passed': True})
+
 report = {'reference': version_text.strip(), 'tests': records,
           'scope': 'in-memory RK/BLAKE2 signature, automatic delta matching, both decoders; sender has no basis file'}
 (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf8')
