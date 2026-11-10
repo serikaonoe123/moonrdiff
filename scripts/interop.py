@@ -147,7 +147,7 @@ records.append({'case': 'moon-matcher-reuses-shifted-blocks', 'passed': True,
                 'target_bytes': len(new), 'delta_bytes': len(delta_bytes)})
 
 # Exercise actual native file I/O across the same format boundary.
-cli = ROOT / '_build/native/debug/build/cmd/moonrdiff' / ('moonrdiff.exe' if os.name == 'nt' else 'moonrdiff')
+cli = ROOT / '_build/native/debug/build/cmd/moonrdiff' / 'moonrdiff.exe'
 native_dir = OUT / ('native-' + uuid.uuid4().hex)
 native_dir.mkdir()
 basis.write_bytes(old)

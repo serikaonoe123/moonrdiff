@@ -12,7 +12,7 @@ parser.add_argument('--skip-links', action='store_true', help='Explicit local-on
 skip_links = parser.parse_args().skip_links
 
 ROOT = Path(__file__).resolve().parents[1]
-EXE = ROOT / '_build/native/debug/build/cmd/moonrdiff' / ('moonrdiff.exe' if os.name == 'nt' else 'moonrdiff')
+EXE = ROOT / '_build/native/debug/build/cmd/moonrdiff' / 'moonrdiff.exe'
 OUT = ROOT / 'results' / ('cli-' + uuid.uuid4().hex)
 OUT.mkdir(parents=True)
 checks = []

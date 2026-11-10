@@ -6,7 +6,7 @@ import subprocess
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-EXE = ROOT / '_build/native/debug/build/cmd/moonrdiff' / ('moonrdiff.exe' if os.name == 'nt' else 'moonrdiff')
+EXE = ROOT / '_build/native/debug/build/cmd/moonrdiff' / 'moonrdiff.exe'
 if not EXE.is_file():
     raise SystemExit('First run: moon build cmd/moonrdiff --target native')
 out = ROOT / 'results' / ('demo-' + uuid.uuid4().hex)

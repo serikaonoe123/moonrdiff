@@ -16,7 +16,7 @@ python scripts/demo.py
 
 ## 四个命令
 
-以下用 `moon run` 运行；构建后的独立可执行文件接受同样参数。Windows 输出位于 `_build/native/debug/build/cmd/moonrdiff/moonrdiff.exe`，Linux 同目录下为 `moonrdiff`。
+以下用 `moon run` 运行；构建后的独立可执行文件接受同样参数。固定工具链在 Windows 和 Linux 均输出 `_build/native/debug/build/cmd/moonrdiff/moonrdiff.exe`；Linux 的 `.exe` 文件名后缀不影响其作为原生程序执行。
 
 ```sh
 moon run cmd/moonrdiff --target native -- signature old.bin old.sig --block-size 2048
