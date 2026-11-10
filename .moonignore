@@ -16,3 +16,4 @@ __pycache__/
 /CHANGELOG.md
 /README.md
 /packaging/
+/benchmarks/

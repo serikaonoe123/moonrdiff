@@ -1,0 +1,723 @@
+{
+  "schema_version": 1,
+  "generation_only": false,
+  "seed": 20261110,
+  "python": "3.12.16",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "cpu": "x86_64",
+  "logical_cpus": 4,
+  "block_size": 4096,
+  "strong_length": 32,
+  "measurement": "GNU time per native process; end-to-end CLI; one warm-cache sample, fixed order",
+  "limitations": "Not network latency or isolated algorithm speed. MoonRdiff preflights delta/patch in two passes; rdiff differs. No confidence intervals.",
+  "status": "success",
+  "records": [
+    {
+      "nominal_mib": 1,
+      "scenario": "identical",
+      "basis_bytes": 1048576,
+      "target_bytes": 1048576,
+      "basis_sha256": "9bf9f0415bf644a419988c10cfa2e6bd089a16a207feef0f8420e66ebedf17f8",
+      "target_sha256": "9bf9f0415bf644a419988c10cfa2e6bd089a16a207feef0f8420e66ebedf17f8",
+      "moon_signature": {
+        "peak_rss_kib": 3660,
+        "elapsed_seconds": 0.19,
+        "harness_wall_seconds": 0.19189198300000498
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.004223182000004044
+      },
+      "moon_delta": {
+        "peak_rss_kib": 3748,
+        "elapsed_seconds": 0.38,
+        "harness_wall_seconds": 0.3836656830000038
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.004873920999997949
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3044,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.006456686999996464
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.003372831999996606
+      },
+      "signature_bytes": 9228,
+      "delta_bytes": 14,
+      "first_exchange_bytes": 9242,
+      "ref_delta_bytes": 11,
+      "ref_first_exchange_bytes": 9239,
+      "full_transfer_bytes": 1048576,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 1,
+      "scenario": "modified",
+      "basis_bytes": 1048576,
+      "target_bytes": 1048576,
+      "basis_sha256": "9bf9f0415bf644a419988c10cfa2e6bd089a16a207feef0f8420e66ebedf17f8",
+      "target_sha256": "22a104958f78c86f29087448587724fa213a737633515822157f09378766bbe2",
+      "moon_signature": {
+        "peak_rss_kib": 3768,
+        "elapsed_seconds": 0.18,
+        "harness_wall_seconds": 0.1842541099999977
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.004195581000004722
+      },
+      "moon_delta": {
+        "peak_rss_kib": 3768,
+        "elapsed_seconds": 0.37,
+        "harness_wall_seconds": 0.3754478560000081
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.004726645999994616
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3108,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.0067269540000012285
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.0028978389999991805
+      },
+      "signature_bytes": 9228,
+      "delta_bytes": 4124,
+      "first_exchange_bytes": 13352,
+      "ref_delta_bytes": 4119,
+      "ref_first_exchange_bytes": 13347,
+      "full_transfer_bytes": 1048576,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 1,
+      "scenario": "insert-delete",
+      "basis_bytes": 1048576,
+      "target_bytes": 1048576,
+      "basis_sha256": "9bf9f0415bf644a419988c10cfa2e6bd089a16a207feef0f8420e66ebedf17f8",
+      "target_sha256": "275cf94833a0775518f15fc9e4aacf1ee1172f76783fcefcb5cb07a05f73e1f1",
+      "moon_signature": {
+        "peak_rss_kib": 3556,
+        "elapsed_seconds": 0.18,
+        "harness_wall_seconds": 0.18366838499999005
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.004156698000002734
+      },
+      "moon_delta": {
+        "peak_rss_kib": 3660,
+        "elapsed_seconds": 0.37,
+        "harness_wall_seconds": 0.3785785830000066
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.004777002000011521
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3236,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.006426297000004411
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.002759519999997906
+      },
+      "signature_bytes": 9228,
+      "delta_bytes": 8220,
+      "first_exchange_bytes": 17448,
+      "ref_delta_bytes": 8215,
+      "ref_first_exchange_bytes": 17443,
+      "full_transfer_bytes": 1048576,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 1,
+      "scenario": "random",
+      "basis_bytes": 1048576,
+      "target_bytes": 1048576,
+      "basis_sha256": "9bf9f0415bf644a419988c10cfa2e6bd089a16a207feef0f8420e66ebedf17f8",
+      "target_sha256": "98b76eb915b67621760e39182ad0f2e7af90d40044633dd8677253ad87272068",
+      "moon_signature": {
+        "peak_rss_kib": 3620,
+        "elapsed_seconds": 0.17,
+        "harness_wall_seconds": 0.17952590599999496
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.0041388039999930015
+      },
+      "moon_delta": {
+        "peak_rss_kib": 3940,
+        "elapsed_seconds": 0.2,
+        "harness_wall_seconds": 0.20504588499998988
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1992,
+        "elapsed_seconds": 0.02,
+        "harness_wall_seconds": 0.022004066000008038
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3300,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.009226389000005497
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1756,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.003385643000001437
+      },
+      "signature_bytes": 9228,
+      "delta_bytes": 1048661,
+      "first_exchange_bytes": 1057889,
+      "ref_delta_bytes": 1048630,
+      "ref_first_exchange_bytes": 1057858,
+      "full_transfer_bytes": 1048576,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 1,
+      "scenario": "compressed",
+      "basis_bytes": 1048914,
+      "target_bytes": 1044878,
+      "basis_sha256": "abaacd5e7db28aa1baeb0d136284650797cc395db39a27ea812423940d2982a3",
+      "target_sha256": "e764551ca7ecede79de4975f3e8a0ddf447666df49830de531e74902ce7710ae",
+      "moon_signature": {
+        "peak_rss_kib": 3620,
+        "elapsed_seconds": 0.18,
+        "harness_wall_seconds": 0.18967129099999624
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.004217862000004402
+      },
+      "moon_delta": {
+        "peak_rss_kib": 4104,
+        "elapsed_seconds": 0.34,
+        "harness_wall_seconds": 0.3450636999999972
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1800,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.009160672999996677
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3492,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.010556087999987085
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1664,
+        "elapsed_seconds": 0.0,
+        "harness_wall_seconds": 0.003242845999992028
+      },
+      "signature_bytes": 9264,
+      "delta_bytes": 275297,
+      "first_exchange_bytes": 284561,
+      "ref_delta_bytes": 275164,
+      "ref_first_exchange_bytes": 284428,
+      "full_transfer_bytes": 1044878,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 16,
+      "scenario": "identical",
+      "basis_bytes": 16777216,
+      "target_bytes": 16777216,
+      "basis_sha256": "e822776b053c549f57838427df06bedb0fa0cc38f85e7e48510416a15f048e10",
+      "target_sha256": "e822776b053c549f57838427df06bedb0fa0cc38f85e7e48510416a15f048e10",
+      "moon_signature": {
+        "peak_rss_kib": 3556,
+        "elapsed_seconds": 2.8,
+        "harness_wall_seconds": 2.8091251560000075
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.03,
+        "harness_wall_seconds": 0.0367011819999874
+      },
+      "moon_delta": {
+        "peak_rss_kib": 4644,
+        "elapsed_seconds": 5.96,
+        "harness_wall_seconds": 5.964368300999993
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1992,
+        "elapsed_seconds": 0.04,
+        "harness_wall_seconds": 0.04130842999998663
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3492,
+        "elapsed_seconds": 0.04,
+        "harness_wall_seconds": 0.04095075300000417
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.01,
+        "harness_wall_seconds": 0.013576956999997947
+      },
+      "signature_bytes": 147468,
+      "delta_bytes": 14,
+      "first_exchange_bytes": 147482,
+      "ref_delta_bytes": 11,
+      "ref_first_exchange_bytes": 147479,
+      "full_transfer_bytes": 16777216,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 16,
+      "scenario": "modified",
+      "basis_bytes": 16777216,
+      "target_bytes": 16777216,
+      "basis_sha256": "e822776b053c549f57838427df06bedb0fa0cc38f85e7e48510416a15f048e10",
+      "target_sha256": "1575186ab97635ddff505b247a412ff5b1c2629b084d9b64e8e626f96d0c3b5c",
+      "moon_signature": {
+        "peak_rss_kib": 3552,
+        "elapsed_seconds": 2.79,
+        "harness_wall_seconds": 2.7923277639999924
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1748,
+        "elapsed_seconds": 0.03,
+        "harness_wall_seconds": 0.036385649999999714
+      },
+      "moon_delta": {
+        "peak_rss_kib": 4580,
+        "elapsed_seconds": 5.94,
+        "harness_wall_seconds": 5.9483999360000155
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1992,
+        "elapsed_seconds": 0.04,
+        "harness_wall_seconds": 0.04143778599998882
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3552,
+        "elapsed_seconds": 0.04,
+        "harness_wall_seconds": 0.042328653999987864
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.01,
+        "harness_wall_seconds": 0.013782010999989325
+      },
+      "signature_bytes": 147468,
+      "delta_bytes": 4124,
+      "first_exchange_bytes": 151592,
+      "ref_delta_bytes": 4119,
+      "ref_first_exchange_bytes": 151587,
+      "full_transfer_bytes": 16777216,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 16,
+      "scenario": "insert-delete",
+      "basis_bytes": 16777216,
+      "target_bytes": 16777216,
+      "basis_sha256": "e822776b053c549f57838427df06bedb0fa0cc38f85e7e48510416a15f048e10",
+      "target_sha256": "958dfad6be07ac49b95f2ff86f82d49fed78043fc6a4126ea8458c4eb53e739c",
+      "moon_signature": {
+        "peak_rss_kib": 3704,
+        "elapsed_seconds": 2.78,
+        "harness_wall_seconds": 2.790875249999999
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.03,
+        "harness_wall_seconds": 0.036496818999978586
+      },
+      "moon_delta": {
+        "peak_rss_kib": 4644,
+        "elapsed_seconds": 6.04,
+        "harness_wall_seconds": 6.04617859199999
+      },
+      "ref_delta": {
+        "peak_rss_kib": 1992,
+        "elapsed_seconds": 0.04,
+        "harness_wall_seconds": 0.0418337980000274
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3684,
+        "elapsed_seconds": 0.04,
+        "harness_wall_seconds": 0.04266994599998952
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.01,
+        "harness_wall_seconds": 0.013446793000014168
+      },
+      "signature_bytes": 147468,
+      "delta_bytes": 8220,
+      "first_exchange_bytes": 155688,
+      "ref_delta_bytes": 8215,
+      "ref_first_exchange_bytes": 155683,
+      "full_transfer_bytes": 16777216,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 16,
+      "scenario": "random",
+      "basis_bytes": 16777216,
+      "target_bytes": 16777216,
+      "basis_sha256": "e822776b053c549f57838427df06bedb0fa0cc38f85e7e48510416a15f048e10",
+      "target_sha256": "95feacc4b52ad10eb860cbde682a7cad60daa662ae4144ba6c70fb8d351dd03a",
+      "moon_signature": {
+        "peak_rss_kib": 3556,
+        "elapsed_seconds": 2.79,
+        "harness_wall_seconds": 2.7935472769999876
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1688,
+        "elapsed_seconds": 0.03,
+        "harness_wall_seconds": 0.036696123000012904
+      },
+      "moon_delta": {
+        "peak_rss_kib": 4984,
+        "elapsed_seconds": 3.3,
+        "harness_wall_seconds": 3.3067748910000034
+      },
+      "ref_delta": {
+        "peak_rss_kib": 2244,
+        "elapsed_seconds": 0.31,
+        "harness_wall_seconds": 0.3129720479999776
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3960,
+        "elapsed_seconds": 0.06,
+        "harness_wall_seconds": 0.06902471299997615
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1756,
+        "elapsed_seconds": 0.01,
+        "harness_wall_seconds": 0.016460531000006995
+      },
+      "signature_bytes": 147468,
+      "delta_bytes": 16778501,
+      "first_exchange_bytes": 16925969,
+      "ref_delta_bytes": 16777992,
+      "ref_first_exchange_bytes": 16925460,
+      "full_transfer_bytes": 16777216,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 16,
+      "scenario": "compressed",
+      "basis_bytes": 16782354,
+      "target_bytes": 16778320,
+      "basis_sha256": "716e1fcacb3e43f4eef45a82ff16c54794ec25a7963c2496ede0b70ffe12d42e",
+      "target_sha256": "ec5ca2fa68f89a9cef1262a2510d10a37bbb1d7863c5476bb605193494f6ddd3",
+      "moon_signature": {
+        "peak_rss_kib": 3700,
+        "elapsed_seconds": 2.79,
+        "harness_wall_seconds": 2.7920726170000023
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.03,
+        "harness_wall_seconds": 0.03672851300001412
+      },
+      "moon_delta": {
+        "peak_rss_kib": 4900,
+        "elapsed_seconds": 5.52,
+        "harness_wall_seconds": 5.522405921000001
+      },
+      "ref_delta": {
+        "peak_rss_kib": 2056,
+        "elapsed_seconds": 0.1,
+        "harness_wall_seconds": 0.10764113300001554
+      },
+      "moon_patch": {
+        "peak_rss_kib": 4516,
+        "elapsed_seconds": 0.09,
+        "harness_wall_seconds": 0.09393317100000331
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.01,
+        "harness_wall_seconds": 0.012832012000018267
+      },
+      "signature_bytes": 147540,
+      "delta_bytes": 4202581,
+      "first_exchange_bytes": 4350121,
+      "ref_delta_bytes": 4200532,
+      "ref_first_exchange_bytes": 4348072,
+      "full_transfer_bytes": 16778320,
+      "restores_verified": true
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "identical",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "moon_signature": {
+        "peak_rss_kib": 3620,
+        "elapsed_seconds": 22.42,
+        "harness_wall_seconds": 22.425402802000008
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.27,
+        "harness_wall_seconds": 0.27822553299998276
+      },
+      "moon_delta": {
+        "peak_rss_kib": 10536,
+        "elapsed_seconds": 47.65,
+        "harness_wall_seconds": 47.66008902599998
+      },
+      "ref_delta": {
+        "peak_rss_kib": 3656,
+        "elapsed_seconds": 0.31,
+        "harness_wall_seconds": 0.31583112200002006
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3556,
+        "elapsed_seconds": 0.23,
+        "harness_wall_seconds": 0.24044681500001275
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.09,
+        "harness_wall_seconds": 0.0918611799999951
+      },
+      "signature_bytes": 1179660,
+      "delta_bytes": 14,
+      "first_exchange_bytes": 1179674,
+      "ref_delta_bytes": 11,
+      "ref_first_exchange_bytes": 1179671,
+      "full_transfer_bytes": 134217728,
+      "restores_verified": true,
+      "default_limit_controls": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "modified",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "1cb5620b16d3dca5c34f39a2cc39a7b5d58078d1695f91394914e2be66e96769",
+      "moon_signature": {
+        "peak_rss_kib": 3616,
+        "elapsed_seconds": 22.55,
+        "harness_wall_seconds": 22.559303857000003
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.27,
+        "harness_wall_seconds": 0.27661776499996904
+      },
+      "moon_delta": {
+        "peak_rss_kib": 10356,
+        "elapsed_seconds": 47.7,
+        "harness_wall_seconds": 47.70313439099999
+      },
+      "ref_delta": {
+        "peak_rss_kib": 3656,
+        "elapsed_seconds": 0.31,
+        "harness_wall_seconds": 0.3163880879999965
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3700,
+        "elapsed_seconds": 0.27,
+        "harness_wall_seconds": 0.27202248500003634
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.09,
+        "harness_wall_seconds": 0.09206161399998791
+      },
+      "signature_bytes": 1179660,
+      "delta_bytes": 4124,
+      "first_exchange_bytes": 1183784,
+      "ref_delta_bytes": 4119,
+      "ref_first_exchange_bytes": 1183779,
+      "full_transfer_bytes": 134217728,
+      "restores_verified": true,
+      "default_limit_controls": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "insert-delete",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "9b25dc2319b40b08785fd633e64cbba8f2ba2ad8910df456665ebcd6ce7f32a8",
+      "moon_signature": {
+        "peak_rss_kib": 3620,
+        "elapsed_seconds": 22.61,
+        "harness_wall_seconds": 22.613781001000007
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1752,
+        "elapsed_seconds": 0.27,
+        "harness_wall_seconds": 0.27606763199997886
+      },
+      "moon_delta": {
+        "peak_rss_kib": 10428,
+        "elapsed_seconds": 47.53,
+        "harness_wall_seconds": 47.538270805000025
+      },
+      "ref_delta": {
+        "peak_rss_kib": 3656,
+        "elapsed_seconds": 0.31,
+        "harness_wall_seconds": 0.31781552200004626
+      },
+      "moon_patch": {
+        "peak_rss_kib": 3556,
+        "elapsed_seconds": 0.27,
+        "harness_wall_seconds": 0.2722234899999876
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.09,
+        "harness_wall_seconds": 0.09187176099999306
+      },
+      "signature_bytes": 1179660,
+      "delta_bytes": 8220,
+      "first_exchange_bytes": 1187880,
+      "ref_delta_bytes": 8215,
+      "ref_first_exchange_bytes": 1187875,
+      "full_transfer_bytes": 134217728,
+      "restores_verified": true,
+      "default_limit_controls": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "random",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "94c87eebe9fe12cb1cf96a93c14216e59d4ee405ce706ce9929a4a306468a6c5",
+      "moon_signature": {
+        "peak_rss_kib": 3620,
+        "elapsed_seconds": 22.28,
+        "harness_wall_seconds": 22.288992017999988
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1748,
+        "elapsed_seconds": 0.27,
+        "harness_wall_seconds": 0.2761557569999695
+      },
+      "moon_delta": {
+        "peak_rss_kib": 11428,
+        "elapsed_seconds": 31.28,
+        "harness_wall_seconds": 31.29040589599998
+      },
+      "ref_delta": {
+        "peak_rss_kib": 3912,
+        "elapsed_seconds": 2.59,
+        "harness_wall_seconds": 2.598094084999957
+      },
+      "moon_patch": {
+        "peak_rss_kib": 4292,
+        "elapsed_seconds": 0.48,
+        "harness_wall_seconds": 0.48718897500003777
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1756,
+        "elapsed_seconds": 0.11,
+        "harness_wall_seconds": 0.11242034700001113
+      },
+      "signature_bytes": 1179660,
+      "delta_bytes": 134227973,
+      "first_exchange_bytes": 135407633,
+      "ref_delta_bytes": 134223880,
+      "ref_first_exchange_bytes": 135403540,
+      "full_transfer_bytes": 134217728,
+      "restores_verified": true,
+      "default_limit_controls": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "compressed",
+      "basis_bytes": 134258691,
+      "target_bytes": 134254658,
+      "basis_sha256": "bd8ebf120a29957e0e59473fd7c4a40f32bd532d2af77ef9d2136b90054f1775",
+      "target_sha256": "5bb2f172ce5f9bc9f2b2dfdd82dd1b760da366edaef29690388f08f979326add",
+      "moon_signature": {
+        "peak_rss_kib": 3556,
+        "elapsed_seconds": 22.28,
+        "harness_wall_seconds": 22.287864513999978
+      },
+      "ref_signature": {
+        "peak_rss_kib": 1748,
+        "elapsed_seconds": 0.27,
+        "harness_wall_seconds": 0.2758055179999701
+      },
+      "moon_delta": {
+        "peak_rss_kib": 10844,
+        "elapsed_seconds": 45.19,
+        "harness_wall_seconds": 45.193266376
+      },
+      "ref_delta": {
+        "peak_rss_kib": 3784,
+        "elapsed_seconds": 0.87,
+        "harness_wall_seconds": 0.8777889379999806
+      },
+      "moon_patch": {
+        "peak_rss_kib": 4324,
+        "elapsed_seconds": 0.62,
+        "harness_wall_seconds": 0.6212145899999086
+      },
+      "ref_patch": {
+        "peak_rss_kib": 1736,
+        "elapsed_seconds": 0.08,
+        "harness_wall_seconds": 0.08152390099996865
+      },
+      "signature_bytes": 1180056,
+      "delta_bytes": 33554492,
+      "first_exchange_bytes": 34734548,
+      "ref_delta_bytes": 33538101,
+      "ref_first_exchange_bytes": 34718157,
+      "full_transfer_bytes": 134254658,
+      "restores_verified": true,
+      "default_limit_controls": [
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  ],
+  "reference_version": "rdiff (librsync 2.3.4)\nCopyright (C) 1997-2016 by Martin Pool, Andrew Tridgell and others.\nhttp://librsync.sourcefrog.net/\nCapabilities: 64 bit files, trace disabled\n\nlibrsync comes with NO WARRANTY, to the extent permitted by law.\nYou may redistribute copies of librsync under the terms of the GNU\nLesser General Public License.  For more information about these\nmatters, see the files named COPYING.\n",
+  "compiler": "moon 0.1.20261023 (3778465 2026-10-23) ~/.moon/bin/moon\nmoonc v0.10.17+d971670cd (2026-10-23) ~/.moon/bin/moonc\nmoonrun 0.1.20261023 (3778465 2026-10-23) ~/.moon/bin/moonrun\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg\n"
+}

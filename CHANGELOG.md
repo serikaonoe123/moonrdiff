@@ -8,5 +8,6 @@
 - Optional strict BLAKE2b-256 file binding manifests.
 - Corrected exact-block BLAKE2 finalization in an attributed minimal Apache-2.0 adaptation.
 - Independent rdiff interoperability, file controls, synthetic memory measurements and archive-consumer acceptance workflow.
+- Verified Linux 1/16/128 MiB representative synthetic workloads, transfer costs, per-command time/RSS and default-budget rejection controls; archived report includes slow paths and random-data overhead.
 
-Not yet a Mooncakes release. API stabilization, representative benchmarks and registry-consumer validation remain pending.
+Not yet a Mooncakes release. API stabilization, performance improvements and registry-consumer validation remain pending.
