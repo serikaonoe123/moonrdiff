@@ -11,6 +11,14 @@
 
 Pending M0 work: finalize strong-checksum dependency and parameters, complete ecosystem/official-roadmap review, and lock golden signature vectors. Pending M1+: signatures, automatic matching, streaming, file CLI, full four-way interoperability and package publication.
 
+### Executed cloud acceptance
+
+Commit `81437d7167a5ffe03aeeee4ba9f289560fa4c87d` passed [run 42743986333](https://github.com/serikaonoe123/moonrdiff/actions/runs/42743986333) on Windows and Ubuntu 24.04. Both platforms executed 5 core test groups on each of JS, Native and Wasm-GC, alongside checks and builds.
+
+Linux executed all 7 independent interoperability cases successfully: 1 MoonBit-authored mixed COPY/LITERAL patch restored by rdiff, and 6 rdiff-produced deltas restored by MoonBit. Reference executable reports librsync 2.3.4; Ubuntu rdiff package is `2.3.4-1.1ubuntu2`. The package query for `librsync2` returned no version (Ubuntu may use a renamed runtime package), so no exact shared-library package revision is claimed.
+
+The Linux artifact was downloaded and its `interop/report.json` inspected locally at `results/ci-42743986333/`. This establishes the initial codec interchange milestone, not signature generation or automatic delta matching.
+
 ## Dependencies and licensing
 
 - Runtime: MoonBit standard core only at this stage. No third-party checksum implementation selected yet.
