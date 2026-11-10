@@ -32,7 +32,40 @@ The script saves per-case progress after correctness checks and preserves failed
 
 The workflow runs the fixed baseline first, then the candidate, so cloud-host variation and ordering remain limitations. Its comparison script requires matching input, signature and delta hashes for all 15 cases, successful restores, all 20 default-limit controls per version and equal compiler/configuration metadata. The historical release baseline only prints opaque error constructors: its checks require the expected constructor, exit 2, empty stdout and no output file. The candidate additionally must print the specific budget reason; reports explicitly distinguish those diagnostic checks. It records regressions too, without a timing pass/fail threshold. Results from that workflow must be inspected before making code-speedup claims.
 
-## Verified Linux baseline: 2026-11-10
+## Verified release optimization: 2026-11-10
+
+[Run 42786913585](https://github.com/serikaonoe123/moonrdiff/actions/runs/42786913585) compared fixed baseline `79b18247f0b30438c0474cfe80f60fd406554558` with optimized `0ebe8a406f54954c514d0050f129b9af9d32bd87`, both **release** builds. All 15 cases per version passed with three samples per command. All input, signature and delta hashes matched between versions; both tools' repeated restores were verified. Both versions passed 20 default-budget controls, with the historical/candidate diagnostic distinction described above. Downloaded artifacts were matched against all 30 official log records.
+
+Environment: Ubuntu 24.04, AMD EPYC 7763 VM with 4 logical CPUs, Python 3.12.16, zlib 1.3, pinned MoonBit and rdiff versions above. This compares the combined code changes under one build profile, separately from the benefit of selecting release instead of debug.
+
+128 MiB nominal cases; times are medians of three in seconds. Reductions describe this measured run, with no confidence intervals:
+
+| Case | Signature before -> after | Time reduction | Delta before -> after | Time reduction |
+| --- | --- | ---: | --- | ---: |
+| identical | 1.75 -> 1.23 | 29.7% | 4.98 -> 3.10 | 37.8% |
+| modified | 1.76 -> 1.24 | 29.5% | 4.98 -> 3.13 | 37.1% |
+| insert-delete | 1.76 -> 1.26 | 28.4% | 5.14 -> 3.09 | 39.9% |
+| random | 1.78 -> 1.26 | 29.2% | 13.65 -> 12.39 | 9.2% |
+| compressed | 1.78 -> 1.24 | 30.3% | 7.52 -> 5.89 | 21.7% |
+
+The changes keep BLAKE2 G lanes in locals, reuse bounded per-hash/context fixed arrays, and replace ring-index remainders with bounded wraps. Public APIs, digest parameters, patch bytes, candidate budgets and two-pass preflight remain unchanged. At 128 MiB, candidate delta peak RSS ranged from 9888 to 10916 KiB across these cases; index memory still scales with block count. These are not demonstrated memory reductions.
+
+Patch was not the optimization target and its results are retained: 128 MiB medians before -> after were identical 0.24 -> 0.68, modified 0.24 -> 0.26, insert-delete 0.24 -> 0.24, random 0.42 -> 0.44, compressed 0.58 -> 0.61 s. The candidate identical case's three samples were 0.68, 1.11 and 0.25 s. This observed regression prompted the separate follow-up below. Small 1 MiB timers also have insufficient resolution for precise ratios.
+
+[Follow-up run 42788339513](https://github.com/serikaonoe123/moonrdiff/actions/runs/42788339513) measured only that 128 MiB COPY case after one untimed warmup per version, using ten alternating AB/BA pairs with fresh outputs and independent restore hashes. Baseline and candidate median elapsed times were both **0.25 s**, ranges 0.22-0.26 and 0.23-0.26 s. Median user/system CPU times were 0.01/0.18 s baseline and 0.015/0.175 s candidate. All 20 measured restores and two warmups passed. Candidate commit `5e4deb004640b4449600f1b6a65cac28777bc6b1` adds only the follow-up harness/workflow after the measured optimization; its MoonBit source is unchanged from `0ebe8a4`.
+
+The follow-up did not reproduce a systematic COPY-patch regression. It does not establish why the original slow samples occurred, nor prove that all patch cases improve. Both the original result and this follow-up remain public. Reproduce the follow-up by building the two release checkouts, then running `python scripts/measure_patch_comparison.py --baseline-root PATH_TO_BASELINE` from the current repository on Linux with GNU time.
+
+Complete immutable snapshots retain every sample, all reference timings/RSS, hashes and unfavorable cases:
+
+- [Baseline release report](../benchmarks/release-2026-11-10/baseline.json), SHA-256 `827053a26b15fd5474cc2d74d24891c30bb518f4910ef386ba4bbcb934d00c18`.
+- [Candidate release report](../benchmarks/release-2026-11-10/candidate.json), SHA-256 `60de0cb0d4154da326600ee272f93bfa70d2f97c3c2ee41ea2074074bd5fa742`.
+- [Computed comparison](../benchmarks/release-2026-11-10/comparison.json), SHA-256 `720c49f8827d45cc637d7150cd773273878a7d8e02f4b1ca0f8ba961ae456c21`.
+- [Alternating COPY-patch follow-up](../benchmarks/release-2026-11-10/patch-followup.json), SHA-256 `fd3cc3b03533161dadb19cccfd6183ce886607e85891052da38353b6ec4e4044`.
+
+The optimized release commands remain slower than packaged rdiff, whose validation/sync work differs. Random targets still increase transmission bytes. More independent runs, application data, profiling and Windows large-file acceptance remain useful; these results do not claim a universal speedup or multi-gigabyte support.
+
+## Historical default-debug baseline: 2026-11-10
 
 Tested commit: `79b18247f0b30438c0474cfe80f60fd406554558`. [Benchmark run 42782560355](https://github.com/serikaonoe123/moonrdiff/actions/runs/42782560355) passed all 15 cases and 20 negative default-budget checks. The downloaded report's records were compared with all 15 official `BENCH_RESULT` log entries. The [unchanged machine-readable report](../benchmarks/2026-11-10-linux.json) preserves hashes, exact byte counts and all six processes' metrics for every size/scenario; SHA-256: `37d8bc9e995cf23d101e0f3389b70148cf80ab4166f069ad4ec0d75451745229`.
 
@@ -60,4 +93,4 @@ For the same tier, triplets are **signature / delta / patch**. Times are seconds
 
 Local changes saved transfer bytes in these fixtures. Independent random targets made the first exchange about 0.89% larger than full transfer at all three sizes, so callers should support choosing full transfer when a delta is uneconomic. No automatic transport selection is implemented. The compressed fixture uses gzip over pseudorandom bytes; its result does not characterize arbitrary archives, media or a real application corpus.
 
-Current signature and delta commands are substantially slower than packaged rdiff. At 128 MiB, signature took about 22 seconds and delta 31–48 seconds. Moon delta RSS peaked at 11,428 KiB in these samples and its index still scales with block count. The next performance work should establish an optimized-build baseline and profile hashing/matching before claiming improvements. This run does not establish Windows 128 MiB acceptance, multi-gigabyte support, input snapshots or transactional publication.
+In that initial debug run, signature took about 22 seconds and delta 31–48 seconds at 128 MiB. Moon delta RSS peaked at 11,428 KiB and its index still scales with block count. These measurements motivated the controlled release comparison above; comparing different runs/build profiles does not isolate a code-change speedup. This run does not establish Windows 128 MiB acceptance, multi-gigabyte support, input snapshots or transactional publication.

@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "status": "success",
+  "baseline_commit": "79b18247f0b30438c0474cfe80f60fd406554558",
+  "candidate_commit": "5e4deb004640b4449600f1b6a65cac28777bc6b1",
+  "profile": "release",
+  "basis_bytes": 134217728,
+  "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+  "delta_sha256": "a3febdbf4bf219d1475f578ec1abf92fd859dd4b2aec1713d6d2080354accd64",
+  "protocol": "One untimed warmup per version; ten measured pairs, alternating AB/BA order; fresh output and independent SHA256 for every invocation.",
+  "limitations": "Single cloud runner; end-to-end sync IO; alternating order reduces but does not eliminate host/disk variation. CPU time does not identify the cause of waits.",
+  "records": [
+    {
+      "pair": 0,
+      "label": "baseline",
+      "peak_rss_kib": 3280,
+      "elapsed_seconds": 0.26,
+      "user_seconds": 0.01,
+      "system_seconds": 0.18,
+      "restore_verified": true
+    },
+    {
+      "pair": 0,
+      "label": "candidate",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.01,
+      "system_seconds": 0.17,
+      "restore_verified": true
+    },
+    {
+      "pair": 1,
+      "label": "candidate",
+      "peak_rss_kib": 3120,
+      "elapsed_seconds": 0.23,
+      "user_seconds": 0.01,
+      "system_seconds": 0.18,
+      "restore_verified": true
+    },
+    {
+      "pair": 1,
+      "label": "baseline",
+      "peak_rss_kib": 3232,
+      "elapsed_seconds": 0.23,
+      "user_seconds": 0.01,
+      "system_seconds": 0.17,
+      "restore_verified": true
+    },
+    {
+      "pair": 2,
+      "label": "baseline",
+      "peak_rss_kib": 3232,
+      "elapsed_seconds": 0.24,
+      "user_seconds": 0.01,
+      "system_seconds": 0.18,
+      "restore_verified": true
+    },
+    {
+      "pair": 2,
+      "label": "candidate",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.02,
+      "system_seconds": 0.19,
+      "restore_verified": true
+    },
+    {
+      "pair": 3,
+      "label": "candidate",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.26,
+      "user_seconds": 0.01,
+      "system_seconds": 0.19,
+      "restore_verified": true
+    },
+    {
+      "pair": 3,
+      "label": "baseline",
+      "peak_rss_kib": 3104,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.03,
+      "system_seconds": 0.18,
+      "restore_verified": true
+    },
+    {
+      "pair": 4,
+      "label": "baseline",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.01,
+      "system_seconds": 0.2,
+      "restore_verified": true
+    },
+    {
+      "pair": 4,
+      "label": "candidate",
+      "peak_rss_kib": 3164,
+      "elapsed_seconds": 0.24,
+      "user_seconds": 0.01,
+      "system_seconds": 0.17,
+      "restore_verified": true
+    },
+    {
+      "pair": 5,
+      "label": "candidate",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.02,
+      "system_seconds": 0.17,
+      "restore_verified": true
+    },
+    {
+      "pair": 5,
+      "label": "baseline",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.26,
+      "user_seconds": 0.02,
+      "system_seconds": 0.19,
+      "restore_verified": true
+    },
+    {
+      "pair": 6,
+      "label": "baseline",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.24,
+      "user_seconds": 0.01,
+      "system_seconds": 0.18,
+      "restore_verified": true
+    },
+    {
+      "pair": 6,
+      "label": "candidate",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.01,
+      "system_seconds": 0.18,
+      "restore_verified": true
+    },
+    {
+      "pair": 7,
+      "label": "candidate",
+      "peak_rss_kib": 3224,
+      "elapsed_seconds": 0.24,
+      "user_seconds": 0.02,
+      "system_seconds": 0.16,
+      "restore_verified": true
+    },
+    {
+      "pair": 7,
+      "label": "baseline",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.26,
+      "user_seconds": 0.02,
+      "system_seconds": 0.19,
+      "restore_verified": true
+    },
+    {
+      "pair": 8,
+      "label": "baseline",
+      "peak_rss_kib": 3300,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.01,
+      "system_seconds": 0.16,
+      "restore_verified": true
+    },
+    {
+      "pair": 8,
+      "label": "candidate",
+      "peak_rss_kib": 3108,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.03,
+      "system_seconds": 0.18,
+      "restore_verified": true
+    },
+    {
+      "pair": 9,
+      "label": "candidate",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.25,
+      "user_seconds": 0.02,
+      "system_seconds": 0.17,
+      "restore_verified": true
+    },
+    {
+      "pair": 9,
+      "label": "baseline",
+      "peak_rss_kib": 3236,
+      "elapsed_seconds": 0.22,
+      "user_seconds": 0.01,
+      "system_seconds": 0.16,
+      "restore_verified": true
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "median_elapsed_seconds": 0.25,
+      "median_user_seconds": 0.01,
+      "median_system_seconds": 0.18
+    },
+    "candidate": {
+      "median_elapsed_seconds": 0.25,
+      "median_user_seconds": 0.015,
+      "median_system_seconds": 0.175
+    }
+  }
+}
