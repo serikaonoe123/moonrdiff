@@ -1,0 +1,9 @@
+import {
+  "serikaonoe123/moonrdiff" @rdiff,
+  "moonbitlang/core/env",
+  "moonbitlang/core/buffer",
+}
+
+pkgtype(kind: "executable")
+
+supported_targets = "js"

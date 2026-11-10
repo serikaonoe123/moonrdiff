@@ -1,0 +1,22 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "serikaonoe123/moonrdiff"
+
+// Values
+pub fn encode(Array[Instruction]) -> Bytes raise DeltaError
+
+pub fn patch(Bytes, Bytes, max_output~ : Int32) -> Bytes raise DeltaError
+
+// Errors
+pub suberror DeltaError {
+  Invalid(String)
+}
+
+// Types and methods
+pub(all) enum Instruction {
+  Literal(Bytes)
+  Copy(offset~ : Int32, length~ : Int32)
+}
+
+// Type aliases
+
+// Traits
