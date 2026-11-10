@@ -30,7 +30,7 @@ let blake2b_sigma : Array[Array[Int32]] = [
 ///|
 /// BLAKE2b G function (rotations 32, 24, 16, 63).
 fn blake2b_g(
-  v : Array[UInt64],
+  v : FixedArray[UInt64],
   a : Int32,
   b : Int32,
   c : Int32,
@@ -38,14 +38,24 @@ fn blake2b_g(
   x : UInt64,
   y : UInt64,
 ) -> Unit {
-  v[a] = v[a] + v[b] + x
-  v[d] = rotr64(v[d] ^ v[a], 32)
-  v[c] = v[c] + v[d]
-  v[b] = rotr64(v[b] ^ v[c], 24)
-  v[a] = v[a] + v[b] + y
-  v[d] = rotr64(v[d] ^ v[a], 16)
-  v[c] = v[c] + v[d]
-  v[b] = rotr64(v[b] ^ v[c], 63)
+  // The four indices are distinct in every compression call. Keep each lane
+  // local throughout G instead of repeatedly loading/storing mutable arrays.
+  let mut va = v[a]
+  let mut vb = v[b]
+  let mut vc = v[c]
+  let mut vd = v[d]
+  va = va + vb + x
+  vd = rotr64(vd ^ va, 32)
+  vc += vd
+  vb = rotr64(vb ^ vc, 24)
+  va = va + vb + y
+  vd = rotr64(vd ^ va, 16)
+  vc += vd
+  vb = rotr64(vb ^ vc, 63)
+  v[a] = va
+  v[b] = vb
+  v[c] = vc
+  v[d] = vd
 }
 
 ///|
@@ -53,12 +63,12 @@ fn blake2b_g(
 /// `t` is the total bytes processed so far (including this block);
 /// `last` sets the last-block flag (inverts v[14]).
 fn blake2b_compress(
-  h : Array[UInt64],
-  block : Array[UInt64],
+  h : FixedArray[UInt64],
+  block : FixedArray[UInt64],
+  v : FixedArray[UInt64],
   t : UInt64,
   last : Bool,
 ) -> Unit {
-  let v = Array::make(16, 0UL)
   for i in 0..<=7 {
     v[i] = h[i]
     v[i + 8] = blake2b_iv[i]
@@ -102,7 +112,9 @@ pub fn blake2b(data : Bytes, out_len : Int32) -> Bytes {
   if out_len < 1 || out_len > 64 {
     abort("blake2b: out_len must be in 1..64")
   }
-  let h = Array::make(8, 0UL)
+  let h = FixedArray::make(8, 0UL)
+  let block = FixedArray::make(16, 0UL)
+  let work = FixedArray::make(16, 0UL)
   for i in 0..<=7 {
     h[i] = blake2b_iv[i]
   }
@@ -113,12 +125,11 @@ pub fn blake2b(data : Bytes, out_len : Int32) -> Bytes {
   let mut t = 0UL
   // full 128-byte blocks
   while len - offset > 128 {
-    let block = Array::make(16, 0UL)
     for i in 0..<=15 {
       block[i] = blake2b_read_lane(data, offset + i * 8)
     }
     t = t + 128UL
-    blake2b_compress(h, block, t, false)
+    blake2b_compress(h, block, work, t, false)
     offset = offset + 128
   }
   // last block: copy remaining bytes into a zero-padded 128-byte buffer
@@ -128,12 +139,11 @@ pub fn blake2b(data : Bytes, out_len : Int32) -> Bytes {
     padded[i] = data[offset + i]
   }
   let last_bytes = Bytes::from_array(padded[:])
-  let block2 = Array::make(16, 0UL)
   for i in 0..<=15 {
-    block2[i] = blake2b_read_lane(last_bytes, i * 8)
+    block[i] = blake2b_read_lane(last_bytes, i * 8)
   }
   t = t + rem.to_uint64()
-  blake2b_compress(h, block2, t, true)
+  blake2b_compress(h, block, work, t, true)
   // output: first out_len bytes of h, little-endian per word
   let out = Array::make(out_len, b'\x00')
   for i in 0..<=7 {

@@ -14,6 +14,8 @@ python scripts/demo.py
 
 下列 Python 演示与验收脚本从完整 GitHub 仓库运行，精简 Mooncakes 源码包不包含 scripts 目录。演示脚本只生成虚构文件，通过原生命令行依次生成摘要、计算补丁、还原、校验。每次使用新的 `results/demo-*` 目录，保留全部结果。报告同时给出摘要与补丁合计大小，避免把单独补丁大小误当作首次交换成本。
 
+性能运行可使用 `moon build cmd/moonrdiff --target native --release`，可执行文件位于 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。省略 `--release` 时仍生成 debug 文件，演示脚本默认使用它；完整仓库中的验收脚本可用 `python scripts/check_cli.py --profile release` 检查 release 文件。性能对照必须记录并使用相同构建模式。
+
 ## 文件命令
 
 以下用 `moon run` 运行；构建后的独立可执行文件接受同样参数。固定工具链在 Windows 和 Linux 均输出 `_build/native/debug/build/cmd/moonrdiff/moonrdiff.exe`；Linux 的 `.exe` 文件名后缀不影响其作为原生程序执行。

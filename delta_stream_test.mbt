@@ -49,7 +49,7 @@ test "streamed matching preserves boundaries tails and global budgets" {
       (b"abcdefghijk", b"abcdhijk"),
       (b"abcabcabcabc", b"abc!abcabcabc"),
     ] {
-    for block_size in [1, 4, 8, 32] {
+    for block_size in [1, 3, 4, 7, 8, 17, 32] {
       for chunk_size in [1, 2, 7, 65536] {
         for checks in [0, 1, 10000] {
           ignore(streamed_delta(basis, target, block_size, chunk_size, checks))
@@ -69,7 +69,7 @@ test "streamed matching preserves boundaries tails and global budgets" {
     target.write_bytes(basis[cut:basis.length()])
     target.write_bytes(b"insert")
     target.write_bytes(basis[0:cut])
-    for block_size in [1, 4, 8, 32] {
+    for block_size in [1, 3, 4, 7, 8, 17, 32] {
       ignore(streamed_delta(basis, target.to_bytes(), block_size, 7, 10000))
     }
   }

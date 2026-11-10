@@ -9,7 +9,9 @@ pub suberror HashStateError {
 ///|
 /// Unkeyed, fixed BLAKE2b-256; bounded pushes and a 128-byte pending block.
 pub struct Blake2b256 {
-  priv h : Array[UInt64]
+  priv h : FixedArray[UInt64]
+  priv words : FixedArray[UInt64]
+  priv work : FixedArray[UInt64]
   priv pending : Array[Byte]
   priv mut used : Int32
   priv mut total : UInt64
@@ -18,12 +20,20 @@ pub struct Blake2b256 {
 
 ///|
 pub fn Blake2b256::new() -> Blake2b256 {
-  let h = Array::make(8, 0UL)
+  let h = FixedArray::make(8, 0UL)
   for i in 0..<8 {
     h[i] = blake2b_iv[i]
   }
   h[0] = h[0] ^ 0x01010020UL
-  { h, pending: Array::make(128, b'\x00'), used: 0, total: 0UL, closed: false, }
+  {
+    h,
+    words: FixedArray::make(16, 0UL),
+    work: FixedArray::make(16, 0UL),
+    pending: Array::make(128, b'\x00'),
+    used: 0,
+    total: 0UL,
+    closed: false,
+  }
 }
 
 ///|
@@ -32,12 +42,11 @@ fn Blake2b256::compress(self : Blake2b256, last : Bool) -> Unit {
     self.pending[i] = b'\x00'
   }
   let bytes = Bytes::from_array(self.pending[:])
-  let words = Array::make(16, 0UL)
   for i in 0..<16 {
-    words[i] = blake2b_read_lane(bytes, i * 8)
+    self.words[i] = blake2b_read_lane(bytes, i * 8)
   }
   self.total += self.used.to_uint64()
-  blake2b_compress(self.h, words, self.total, last)
+  blake2b_compress(self.h, self.words, self.work, self.total, last)
   self.used = 0
 }
 

@@ -9,10 +9,12 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--skip-links', action='store_true', help='Explicit local-only restriction; CI does not pass this option.')
-skip_links = parser.parse_args().skip_links
+parser.add_argument('--profile', choices=['debug','release'], default='debug')
+args = parser.parse_args()
+skip_links = args.skip_links
 
 ROOT = Path(__file__).resolve().parents[1]
-EXE = ROOT / '_build/native/debug/build/cmd/moonrdiff' / 'moonrdiff.exe'
+EXE = ROOT / f'_build/native/{args.profile}/build/cmd/moonrdiff' / 'moonrdiff.exe'
 OUT = ROOT / 'results' / ('cli-' + uuid.uuid4().hex)
 OUT.mkdir(parents=True)
 checks = []
@@ -223,6 +225,7 @@ invoke('manifest',basis,target,delta,absent,'--max-output','1',code=2)
 assert not absent.exists()
 
 report = {'platform': os.name, 'checks': checks, 'passed': True,
+          'profile': args.profile,
           'link_checks_skipped': skip_links,
           'scope': 'native CLI, byte verification, limits and exclusive file creation; all generated data'}
 (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf8')

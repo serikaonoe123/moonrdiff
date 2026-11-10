@@ -87,7 +87,13 @@ pub fn DeltaEncoder::new(
 
 ///|
 fn DeltaEncoder::byte(self : DeltaEncoder, index : Int32) -> Byte {
-  self.ring[(self.head + index) % self.signature.block_size]
+  // head and index are each below block_size, so at most one wrap is needed.
+  let slot = self.head + index
+  self.ring[if slot >= self.signature.block_size {
+    slot - self.signature.block_size
+  } else {
+    slot
+  }]
 }
 
 ///|
@@ -115,7 +121,11 @@ fn DeltaEncoder::pop(self : DeltaEncoder) -> Unit {
   } else {
     self.tail_weak = self.weak
   }
-  self.head = (self.head + 1) % self.signature.block_size
+  self.head = if self.head + 1 == self.signature.block_size {
+    0
+  } else {
+    self.head + 1
+  }
   self.count -= 1
   self.power = next_power
 }
@@ -213,7 +223,12 @@ pub fn DeltaEncoder::push(
   }
   self.received += chunk.length()
   for byte in chunk {
-    self.ring[(self.head + self.count) % self.signature.block_size] = byte
+    let slot = self.head + self.count
+    self.ring[if slot >= self.signature.block_size {
+      slot - self.signature.block_size
+    } else {
+      slot
+    }] = byte
     if self.count < self.tail {
       self.tail_weak = self.tail_weak * 0x08104225U + byte.to_uint()
     }

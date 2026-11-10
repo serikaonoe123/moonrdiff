@@ -32,6 +32,10 @@ jobs:
         run: moon update
       - name: Check, build and test
         run: python scripts/check.py
+      - name: Release native CLI acceptance
+        run: |
+          moon build cmd/moonrdiff --target native --release --deny-warn
+          python scripts/check_cli.py --profile release
       - name: Archive policy and independent consumers
         run: python scripts/check_package.py
       - name: Install reference tool from Ubuntu signed repository

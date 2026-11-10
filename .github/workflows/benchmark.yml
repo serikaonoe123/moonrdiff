@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['scripts/benchmark.py', '.github/workflows/benchmark.yml']
+    paths: ['scripts/benchmark.py', 'scripts/compare_benchmarks.py', '.github/workflows/benchmark.yml']
 permissions:
   contents: read
 jobs:
@@ -22,7 +22,18 @@ jobs:
           version: '0.10.17+d971670cd'
           core-version: '0.10.17+d971670cd'
       - run: moon update
-      - run: moon build cmd/moonrdiff --target native --deny-warn
+      - run: moon build cmd/moonrdiff --target native --release --deny-warn
+      - name: Check out fixed pre-optimization source
+        uses: actions/checkout@v4
+        with:
+          ref: 79b18247f0b30438c0474cfe80f60fd406554558
+          path: results/baseline-source
+          persist-credentials: false
+      - name: Build baseline release with the same compiler
+        working-directory: results/baseline-source
+        run: |
+          moon update
+          moon build cmd/moonrdiff --target native --release --deny-warn
       - name: Install reference and measurement tools
         run: |
           sudo apt-get update
@@ -30,8 +41,12 @@ jobs:
           mkdir -p results
           lscpu > results/cpu.txt
           dpkg-query -W rdiff time > results/benchmark-tools.txt
-      - name: Benchmark and verify 1 16 128 MiB workloads
-        run: python scripts/benchmark.py
+      - name: Benchmark fixed baseline release with three repetitions
+        run: python scripts/benchmark.py --profile release --source-root results/baseline-source --label baseline --repetitions 3
+      - name: Benchmark current release with three repetitions
+        run: python scripts/benchmark.py --profile release --label candidate --repetitions 3
+      - name: Compare matched inputs and unchanged output bytes
+        run: python scripts/compare_benchmarks.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -41,3 +56,4 @@ jobs:
             results/**/commands.log
             results/cpu.txt
             results/benchmark-tools.txt
+            results/performance-comparison.json
