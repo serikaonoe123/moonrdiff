@@ -2,3 +2,5 @@
 /.mooncakes/
 /results/
 /.env
+__pycache__/
+*.pyc

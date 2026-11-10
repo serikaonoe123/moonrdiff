@@ -4,7 +4,11 @@ package "serikaonoe123/moonrdiff"
 // Values
 pub fn encode(Array[Instruction]) -> Bytes raise DeltaError
 
+pub fn parse_signature(Bytes, max_blocks? : Int32) -> Signature raise DeltaError
+
 pub fn patch(Bytes, Bytes, max_output~ : Int32) -> Bytes raise DeltaError
+
+pub fn signature(Bytes, block_size? : Int32, strong_length? : Int32, max_blocks? : Int32) -> Bytes raise DeltaError
 
 // Errors
 pub suberror DeltaError {
@@ -16,6 +20,12 @@ pub(all) enum Instruction {
   Literal(Bytes)
   Copy(offset~ : Int32, length~ : Int32)
 }
+
+pub struct Signature {
+  // private fields
+}
+pub fn Signature::block_count(Self) -> Int32
+pub fn Signature::to_bytes(Self) -> Bytes
 
 // Type aliases
 

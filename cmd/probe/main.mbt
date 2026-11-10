@@ -41,6 +41,23 @@ fn main {
         },
       ),
     )
+  } else if args.length() == 6 && args[2] == "signature" {
+    println(
+      hex(
+        @rdiff.signature(
+          unhex(args[3]),
+          block_size=unhex(args[4])[0].to_int(),
+          strong_length=unhex(args[5])[0].to_int(),
+        ) catch {
+          _ => abort("Invalid signature configuration")
+        },
+      ),
+    )
+  } else if args.length() == 4 && args[2] == "signature-roundtrip" {
+    let signature = @rdiff.parse_signature(unhex(args[3])) catch {
+      _ => abort("Invalid signature input")
+    }
+    println(hex(signature.to_bytes()))
   } else if args.length() == 5 && args[2] == "patch" {
     println(
       hex(

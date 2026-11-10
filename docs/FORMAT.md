@@ -1,6 +1,6 @@
 # Initial format contract
 
-Status: explicit-instruction codec prototype, not a remote delta matcher.
+Status: signature generation/reading and explicit-instruction codec; automatic delta matching is pending.
 
 ## Supported delta data
 
@@ -13,9 +13,17 @@ Status: explicit-instruction codec prototype, not a remote delta matcher.
 - Copy addresses the old basis, never the output under construction.
 - Raw deltas do not authenticate the basis or result. The caller must bind them to the correct files; this prototype does not add a verification manifest.
 
-## Planned signature profile
+## Supported signature profile
 
-Target: `RS_RK_BLAKE2_SIG_MAGIC` (0x72730147). No signature reader, writer or checksum implementation exists yet. BLAKE2 variant/parameters, truncation and rolling-checksum vectors must be established against the fixed reference before advertising support. Strong-checksum dependency selection is pending.
+`RS_RK_BLAKE2_SIG_MAGIC` (0x72730147) only. Header has positive Int32 block size and strong length 1..32. Each record contains a 32-bit unsigned weak checksum followed by the truncated strong digest. The last basis block may be short. Empty files produce just the header.
+
+The weak checksum is the polynomial H = M^n + sum(byte[i] * M^(n-1-i)) modulo 2^32, with M = 0x08104225. The strong checksum is unkeyed BLAKE2b with output size 32, then its first strong_length bytes. It is not BLAKE2b configured to produce strong_length bytes.
+
+API: signature(basis, block_size=2048, strong_length=32, max_blocks=1000000); parse_signature(bytes, max_blocks=1000000); Signature::block_count and Signature::to_bytes. This phase operates entirely in memory. Parsing preserves block order and bounds count before allocating records.
+
+The format contains no record count, original length, or end marker. Removing an entire record yields another structurally valid signature; the parser cannot detect this. The record count cannot determine the original last block length. File binding and expected size must be supplied at the application layer.
+
+Dependency: cc06b/mooncry 0.71.0 (Apache-2.0), registry package. Original polynomial-checksum code expresses the format equation; no librsync source routines were copied or translated.
 
 ## References
 

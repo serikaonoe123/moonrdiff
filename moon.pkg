@@ -1,3 +1,4 @@
 import {
   "moonbitlang/core/buffer",
+  "cc06b/mooncry/lib" @crypto,
 }
