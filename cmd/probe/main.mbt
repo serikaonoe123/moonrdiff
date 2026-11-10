@@ -74,7 +74,8 @@ fn main {
       _ => abort("Invalid signature input")
     }
     println(hex(signature.to_bytes()))
-  } else if args.length() == 6 && args[2] == "delta" {
+  } else if args.length() == 6 &&
+    (args[2] == "delta" || args[2] == "delta-stream") {
     let signature = @rdiff.parse_signature(unhex(args[3])) catch {
       _ => abort("Invalid signature")
     }
@@ -85,7 +86,24 @@ fn main {
     }
     println(
       hex(
-        @rdiff.delta(signature, unhex(args[4]), basis_size~) catch {
+        try {
+          if args[2] == "delta" {
+            @rdiff.delta(signature, unhex(args[4]), basis_size~)
+          } else {
+            let encoder = @rdiff.DeltaEncoder::new(signature, basis_size~)
+            let target = unhex(args[4])
+            let out = @buffer.Buffer()
+            let mut position = 0
+            while position < target.length() {
+              let left = target.length() - position
+              let n = if left < 7 { left } else { 7 }
+              out.write_bytes(encoder.push(target[position:position + n]))
+              position += n
+            }
+            out.write_bytes(encoder.finish())
+            out.to_bytes()
+          }
+        } catch {
           _ => abort("Invalid delta input")
         },
       ),

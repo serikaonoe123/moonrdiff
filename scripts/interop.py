@@ -121,10 +121,11 @@ for case_index, (old, new) in enumerate(matching_cases):
             supplied_sig = sender / 'basis.sig'
             supplied_sig.write_bytes(signature_bytes)
             (sender / 'target.bin').write_bytes(new)
-            for generator in ['moon', 'rdiff']:
+            for generator in ['moon', 'moon-stream', 'rdiff']:
                 generated = sender / 'generated.delta'
-                if generator == 'moon':
-                    generated.write_bytes(probe('delta', signature_bytes.hex(), new.hex(),
+                if generator in ['moon', 'moon-stream']:
+                    operation = 'delta' if generator == 'moon' else 'delta-stream'
+                    generated.write_bytes(probe(operation, signature_bytes.hex(), new.hex(),
                                                 len(old).to_bytes(4, 'big').hex(), cwd=sender))
                 else:
                     run(['rdiff', '-f', 'delta', str(supplied_sig), str(sender / 'target.bin'),
@@ -181,6 +182,18 @@ for chunk_size in [1, 7, 65536]:
     run([str(cli), 'patch', str(basis), str(reference_delta), str(partitioned), '--chunk-size', str(chunk_size)])
     assert partitioned.read_bytes() == new
     records.append({'case': f'native-incremental-patch-{chunk_size}', 'passed': True})
+
+previous = None
+for chunk_size in [1, 2, 7, 65536]:
+    partitioned = native_dir / f'delta-chunk-{chunk_size}.delta'
+    run([str(cli), 'delta', str(native_sig), str(target), str(partitioned),
+         '--basis-size', str(len(old)), '--chunk-size', str(chunk_size)])
+    encoded = partitioned.read_bytes()
+    assert previous is None or previous == encoded
+    previous = encoded
+    run(['rdiff', '-f', 'patch', str(basis), str(partitioned), str(restored)])
+    assert restored.read_bytes() == new
+    records.append({'case': f'native-incremental-delta-{chunk_size}', 'passed': True})
 
 report = {'reference': version_text.strip(), 'tests': records,
           'scope': 'in-memory RK/BLAKE2 signature, automatic delta matching, both decoders; sender has no basis file'}

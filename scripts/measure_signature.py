@@ -34,9 +34,22 @@ for size in [4 * 1024 * 1024, 32 * 1024 * 1024]:
     assert json.loads(completed_patch.stdout)['incremental']
     with source.open('rb') as a, restored.open('rb') as b:
         assert hashlib.file_digest(a, 'sha256').digest() == hashlib.file_digest(b, 'sha256').digest()
+    generated, generated_restore, delta_metrics = [out / f'{size}.{suffix}' for suffix in ['generated.delta','generated-restored','delta-time']]
+    completed_delta = subprocess.run(['/usr/bin/time', '-f', '%M %e', '-o', str(delta_metrics),
+                                      str(exe), 'delta', str(signature), str(source), str(generated),
+                                      '--basis-size', str(size)],
+                                     capture_output=True,text=True,check=True,timeout=120)
+    delta_rss, delta_elapsed = delta_metrics.read_text().split()
+    assert json.loads(completed_delta.stdout)['incremental']
+    subprocess.run([str(exe),'patch',str(source),str(generated),str(generated_restore)],
+                   capture_output=True,check=True,timeout=120)
+    with source.open('rb') as a, generated_restore.open('rb') as b:
+        assert hashlib.file_digest(a,'sha256').digest() == hashlib.file_digest(b,'sha256').digest()
     records.append({'input_bytes': size, 'signature_bytes': signature.stat().st_size,
                     'peak_rss_kib': int(rss), 'elapsed_seconds': float(elapsed),
-                    'patch_peak_rss_kib': int(patch_rss), 'patch_elapsed_seconds': float(patch_elapsed)})
+                    'patch_peak_rss_kib': int(patch_rss), 'patch_elapsed_seconds': float(patch_elapsed),
+                    'delta_peak_rss_kib': int(delta_rss),'delta_elapsed_seconds': float(delta_elapsed),
+                    'delta_bytes': generated.stat().st_size,'signature_blocks': size // 4096})
 (out / 'report.json').write_text(json.dumps({'platform': platform.platform(),
     'measurement': 'GNU time peak RSS of each native child, KiB',
     'block_size': 4096, 'chunk_size': 65536, 'samples': records,

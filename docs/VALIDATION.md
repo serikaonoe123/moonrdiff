@@ -87,3 +87,14 @@ Commit `36af20d4b5a7685c2b0a22e9d20040e74d6b563c` passed [run 42770730851](https
 - Local file acceptance passed 50 checks with explicit --skip-links, including 8 MiB restored-copy verification, malformed preflight leaving no output, chunk boundaries and instruction limits. The previously refused local link operation was not retried. Default cloud runs schedule 51 checks on Windows and 52 on Linux, with full link coverage.
 - Linux reference matrix adds 3 native partitioned-patch cases to the previous 241 (244 total). Child-process measurements now also record 4 MiB/32 MiB pure-COPY restore RSS and independently compare file hashes. Current execution results require this milestone's own CI artifact.
 - Automatic delta matching remains in memory; incremental matching, trusted file binding, transactional result publication and large-file/package acceptance remain pending.
+
+Commit `eeb298f51abc86e9f9d658c21363c9f9294e1c3b` passed [run 42774037812](https://github.com/serikaonoe123/moonrdiff/actions/runs/42774037812). Downloaded artifacts confirm Windows 51 / Linux 52 file checks without link skips and all 244 reference cases. Pure-COPY restore peak RSS was 3188 KiB at 4 MiB and 3324 KiB at 32 MiB; these are synthetic-sample measurements.
+
+## 2026-11-10: incremental delta matching
+
+- Added DeltaEncoder with a one-block ring, rolling full/tail checksums, global comparison fallback, fixed 64 KiB literal batches, cross-push COPY coalescing and closed/failed lifecycle. Signature/index memory remains proportional to basis blocks. Input/output budgets are cumulative, with 64 KiB pushes and a 1 MiB block cap.
+- Native delta scans the target twice with bounded reads/output batches: preflight budget validation, then exclusive output creation and replay. The old basis bytes are never an encoder argument. Same-size concurrent changes are still outside the stability guarantee.
+- Local checks/builds and 21 core groups passed on JS, Native and Wasm-GC. Tests compare small streamed deltas byte-for-byte with the existing encoder, vary input partition, exercise relocated tails and shared budgets, and check fixed long-literal batching and lifecycle errors.
+- Local file acceptance passed 59 checks with explicit --skip-links; no denied link creation was retried. Full cloud file counts should be 60 Windows / 61 Linux. Independent Linux matrix adds 80 streamed-generator combinations and 4 native delta partition cases to the prior 244, totaling 328 scheduled cases.
+- Linux measurements now record delta RSS and elapsed time for 4 MiB and 32 MiB targets along with signature-block count and patch size; generated patches are restored and checked by independent file hashes. Results require this milestone's own run.
+- Trusted file/version binding, snapshot/transactional publishing guarantees, large-file limits, representative performance evaluation and package-consumer acceptance remain pending.

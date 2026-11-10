@@ -42,7 +42,7 @@ jobs:
       - name: Independent rdiff 2.3.4 interoperability
         if: runner.os == 'Linux'
         run: python scripts/interop.py
-      - name: Measure incremental signature and patch memory
+      - name: Measure incremental signature delta and patch memory
         if: runner.os == 'Linux'
         run: python scripts/measure_signature.py
       - name: Keep verification evidence

@@ -163,6 +163,24 @@ large_patch.write_bytes(b'rs\x02\x36\x4f' + struct.pack('>II', 0, 8388608) + b'\
 invoke('patch', large_basis, large_patch, large_restored)
 assert hashlib.sha256(large_restored.read_bytes()).digest() == hashlib.sha256(large_basis.read_bytes()).digest()
 
+previous = None
+for chunk_size in [1, 2, 7, 65536]:
+    chunk_delta = OUT / f'delta-chunk-{chunk_size}.delta'
+    info = json.loads(invoke('delta', sig, target, chunk_delta, '--basis-size', len(old),
+                             '--chunk-size', chunk_size).stdout)
+    assert info['incremental']
+    assert previous is None or previous == chunk_delta.read_bytes()
+    previous = chunk_delta.read_bytes()
+for chunk_size in ['0','65537']:
+    invoke('delta', sig, target, absent, '--basis-size', len(old), '--chunk-size', chunk_size, code=2)
+invoke('delta', sig, target, absent, '--basis-size', len(old), '--max-output', '5', code=2)
+assert not absent.exists()
+fallback = OUT / 'fallback.delta'
+invoke('delta', sig, target, fallback, '--basis-size', len(old), '--max-checks', '0')
+fallback_restore = OUT / 'fallback.bin'
+invoke('patch', basis, fallback, fallback_restore)
+assert fallback_restore.read_bytes() == new
+
 report = {'platform': os.name, 'checks': checks, 'passed': True,
           'link_checks_skipped': skip_links,
           'scope': 'native CLI, byte verification, limits and exclusive file creation; all generated data'}

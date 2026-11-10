@@ -18,6 +18,13 @@ pub suberror DeltaError {
 }
 
 // Types and methods
+pub struct DeltaEncoder {
+  // private fields
+}
+pub fn DeltaEncoder::finish(Self) -> Bytes raise DeltaError
+pub fn DeltaEncoder::new(Signature, basis_size~ : Int32, max_candidate_checks? : Int32, max_delta_size? : Int32, max_target_size? : Int32) -> Self raise DeltaError
+pub fn DeltaEncoder::push(Self, BytesView) -> Bytes raise DeltaError
+
 pub(all) enum Instruction {
   Literal(Bytes)
   Copy(offset~ : Int32, length~ : Int32)

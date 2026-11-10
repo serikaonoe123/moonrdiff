@@ -28,7 +28,7 @@ fn rk_slide(
 
 ///|
 priv struct DeltaWriter {
-  out : @buffer.Buffer
+  mut out : @buffer.Buffer
   limit : Int32
   mut size : Int32
   mut copy_offset : Int32

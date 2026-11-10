@@ -44,17 +44,8 @@ async fn read_regular(path : String, limit : Int32) -> Bytes {
 }
 
 ///|
-/// CreateNew is an exclusive OS operation; existing files are never truncated.
-async fn write_new(path : String, data : Bytes) -> Unit {
-  let file = @fs.create(path, allow_existing=false, sync=Full)
-  defer file.close()
-  file.write(data)
-  file.sync(only_data=false)
-}
-
-///|
 fn help() -> String {
-  "MoonRdiff (incremental signature/patch; in-memory delta)\n" +
+  "MoonRdiff (incremental signature/delta/patch)\n" +
   "  signature BASIS SIGNATURE [--block-size N] [--strong-length N] [--chunk-size N]\n" +
   "  delta SIGNATURE TARGET DELTA --basis-size N [--max-checks N]\n" +
   "  patch BASIS DELTA OUTPUT [--chunk-size N] [--max-instructions N]\n" +
@@ -100,7 +91,14 @@ async fn execute(args : Array[String]) -> Int32 {
         command == "patch" &&
         (name == "--chunk-size" || name == "--max-instructions")
       ) ||
-      (command == "delta" && (name == "--basis-size" || name == "--max-checks"))
+      (
+        command == "delta" &&
+        (
+          name == "--basis-size" ||
+          name == "--max-checks" ||
+          name == "--chunk-size"
+        )
+      )
     guard allowed && !options.contains(name) else {
       raise Usage("Unknown or repeated option: " + name)
     }
@@ -137,6 +135,19 @@ async fn execute(args : Array[String]) -> Int32 {
     )
     return 0
   }
+  if command == "delta" {
+    delta_file(
+      args[2],
+      args[3],
+      args[4],
+      input_limit,
+      output_limit,
+      options["--basis-size"],
+      options.get("--max-checks").unwrap_or(1000000),
+      options.get("--chunk-size").unwrap_or(65536),
+    )
+    return 0
+  }
   let first = read_regular(args[2], input_limit)
   let second = read_regular(args[3], input_limit)
   if command == "verify" {
@@ -153,22 +164,6 @@ async fn execute(args : Array[String]) -> Int32 {
     )
     return if matched { 0 } else { 1 }
   }
-  let result = if command == "delta" {
-    @rdiff.delta(
-      @rdiff.parse_signature(first),
-      second,
-      basis_size=options["--basis-size"],
-      max_candidate_checks=options.get("--max-checks").unwrap_or(1000000),
-      max_delta_size=output_limit,
-    )
-  } else {
-    @rdiff.patch(first, second, max_output=output_limit)
-  }
-  write_new(args[4], result)
-  @stdio.stdout.write(
-    ({ "command": command, "output_bytes": result.length() } : Json).stringify() +
-    "\n",
-  )
   0
 }
 

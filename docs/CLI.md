@@ -1,6 +1,6 @@
 # 文件命令行使用说明
 
-MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，文件适配使用固定版本 `moonbitlang/async@0.19.3`（Apache-2.0）。摘要和 patch 命令已逐块读取并写出；差量计算和 verify 仍完整读入文件。默认每个输入和结果均限制为 64 MiB，尚未完成大文件验收。
+MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，文件适配使用固定版本 `moonbitlang/async@0.19.3`（Apache-2.0）。signature、delta、patch 命令均已逐块处理文件。delta 仍在内存中保留摘要与索引；verify 仍完整读入两个文件。默认每个输入和结果均限制为 64 MiB，尚未完成大文件验收。
 
 ## 构建与示例
 
@@ -36,7 +36,7 @@ verify 逐字节比较两个文件，适合手上有预期结果时验收；它�
 | `--max-input N` | 全部 | 每个输入 67108864 字节 |
 | `--max-output N` | signature、delta、patch | 67108864 字节 |
 | `--block-size N` | signature | 2048 字节，支持 1—1048576 |
-| `--chunk-size N` | signature、patch | 65536 字节，支持 1—65536 |
+| `--chunk-size N` | signature、delta、patch | 65536 字节，支持 1—65536 |
 | `--strong-length N` | signature | 32，支持 1—32；建议保持默认 |
 | `--max-instructions N` | patch | 1000000，超过报错 |
 | `--basis-size N` | delta | 必填，非负字节数 |
@@ -65,3 +65,5 @@ python scripts/check.py
 摘要生成的工作缓冲区由块大小、读取分块和当前输出批次决定，不保留整个文件或累计摘要；这不等于对进程峰值内存作恒定数值保证。Linux CI 使用 GNU time 分别测量 4 MiB 与 32 MiB 虚构输入的原生子进程峰值 RSS，结果保存在产物中。
 
 patch 先在有界缓冲区内检查整份补丁的格式、复制范围、输出预算和指令数，再独占创建结果文件并重放补丁。第二遍读取或写入失败仍可能留下不完整的新文件。这不是输入文件快照或事务发布；输入大小检查无法检测所有同大小修改。还原按需随机读取旧文件，复制和字面片段均分批写出。Linux CI 同时测量 4 MiB/32 MiB 整段复制补丁还原的峰值内存，并独立校验结果。
+
+delta 也先扫描目标文件计算并检查完整输出预算，再独占创建结果并重放生成过程，因此目标文件读两遍。需保持输入稳定，大小检查不提供快照保证。目标读取窗口、字面数据和输出批次均有界；摘要与候选索引随块数增长。默认流式库目标预算 64 MiB，文件命令沿用 --max-input；块大小上限 1 MiB。Linux 测量报告同时记录差量计算峰值 RSS、摘要块数和输出大小，不能将其描述成与所有输入规模无关的恒定内存。

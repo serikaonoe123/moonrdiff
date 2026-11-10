@@ -54,3 +54,11 @@ PatchDecoder::new(basis_size, max_output, max_instructions=1000000) exposes push
 All standard opcode widths are accepted within the Int32 parameter limit. Output budget is reserved when each instruction is parsed, and copy bounds are checked against supplied basis size. Reserved opcodes, excess instructions, overflows and data after END fail closed. Missing END, unfinished parameters or literal bodies fail at finish. Any failed push/finish poisons the decoder; finished instances cannot be reused. Output emitted before a later error is provisional and must not be treated as a validated complete result.
 
 The CLI validates a first full bounded pass before creating output and replays in a second bounded pass. This keeps format/budget failures from creating files but does not snapshot changing inputs or guarantee atomic output publication. The in-memory patch function remains available independently.
+
+## Incremental delta encoder
+
+DeltaEncoder::new(signature, basis_size, max_candidate_checks=1000000, max_delta_size=16777216, max_target_size=67108864) accepts the existing validated signature and explicit basis metadata. Block size is capped at 1 MiB and pushes at 64 KiB. It indexes full blocks once per encoder, maintains a ring lookahead for one block, and rolls full/tail checksums across pushes. EOF drains shorter windows, including relocated short basis tails. Full-block matches retain priority.
+
+push returns newly encoded bytes; finish emits the remaining literal/COPY and END. Literal accumulation is capped at 64 KiB and COPY coalescing persists across pushes. Identical input/configuration produces identical bytes regardless of push partition; long literal layout may differ from the in-memory encoder. Comparison budget exhaustion uses literal fallback for the rest of the entire stream. Input/output budgets are cumulative. Failed or finished encoders cannot be resumed. Caller must discard provisional output on error.
+
+The target and delta need not be retained, but the signature plus index scale with basis block count. Clients must drain batches. The native delta command runs two bounded passes so output-budget failures happen before file creation, still requiring stable target data and no transactional or authentication guarantee.
