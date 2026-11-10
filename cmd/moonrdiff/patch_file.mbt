@@ -8,6 +8,7 @@ async fn patch_file(
   output_limit : Int32,
   chunk_size : Int32,
   max_instructions : Int32,
+  binding : Binding?,
 ) -> Unit {
   guard chunk_size >= 1 && chunk_size <= 65536 else {
     raise Usage("Chunk size must be 1..65536")
@@ -31,8 +32,33 @@ async fn patch_file(
     delta_size <= input_limit.to_int64() else {
     raise Usage("Patch input byte limit exceeded")
   }
+  if binding is Some(expected) {
+    guard expected.basis.size.to_int64() == basis_size &&
+      expected.delta.size.to_int64() == delta_size else {
+      raise Usage("Manifest input size mismatch")
+    }
+    guard digest_handle(basis, basis_size) == expected.basis.hash else {
+      raise Usage("Manifest basis digest mismatch")
+    }
+    guard digest_handle(delta, delta_size) == expected.delta.hash else {
+      raise Usage("Manifest delta digest mismatch")
+    }
+    guard expected.target.size <= output_limit else {
+      raise Usage("Manifest target exceeds output limit")
+    }
+  }
   let mut written = 0
   for pass in 0..<2 {
+    written = 0
+    let result_hash = match binding {
+      Some(_) => Some(@crypto.Blake2b256::new())
+      None => None
+    }
+    let delta_hash = match binding {
+      Some(_) => Some(@crypto.Blake2b256::new())
+      None => None
+    }
+
     let decoder = @rdiff.PatchDecoder::new(
       basis_size=basis_size.to_int(),
       max_output=output_limit,
@@ -53,12 +79,20 @@ async fn patch_file(
         chunk_size
       }
       let bytes = delta.read_exactly_at(n, position~)
+      if delta_hash is Some(hash) {
+        hash.push(bytes)
+      }
       let parts = decoder.push(bytes)
-      if output is Some(file) {
+      if output is Some(_) || binding is Some(_) {
         for part in parts {
           match part {
             @rdiff.Literal(data) => {
-              file.write(data)
+              if output is Some(file) {
+                file.write(data)
+              }
+              if result_hash is Some(hash) {
+                hash.push(data)
+              }
               written += data.length()
             }
             @rdiff.Copy(offset~, length~) => {
@@ -70,7 +104,12 @@ async fn patch_file(
                   amount,
                   position=(offset + copied).to_int64(),
                 )
-                file.write(data)
+                if output is Some(file) {
+                  file.write(data)
+                }
+                if result_hash is Some(hash) {
+                  hash.push(data)
+                }
                 copied += amount
                 written += amount
               }
@@ -81,6 +120,17 @@ async fn patch_file(
       position += n.to_int64()
     }
     decoder.finish()
+    if binding is Some(expected) &&
+      result_hash is Some(hash) &&
+      delta_hash is Some(raw) {
+      guard hex_digest(raw.finish()) == expected.delta.hash else {
+        raise Usage("Manifest delta changed during patch")
+      }
+      guard written == expected.target.size &&
+        hex_digest(hash.finish()) == expected.target.hash else {
+        raise Usage("Manifest result digest mismatch")
+      }
+    }
     guard basis.size() == basis_size && delta.size() == delta_size else {
       raise Usage("Input size changed while patching")
     }
@@ -94,6 +144,7 @@ async fn patch_file(
         "command": "patch",
         "output_bytes": written,
         "incremental": true,
+        "manifest_verified": binding is Some(_),
         "chunk_size": chunk_size,
       } : Json).stringify() +
     "\n",

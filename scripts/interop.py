@@ -195,6 +195,18 @@ for chunk_size in [1, 2, 7, 65536]:
     assert restored.read_bytes() == new
     records.append({'case': f'native-incremental-delta-{chunk_size}', 'passed': True})
 
+binding_path = native_dir / 'binding.json'
+bound_result = native_dir / 'bound-result.bin'
+run([str(cli),'manifest',str(basis),str(target),str(reference_delta),str(binding_path)])
+binding = json.loads(binding_path.read_text())
+assert binding['basis']['hash'] == hashlib.blake2b(old,digest_size=32).hexdigest()
+assert binding['target']['hash'] == hashlib.blake2b(new,digest_size=32).hexdigest()
+records.append({'case':'native-manifest-independent-digests','passed':True})
+result = json.loads(run([str(cli),'patch',str(basis),str(reference_delta),str(bound_result),
+                        '--manifest',str(binding_path)]))
+assert result['manifest_verified'] and bound_result.read_bytes() == new
+records.append({'case':'rdiff-patch-with-file-binding','passed':True})
+
 report = {'reference': version_text.strip(), 'tests': records,
           'scope': 'in-memory RK/BLAKE2 signature, automatic delta matching, both decoders; sender has no basis file'}
 (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf8')

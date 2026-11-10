@@ -5,8 +5,17 @@ package "serikaonoe123/moonrdiff/third_party/mooncry_blake2"
 pub fn blake2b(Bytes, Int32) -> Bytes
 
 // Errors
+pub suberror HashStateError {
+  InvalidState
+}
 
 // Types and methods
+pub struct Blake2b256 {
+  // private fields
+}
+pub fn Blake2b256::finish(Self) -> Bytes raise HashStateError
+pub fn Blake2b256::new() -> Self
+pub fn Blake2b256::push(Self, BytesView) -> Unit raise HashStateError
 
 // Type aliases
 

@@ -73,3 +73,7 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 ## 分块差量接口
 
 `DeltaEncoder::new(signature, basis_size=...)` 接收最多 64 KiB 的 `push(chunk)`，调用者消费每批补丁字节并在输入结束时调用一次 `finish()`。输入分块不改变补丁字节；长字面数据按固定 64 KiB 批次编码，可能与内存接口生成不同但兼容的补丁。块大小上限 1 MiB，索引内存随摘要块数增长。全局比较、目标字节和输出字节预算不会在分块之间重置。
+
+## 文件绑定清单
+
+可先运行 `manifest BASIS TARGET DELTA binding.json`，再给 `patch` 添加 `--manifest binding.json`。旧文件、补丁及还原字节流必须满足清单的大小和 BLAKE2b-256 摘要；不指定清单时保留原始 rdiff 兼容模式。清单的来源必须可信：它检测版本用错或内容损坏，不认证发布者。当前生成清单需要同时访问这三个文件，适合离线更新包准备；详见 [绑定清单规范](docs/BINDING.md)。

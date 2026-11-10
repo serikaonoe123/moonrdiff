@@ -16,10 +16,12 @@ new = b'New version header\n' + old[:4096] + b'An inserted record\n' + old[4096:
 basis, target, sig, delta, restored = [out / name for name in ['old.bin', 'new.bin', 'old.sig', 'update.delta', 'restored.bin']]
 basis.write_bytes(old)
 target.write_bytes(new)
+manifest = out / "binding.json"
 commands = [
     ['signature', str(basis), str(sig), '--block-size', '128'],
     ['delta', str(sig), str(target), str(delta), '--basis-size', str(len(old))],
-    ['patch', str(basis), str(delta), str(restored)],
+    ['manifest',str(basis),str(target),str(delta),str(manifest)],
+    ['patch', str(basis), str(delta), str(restored), '--manifest',str(manifest)],
     ['verify', str(target), str(restored)],
 ]
 records = []

@@ -49,7 +49,7 @@ fn help() -> String {
   "  signature BASIS SIGNATURE [--block-size N] [--strong-length N] [--chunk-size N]\n" +
   "  delta SIGNATURE TARGET DELTA --basis-size N [--max-checks N]\n" +
   "  patch BASIS DELTA OUTPUT [--chunk-size N] [--max-instructions N]\n" +
-  "  verify EXPECTED ACTUAL\n" +
+  "  verify EXPECTED ACTUAL\n  manifest BASIS TARGET DELTA MANIFEST\n  patch may add --manifest MANIFEST for file binding verification\n" +
   "Options: --max-input N and --max-output N (bytes, default 67108864).\n" +
   "Outputs must be new files. Exit: 0 success, 1 verify mismatch, 2 error.\n"
 }
@@ -64,6 +64,7 @@ async fn execute(args : Array[String]) -> Int32 {
   let command = args[1]
   let required = match command {
     "signature" | "verify" => 2
+    "manifest" => 4
     "delta" | "patch" => 3
     _ => raise Usage("Unknown command\n" + help())
   }
@@ -71,12 +72,21 @@ async fn execute(args : Array[String]) -> Int32 {
     raise Usage("Missing file arguments\n" + help())
   }
   let options : Map[String, Int32] = Map([])
+  let mut manifest_path : String? = None
   let mut offset = required + 2
   while offset < args.length() {
     guard offset + 1 < args.length() else {
       raise Usage("Missing option value")
     }
     let name = args[offset]
+    if name == "--manifest" && command == "patch" {
+      guard manifest_path is None else {
+        raise Usage("Repeated manifest option")
+      }
+      manifest_path = Some(args[offset + 1])
+      offset += 2
+      continue
+    }
     let allowed = name == "--max-input" ||
       (command != "verify" && name == "--max-output") ||
       (
@@ -111,6 +121,10 @@ async fn execute(args : Array[String]) -> Int32 {
   if command == "delta" && options.get("--basis-size") is None {
     raise Usage("delta requires --basis-size")
   }
+  if command == "manifest" {
+    manifest_file(args[2], args[3], args[4], args[5], input_limit, output_limit)
+    return 0
+  }
   if command == "signature" {
     signature_file(
       args[2],
@@ -132,6 +146,10 @@ async fn execute(args : Array[String]) -> Int32 {
       output_limit,
       options.get("--chunk-size").unwrap_or(65536),
       options.get("--max-instructions").unwrap_or(1000000),
+      match manifest_path {
+        Some(path) => Some(read_binding(path))
+        None => None
+      },
     )
     return 0
   }

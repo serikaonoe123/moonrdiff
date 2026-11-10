@@ -181,6 +181,47 @@ fallback_restore = OUT / 'fallback.bin'
 invoke('patch', basis, fallback, fallback_restore)
 assert fallback_restore.read_bytes() == new
 
+manifest = OUT / 'binding.json'
+invoke('manifest', basis, target, delta, manifest)
+binding = json.loads(manifest.read_text())
+assert binding['schema_version'] == 1 and binding['algorithm'] == 'blake2b-256'
+for key, data in [('basis',old),('target',new),('delta',delta.read_bytes())]:
+    assert binding[key] == {'size':len(data),'hash':hashlib.blake2b(data,digest_size=32).hexdigest()}
+bound_result = OUT / 'bound.bin'
+assert json.loads(invoke('patch',basis,delta,bound_result,'--manifest',manifest).stdout)['manifest_verified']
+assert bound_result.read_bytes() == new
+invoke('manifest',basis,target,delta,manifest,code=2)
+wrong_basis = OUT / 'wrong-basis.bin'
+wrong_basis.write_bytes(bytes([old[0]^1])+old[1:])
+invoke('patch',wrong_basis,delta,absent,'--manifest',manifest,code=2)
+wrong_delta = OUT / 'wrong.delta'
+raw = delta.read_bytes()
+wrong_delta.write_bytes(raw[:-1]+bytes([raw[-1]^1]))
+invoke('patch',basis,wrong_delta,absent,'--manifest',manifest,code=2)
+for field,value in [('schema_version',2),('algorithm','sha256'),('extra',0)]:
+    altered = dict(binding); altered[field]=value
+    path = OUT / f'binding-{field}.json';path.write_text(json.dumps(altered))
+    invoke('patch',basis,delta,absent,'--manifest',path,code=2)
+for key in ['basis','target','delta']:
+    altered = json.loads(json.dumps(binding));altered[key]['hash']='0'*64
+    path=OUT/f'binding-{key}-bad.json';path.write_text(json.dumps(altered))
+    invoke('patch',basis,delta,absent,'--manifest',path,code=2)
+duplicate = OUT / 'duplicate.json'
+duplicate.write_text(manifest.read_text().replace('"schema_version": 1','"schema_version": 1, "schema_version": 1'))
+invoke('patch',basis,delta,absent,'--manifest',duplicate,code=2)
+invoke('patch',basis,delta,absent,'--manifest',manifest,'--manifest',manifest,code=2)
+invoke('patch',basis,delta,absent,'--manifest',OUT/'missing-manifest',code=2)
+assert not absent.exists()
+
+# A truthful record of unrelated inputs is not a valid bound update.
+unrelated = OUT / 'unrelated.bin';unrelated.write_bytes(b'unrelated result')
+bad_association = OUT / 'unrelated-binding.json'
+invoke('manifest',basis,unrelated,delta,bad_association)
+invoke('patch',basis,delta,absent,'--manifest',bad_association,code=2)
+assert not absent.exists()
+invoke('manifest',basis,target,delta,absent,'--max-output','1',code=2)
+assert not absent.exists()
+
 report = {'platform': os.name, 'checks': checks, 'passed': True,
           'link_checks_skipped': skip_links,
           'scope': 'native CLI, byte verification, limits and exclusive file creation; all generated data'}

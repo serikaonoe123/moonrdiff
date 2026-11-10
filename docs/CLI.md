@@ -14,7 +14,7 @@ python scripts/demo.py
 
 演示脚本只生成虚构文件，通过原生命令行依次生成摘要、计算补丁、还原、校验。每次使用新的 `results/demo-*` 目录，保留全部结果。报告同时给出摘要与补丁合计大小，避免把单独补丁大小误当作首次交换成本。
 
-## 四个命令
+## 文件命令
 
 以下用 `moon run` 运行；构建后的独立可执行文件接受同样参数。固定工具链在 Windows 和 Linux 均输出 `_build/native/debug/build/cmd/moonrdiff/moonrdiff.exe`；Linux 的 `.exe` 文件名后缀不影响其作为原生程序执行。
 
@@ -67,3 +67,12 @@ python scripts/check.py
 patch 先在有界缓冲区内检查整份补丁的格式、复制范围、输出预算和指令数，再独占创建结果文件并重放补丁。第二遍读取或写入失败仍可能留下不完整的新文件。这不是输入文件快照或事务发布；输入大小检查无法检测所有同大小修改。还原按需随机读取旧文件，复制和字面片段均分批写出。Linux CI 同时测量 4 MiB/32 MiB 整段复制补丁还原的峰值内存，并独立校验结果。
 
 delta 也先扫描目标文件计算并检查完整输出预算，再独占创建结果并重放生成过程，因此目标文件读两遍。需保持输入稳定，大小检查不提供快照保证。目标读取窗口、字面数据和输出批次均有界；摘要与候选索引随块数增长。默认流式库目标预算 64 MiB，文件命令沿用 --max-input；块大小上限 1 MiB。Linux 测量报告同时记录差量计算峰值 RSS、摘要块数和输出大小，不能将其描述成与所有输入规模无关的恒定内存。
+
+## 绑定校验
+
+```sh
+moon run cmd/moonrdiff --target native -- manifest old.bin new.bin update.delta binding.json
+moon run cmd/moonrdiff --target native -- patch old.bin update.delta restored.bin --manifest binding.json
+```
+
+manifest 记录三个普通文件的身份；它本身不证明补丁能还原目标，patch 的第一遍预演才验证这一关系。成功的绑定还原会返回 manifest_verified=true。清单最多 16 KiB，摘要按 64 KiB 分块读取，使用标准 BLAKE2b-256。预期结果与补丁不配对时，在预演阶段报错且不创建输出。若第二遍输入变化或写入失败，可能留下新结果文件并报告失败；不提供快照或事务承诺。
