@@ -1,0 +1,47 @@
+name: Check patch timing
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/measure_patch_comparison.py', '.github/workflows/patch-performance.yml']
+permissions:
+  contents: read
+jobs:
+  patch-timing:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f
+        with:
+          version: '0.10.17+d971670cd'
+          core-version: '0.10.17+d971670cd'
+      - run: moon update
+      - run: moon build cmd/moonrdiff --target native --release --deny-warn
+      - uses: actions/checkout@v4
+        with:
+          ref: 79b18247f0b30438c0474cfe80f60fd406554558
+          path: results/baseline-source
+          persist-credentials: false
+      - working-directory: results/baseline-source
+        run: |
+          moon update
+          moon build cmd/moonrdiff --target native --release --deny-warn
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y time
+          lscpu > results/patch-cpu.txt
+      - run: python scripts/measure_patch_comparison.py --baseline-root results/baseline-source
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: patch-timing-reports
+          path: |
+            results/patch-comparison-*/report.json
+            results/patch-comparison-*/commands.log
+            results/patch-cpu.txt
