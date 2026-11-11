@@ -11,6 +11,7 @@ __pycache__/
 /docs/VALIDATION.md
 /docs/UPSTREAM-BLAKE2-REPRO.md
 /docs/STATUS.md
+/docs/SOURCE-UPDATE.md
 /docs/PACKAGING.md
 /docs/BENCHMARKS.md
 /docs/LARGE-FILES.md

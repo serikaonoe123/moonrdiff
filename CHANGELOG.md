@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add a reproducible source-bundle update example using two committed project snapshots, TAR/ZIP inputs, separated sender/receiver directories, bound restores and file-byte transfer accounting; run it on Windows/Linux CI.
+
 - Record successful local Native revalidation of the original failed consumer, 27 root tests and a fresh complete archive/CLI acceptance. Historical D8050 is not currently reproduced; no targeted fix or root cause is claimed.
 - Add a 38-case deterministic edit corpus covering the complete incremental signature/delta/patch pipeline under two push partitions, including empty pushes, repeated data, short tails and 64 KiB boundaries.
 - Check exact signature/target/patch-output budgets and delta limits; nine literal sizes accept the exact delta budget and reject one byte less with the public error type.

@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -38,6 +39,8 @@ jobs:
         run: |
           moon build cmd/moonrdiff --target native --release --deny-warn
           python scripts/check_cli.py --profile release
+      - name: Source bundle update example
+        run: python scripts/demo_source_update.py
       - name: Archive policy and independent consumers
         run: python scripts/check_package.py
       - name: Keep reviewable package candidate

@@ -66,6 +66,8 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 
 ## 文件命令行
 
+实际集成流程见 [源码归档更新示例](docs/SOURCE-UPDATE.md)：从两个固定 Git 提交生成 TAR/ZIP，完成摘要、差量、绑定还原和校验，并报告计入摘要与清单的传输量。
+
 见 [文件命令行使用说明](docs/CLI.md)。执行 `moon build cmd/moonrdiff --target native` 后，可运行 `python scripts/demo.py` 完成虚构数据的摘要、补丁、还原及逐字节校验。已有输出一律拒绝覆盖，默认每个输入和结果限制为 64 MiB。
 
 ## 分块摘要接口
