@@ -17,4 +17,6 @@ for label in ['windows','linux']:
     report=json.loads((DIRECTORY/(label+'.json')).read_bytes())
     assert report['status']=='success' and report['full_128mib_acceptance']
     assert report['fixture_report_sha256']==expected['fixtures-'+label+'.json']
-print('Original artifact bytes retained: four large-file acceptance/fixture snapshots.')
+candidate=ROOT/'packaging/candidate-0.1.0.json'
+assert hashlib.sha256(candidate.read_bytes()).hexdigest()=='99cfe413492f8573d49fd63283bec8549e64588b08b57344182029f32bacb0be'
+print('Original artifact bytes retained: four large-file snapshots and the 0.1.0 candidate inventory.')
