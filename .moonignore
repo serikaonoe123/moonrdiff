@@ -13,6 +13,7 @@ __pycache__/
 /docs/STATUS.md
 /docs/PACKAGING.md
 /docs/BENCHMARKS.md
+/docs/LARGE-FILES.md
 /CHANGELOG.md
 /README.md
 /packaging/
