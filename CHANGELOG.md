@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Compare native CLI verify inputs in paired 64 KiB reads, retaining JSON fields, exit codes and per-input budgets; add EOF/mismatch/budget controls and Linux verify RSS measurements.
+
 - Extend the source-update example with TAR.GZ and verified full-file delivery when its complete file/identity cost is lower. Report offline planning, signature reuse and already-sent signature costs separately.
 
 - Add a reproducible source-bundle update example using two committed project snapshots, TAR/ZIP inputs, separated sender/receiver directories, bound restores and file-byte transfer accounting; run it on Windows/Linux CI.

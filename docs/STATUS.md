@@ -6,7 +6,7 @@ Updated 2026-11-11. Mooncakes 0.1.1 documentation patch is published from 9ed7e1
 | --- | --- | --- |
 | Format/core | RK/BLAKE2 signatures, rdiff patch codec, full four-way interoperability | Broader adversarial/randomized and boundary evaluation |
 | Incremental APIs | SignatureEncoder, DeltaEncoder, PatchDecoder with state/budget checks; Windows/Linux release 128 MiB sample paths passed; new 38-case partitioned-pipeline and exact-budget regression passed all three backends on both platforms in CI 42963384904 (4013e9c) | Wider resource boundaries and larger real application inputs |
-| Native CLI | Windows/Linux debug/release acceptance; specific usage/format/budget diagnostics preserved in release | Input snapshot/transactional publication deliberately not promised |
+| Native CLI | Local debug/release chunked verify passed boundary/mismatch/budget controls; existing four-field JSON, exit codes and limits retained | Fresh cloud/128 MiB acceptance of chunked verify; input snapshot/transactional publication deliberately not promised |
 | Binding | Strict optional manifest, standard BLAKE2b-256, preflight/replay checks; both native platforms passed 128 MiB modified-file bound restore | Distributed manifest creation and publisher authentication not provided |
 | Examples | Fixed-Git-source TAR/ZIP/TAR.GZ updates and verified delta/full-file choice passed Windows/Linux CI 42988522025; original reports archived with byte audits | External application integrations and broader real application data |
 | Packaging | Published 0.1.1: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |

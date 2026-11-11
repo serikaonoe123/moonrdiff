@@ -1,6 +1,6 @@
 # 文件命令行使用说明
 
-MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，文件适配使用固定版本 `moonbitlang/async@0.19.3`（Apache-2.0）。signature、delta、patch 命令均已逐块处理文件。delta 仍在内存中保留摘要与索引；verify 仍完整读入两个文件。默认每个输入和结果均限制为 64 MiB。Windows Server 2025 和 Ubuntu 24.04 云端 release 构建均已通过五类 128 MiB 级样本的摘要、差量和还原验收，运行时显式提高预算；不代表更大文件或所有运行环境均已验证。
+MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，文件适配使用固定版本 `moonbitlang/async@0.19.3`（Apache-2.0）。signature、delta、patch 命令均已逐块处理文件。delta 仍在内存中保留摘要与索引；当前开发版 verify 按固定 64 KiB 分块比较两个文件。默认每个输入和结果均限制为 64 MiB。Windows Server 2025 和 Ubuntu 24.04 云端 release 构建均已通过五类 128 MiB 级样本的摘要、差量和还原验收，运行时显式提高预算；不代表更大文件或所有运行环境均已验证。
 
 ## 构建与示例
 
@@ -29,7 +29,7 @@ moon run cmd/moonrdiff --target native -- verify new.bin restored.bin
 
 `--basis-size` 必须是生成摘要时的旧文件实际字节数；signature 成功时的 JSON 中会返回该值。计算端需要摘要、新文件和这个大小，无需旧文件内容。原始摘要和补丁不携带完整文件身份，不能用“成功解析”证明选对了版本。
 
-verify 逐字节比较两个文件，适合手上有预期结果时验收；它不执行身份认证，也不能在没有预期文件时证明补丁可信。
+verify 逐字节比较两个文件，适合手上有预期结果时验收。当前 GitHub 开发版每次最多读取每个文件的 64 KiB，发现差异即停止比较；长度不同也返回不匹配。两个文件均须通过普通文件、打开后类型和输入大小预算检查，比较后复查大小。返回 JSON 仍为 command、matched、expected_bytes、actual_bytes；退出码仍为 0 相同、1 不同、2 错误，不接受 --chunk-size。它不执行身份认证，也不能检测所有同大小并发修改；输入必须保持稳定。已发布 Mooncakes 0.1.1 保留原来的完整读取实现。
 
 ## 参数与结果
 
@@ -58,7 +58,7 @@ verify 逐字节比较两个文件，适合手上有预期结果时验收；它�
 
 Linux 的 1/16/128 MiB 合成基准已验证相同、局部修改、插入删除、随机和 gzip 数据共 15 组。128 MiB 级运行显式设为 `--max-input 536870912 --max-output 536870912`；并验证默认输入预算、仅提高输入预算时的默认输出预算会报错且不创建输出。这只是当前样本验收，不表示 512 MiB 或任意大文件已测。完整仓库中的 `docs/BENCHMARKS.md` 和 `benchmarks/2026-11-10-linux.json` 保留原始结果。随机数据可能比整文件传输更大；当前 debug 构建的摘要与差量计算显著慢于参考 rdiff。
 
-另有 Windows/Linux 专用 128 MiB 验收，覆盖五类未绑定还原及局部修改样本的绑定还原、清单独立哈希与 CLI verify，并检查默认 verify/manifest 输入预算仍会拒绝超限文件。协议及具体提交、云端报告见完整仓库的 `docs/LARGE-FILES.md`。它是正确性与预算验收，不是跨平台性能比较；verify 仍会将两个文件完整读入内存。
+另有 Windows/Linux 专用 128 MiB 验收，覆盖五类未绑定还原及局部修改样本的绑定还原、清单独立哈希与 CLI verify，并检查默认 verify/manifest 输入预算仍会拒绝超限文件。协议及具体提交、云端报告见完整仓库的 `docs/LARGE-FILES.md`。它是正确性与预算验收，不是跨平台性能比较；该历史运行早于分块 verify；当前开发版的有界读取不等于进程峰值内存恒定，也不扩大默认预算或已测文件大小。
 
 ## 验证
 

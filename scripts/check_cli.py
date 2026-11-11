@@ -51,6 +51,35 @@ assert restored.read_bytes() == new
 assert json.loads(invoke('verify', target, restored).stdout)['matched']
 assert not json.loads(invoke('verify', basis, restored, code=1).stdout)['matched']
 
+# Verify exact EOF and mismatches at either side of the fixed 64 KiB boundary.
+verify_expected, verify_actual = OUT/'verify-expected.bin', OUT/'verify-actual.bin'
+for length in [0, 1, 65535, 65536, 65537, 131073]:
+    data = (bytes(range(256)) * ((length + 255) // 256))[:length]
+    verify_expected.write_bytes(data)
+    verify_actual.write_bytes(data)
+    expected_result = {'command': 'verify', 'matched': True,
+                       'expected_bytes': length, 'actual_bytes': length}
+    assert json.loads(invoke('verify', verify_expected, verify_actual,
+                             '--max-input', length).stdout) == expected_result
+    for position in sorted({p for p in [0, 65535, 65536, length-1] if 0 <= p < length}):
+        changed = bytearray(data)
+        changed[position] ^= 255
+        verify_actual.write_bytes(changed)
+        assert json.loads(invoke('verify', verify_expected, verify_actual, code=1).stdout) == {
+            **expected_result, 'matched': False}
+    verify_actual.write_bytes(data + b'x')
+    for left, right in [(verify_expected, verify_actual), (verify_actual, verify_expected)]:
+        info = json.loads(invoke('verify', left, right, code=1).stdout)
+        assert not info['matched']
+        assert (info['expected_bytes'], info['actual_bytes']) == (left.stat().st_size, right.stat().st_size)
+        # A size mismatch must not bypass either input's byte budget.
+        assert 'Input byte limit exceeded' in invoke('verify', left, right,
+                                                      '--max-input', length, code=2).stderr
+    assert verify_expected.read_bytes() == data and verify_actual.read_bytes() == data + b'x'
+invoke('verify', verify_expected, OUT, code=2)
+invoke('verify', OUT/'missing-verify', verify_actual, code=2)
+invoke('verify', verify_expected, verify_actual, '--chunk-size', 1, code=2)
+
 # Invalid arguments and inputs must not create output.
 absent = OUT / 'must-not-exist'
 invoke(code=2)

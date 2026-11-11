@@ -55,6 +55,62 @@ fn help() -> String {
 }
 
 ///|
+/// Compare bounded reads; inputs must remain stable throughout verification.
+async fn verify_files(
+  expected : String,
+  actual : String,
+  limit : Int32,
+) -> Int32 {
+  guard @fs.kind(expected) is @fs.Regular && @fs.kind(actual) is @fs.Regular else {
+    raise Usage("Input must be a regular file")
+  }
+  let first = @fs.open(expected, mode=ReadOnly)
+  defer first.close()
+  let second = @fs.open(actual, mode=ReadOnly)
+  defer second.close()
+  guard first.kind() is @fs.Regular && second.kind() is @fs.Regular else {
+    raise Usage("Input is no longer a regular file")
+  }
+  let expected_size = first.size()
+  let actual_size = second.size()
+  // Validate both budgets even when lengths or the first bytes already differ.
+  guard expected_size >= 0L &&
+    expected_size <= limit.to_int64() &&
+    actual_size >= 0L &&
+    actual_size <= limit.to_int64() else {
+    raise Usage("Input byte limit exceeded")
+  }
+  let mut matched = expected_size == actual_size
+  let mut position = 0L
+  while matched && position < expected_size {
+    let remaining = expected_size - position
+    let n = if remaining < 65536L { remaining.to_int() } else { 65536 }
+    let a = first.read_exactly_at(n, position~)
+    let b = second.read_exactly_at(n, position~)
+    matched = a == b
+    position += n.to_int64()
+  }
+  guard first.size() == expected_size && second.size() == actual_size else {
+    raise Usage("Input size changed while reading")
+  }
+  @stdio.stdout.write(
+    (
+      {
+        "command": "verify",
+        "matched": matched,
+        "expected_bytes": expected_size.to_int(),
+        "actual_bytes": actual_size.to_int(),
+      } : Json).stringify() +
+    "\n",
+  )
+  if matched {
+    0
+  } else {
+    1
+  }
+}
+
+///|
 async fn execute(args : Array[String]) -> Int32 {
   if args.length() == 2 && args[1] == "--help" {
     @stdio.stdout.write(help())
@@ -166,21 +222,8 @@ async fn execute(args : Array[String]) -> Int32 {
     )
     return 0
   }
-  let first = read_regular(args[2], input_limit)
-  let second = read_regular(args[3], input_limit)
   if command == "verify" {
-    let matched = first == second
-    @stdio.stdout.write(
-      (
-        {
-          "command": "verify",
-          "matched": matched,
-          "expected_bytes": first.length(),
-          "actual_bytes": second.length(),
-        } : Json).stringify() +
-      "\n",
-    )
-    return if matched { 0 } else { 1 }
+    return verify_files(args[2], args[3], input_limit)
   }
   0
 }

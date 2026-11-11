@@ -45,7 +45,16 @@ for size in [4 * 1024 * 1024, 32 * 1024 * 1024]:
                    capture_output=True,check=True,timeout=120)
     with source.open('rb') as a, generated_restore.open('rb') as b:
         assert hashlib.file_digest(a,'sha256').digest() == hashlib.file_digest(b,'sha256').digest()
+    verify_metrics = out / f'{size}.verify-time'
+    completed_verify = subprocess.run([
+        '/usr/bin/time', '-f', '%M %e', '-o', str(verify_metrics),
+        str(exe), 'verify', str(source), str(generated_restore)],
+        capture_output=True, text=True, check=True, timeout=120)
+    verify_rss, verify_elapsed = verify_metrics.read_text().split()
+    assert json.loads(completed_verify.stdout) == {
+        'command': 'verify', 'matched': True, 'expected_bytes': size, 'actual_bytes': size}
     records.append({'input_bytes': size, 'signature_bytes': signature.stat().st_size,
+                    'verify_peak_rss_kib': int(verify_rss), 'verify_elapsed_seconds': float(verify_elapsed),
                     'peak_rss_kib': int(rss), 'elapsed_seconds': float(elapsed),
                     'patch_peak_rss_kib': int(patch_rss), 'patch_elapsed_seconds': float(patch_elapsed),
                     'delta_peak_rss_kib': int(delta_rss),'delta_elapsed_seconds': float(delta_elapsed),
