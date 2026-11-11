@@ -37,4 +37,19 @@ registry_patch={
 }
 for name,sha in registry_patch.items():
     assert hashlib.sha256((ROOT/'packaging/registry-0.1.1'/name).read_bytes()).hexdigest()==sha,name
-print('Original large-file, candidate and published registry evidence bytes retained.')
+source_update = {
+    'windows.json': '2170268a0cb89f6fce3a028e83e5733591a17293cca3fed8a770de9f8b99df1f',
+    'linux.json': '5deee3612a6a557c89cf422df15494198682779f2ef435f24974b6f7e8bf7660',
+}
+for name, sha in source_update.items():
+    original = (ROOT/'benchmarks/source-update-2026-11-11'/name).read_bytes()
+    assert hashlib.sha256(original).hexdigest() == sha, name
+    report = json.loads(original)
+    assert report['status'] == 'success'
+    assert report['source_commit'] == '281bbee7e9900988027be0c9f3253cf09f0c8bf3'
+    assert {case['format']: case['offline_plan']['choice'] for case in report['cases']} == {
+        'tar': 'delta', 'zip': 'delta', 'tar.gz': 'full',
+    }
+    for case in report['cases']:
+        assert case['target_sha256'] == case['restored_sha256'] == case['selected_result_sha256']
+print('Original large-file, source-update, candidate and published registry evidence bytes retained.')

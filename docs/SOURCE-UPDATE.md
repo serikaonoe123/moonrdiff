@@ -54,3 +54,5 @@ python scripts/demo_source_update.py
 - signature_already_sent_total_bytes：本轮已经发送摘要时，将摘要字节加回所选负载，避免漏算已经发生的开销。不能把离线预先规划的整文件成本套用到这个阶段。
 
 2026-11-11 本地三格式报告 results/source-update-c86aec3f14d14f25a8ab118307c1f876/report.json：TAR、ZIP 选择差量；TAR.GZ 完整新版 40,728 字节，目标清单 134 字节，整文件合计 40,862 字节，低于差量首次交换的 41,875 字节，因此实际示例验证了整文件交付分支。所有三种格式的补丁还原和所选交付结果均与目标一致。该结果不保证其他压缩数据一定选择同一方案，也不代表真实网络节省量或计算成本收益。
+
+扩展提交 `281bbee7e9900988027be0c9f3253cf09f0c8bf3` 已通过 [Windows/Linux CI 42988522025](https://github.com/serikaonoe123/moonrdiff/actions/runs/42988522025)。下载的两平台原报告已逐项核对 34 文件输入清单、Git blob 哈希、交付结果及成本字段，并保存在 benchmarks/source-update-2026-11-11/，由 CI 保持原字节 SHA-256 校验。两平台均验证了两种交付分支。该次云端 TAR.GZ 差量首次交换为 41,793 字节；整文件方案 Windows 为 40,780 字节、Linux 为 40,779 字节；若摘要本轮已经发送，所选方案的累计成本分别为 41,512 和 41,511 字节。保留各运行环境的原始结果，不将不同环境的压缩或元数据字节强行归一化。
