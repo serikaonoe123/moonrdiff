@@ -187,9 +187,10 @@ test "seeded edit corpus preserves the complete partitioned update pipeline" {
       )
     } else {
       let cut = length / 3
+      let after_deleted = cut + length / 11
       let end = length - length / 7
       target.write_bytes(b"\x00\xffprefix")
-      target.write_bytes(basis[cut:end])
+      target.write_bytes(basis[after_deleted:end])
       target.write_bytes(
         corpus_bytes(17, (seed + 65537).reinterpret_as_uint(), false),
       )
