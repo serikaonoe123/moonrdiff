@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import uuid
 import zipfile
+import re
 import argparse
 parser=argparse.ArgumentParser()
 parser.add_argument("--targets",nargs="+",choices=["js","native","wasm-gc"],default=["js","native","wasm-gc"])
@@ -16,6 +17,11 @@ parser.add_argument("--skip-native-cli",action="store_true")
 args=parser.parse_args()
 
 ROOT = Path(__file__).resolve().parents[1]
+metadata=(ROOT/'moon.mod').read_text(encoding='utf8')
+versions=re.findall(r'^version\s*=\s*"([^"\n]+)"\s*$',metadata,re.MULTILINE)
+assert len(versions)==1
+VERSION=versions[0]
+CONSUMER_TESTS=5
 OUT = ROOT / 'results' / ('package-' + uuid.uuid4().hex)
 OUT.mkdir(parents=True)
 def run(args, cwd=ROOT):
@@ -26,7 +32,7 @@ def run(args, cwd=ROOT):
     return result.stdout
 
 run(['moon','package','--frozen'])
-archive = ROOT/'_build/publish/serikaonoe123-moonrdiff-0.0.1.zip'
+archive = ROOT/f'_build/publish/serikaonoe123-moonrdiff-{VERSION}.zip'
 allowed = set((ROOT/'packaging/files.txt').read_text().splitlines())
 package = OUT/'package'
 package.mkdir()
@@ -59,6 +65,7 @@ resolution=json.loads(run(['moon','tree','--json'],consumer))
 modules=resolution['modules']
 engine=[x for x in modules if x['name']=='serikaonoe123/moonrdiff']
 assert len(engine)==1 and engine[0]['source']['kind']=='local'
+assert engine[0]['version']==VERSION
 assert Path(engine[0]['source']['path']).resolve()==package.resolve()
 assert all(Path(x['source']['path']).resolve()!=ROOT for x in modules if x['source']['kind']=='local')
 dependency=[x for x in modules if x['name']=='moonbitlang/async']
@@ -66,8 +73,8 @@ assert len(dependency)==1 and dependency[0]['version']=='0.19.3' and dependency[
 results=[]
 for target in args.targets:
     log=run(['moon','test','--package','moonrdiff-example/consumer','--target',target,'--deny-warn'],consumer)
-    assert 'Total tests: 2, passed: 2, failed: 0.' in log
-    results.append({'target':target,'public_consumer_tests':2,'passed':True})
+    assert f'Total tests: {CONSUMER_TESTS}, passed: {CONSUMER_TESTS}, failed: 0.' in log
+    results.append({'target':target,'public_consumer_tests':CONSUMER_TESTS,'passed':True})
 if not args.skip_native_cli:
     run(['moon','build','cmd/moonrdiff','--target','native','--deny-warn'],package)
     # Workspace builds place each module under a shared target dir; resolve its artifact.
@@ -86,7 +93,10 @@ if not args.skip_native_cli:
     ]:
         run([str(exe),*command_args],package)
     assert restored.read_bytes()==target.read_bytes()
-report={'module':'serikaonoe123/moonrdiff','version':'0.0.1','archive_bytes':archive.stat().st_size,
+shutil.copyfile(archive,OUT/archive.name)
+report={'module':'serikaonoe123/moonrdiff','version':VERSION,
+        'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+        'archive_bytes':archive.stat().st_size,
         'archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'files':inventory,
         'resolution':'local workspace pointing only at extracted archive; not Mooncakes registry',
         'consumer_results':results,'packaged_native_file_flow_passed':not args.skip_native_cli}

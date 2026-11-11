@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (module candidate 0.0.1)
+## Unreleased (module candidate 0.1.0)
 
 - Windows/Linux release CLI 128 MiB acceptance: five fixture types, default-budget rejection, and independent manifest/bound-restore/verify checks for the modified case.
 

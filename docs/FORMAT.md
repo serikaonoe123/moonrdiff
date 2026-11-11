@@ -1,6 +1,6 @@
-# Initial format contract
+# Format and API contract
 
-Status: signature generation/reading and explicit-instruction codec; automatic in-memory delta matching is available.
+The root package provides in-memory and incremental signature, delta and patch APIs. Native file commands also support an optional separate binding manifest. This document distinguishes those interfaces; the raw rdiff formats remain unchanged.
 
 ## Supported delta data
 
@@ -9,9 +9,10 @@ Status: signature generation/reading and explicit-instruction codec; automatic i
 - Parameter widths: 1, 2, 4, 8 bytes; big-endian unsigned representation.
 - In-memory API rejects parameter values above 2,147,483,647 before conversion. Also rejects reserved opcodes, missing END, trailing bytes, truncated parameters/data, out-of-basis copies and output beyond caller budget.
 - Encode: short literals up to 64 bytes, 4-byte lengths for longer literals, 4-byte offset/length COPY, final END. Empty literals are omitted. Encoder has no basis input and cannot validate COPY against its size; decoder performs that validation.
-- The entire basis, delta and output are resident in memory. This is not a streaming API.
+- The in-memory patch convenience function holds supplied basis/delta and reconstructed output. PatchDecoder provides incremental parsing separately, as described below.
 - Copy addresses the old basis, never the output under construction.
-- Raw deltas do not authenticate the basis or result. The caller must bind them to the correct files; this prototype does not add a verification manifest.
+- Raw deltas do not authenticate the basis or result. The caller must bind them to the correct files. Native commands can use the optional separate [binding manifest](BINDING.md); it does not alter raw delta bytes or authenticate a publisher.
+- encode takes explicit in-memory instructions with no output-budget parameter; callers control their sizes and allocation cost. It cannot validate COPY against a basis. Use the budgeted delta encoders for automatic matching and PatchDecoder for an explicit instruction-count limit.
 
 ## Supported signature profile
 
@@ -19,7 +20,7 @@ Status: signature generation/reading and explicit-instruction codec; automatic i
 
 The weak checksum is the polynomial H = M^n + sum(byte[i] * M^(n-1-i)) modulo 2^32, with M = 0x08104225. The strong checksum is unkeyed BLAKE2b with output size 32, then its first strong_length bytes. It is not BLAKE2b configured to produce strong_length bytes.
 
-API: signature(basis, block_size=2048, strong_length=32, max_blocks=1000000); parse_signature(bytes, max_blocks=1000000); Signature::block_count and Signature::to_bytes. This phase operates entirely in memory. Parsing preserves block order and bounds count before allocating records.
+In-memory API: signature(basis, block_size=2048, strong_length=32, max_blocks=1000000); parse_signature(bytes, max_blocks=1000000); Signature::block_count and Signature::to_bytes. Parsing preserves block order and bounds count before allocating records. Incremental generation is provided separately by SignatureEncoder.
 
 The format contains no record count, original length, or end marker. Removing an entire record yields another structurally valid signature; the parser cannot detect this. The record count cannot determine the original last block length. File binding and expected size must be supplied at the application layer.
 
@@ -45,7 +46,7 @@ The signature index scales with block count. Basis offsets are Int32-bounded by 
 
 SignatureEncoder::new(block_size=2048, strong_length=32, max_blocks=1000000, max_output=67108864) returns a stateful encoder. Block size is bounded to 1..1048576. push accepts at most 65536 bytes, emits the header on its first call, then complete records. finish emits a header if necessary and the final short block. Empty pushes are permitted. Finished or failed encoders reject further calls. Budget or oversized-push failures poison the encoder, so all partial output must be discarded by the caller.
 
-Output concatenation across any valid partition is byte-identical to the in-memory signature API. The encoder retains one block buffer and produces one bounded batch per push. Callers must drain returned batches to avoid accumulating the signature themselves. It does not enforce expected input size or authenticate data; the CLI reads its known file size, validates estimated output limits first, and writes batches to an exclusive new file. This changes only signature generation; matcher and patch APIs remain in memory.
+Output concatenation across any valid partition is byte-identical to the in-memory signature API. The encoder retains one block buffer and produces one bounded batch per push. Callers must drain returned batches to avoid accumulating the signature themselves. It does not enforce expected input size or authenticate data; the CLI reads its known file size, validates estimated output limits first, and writes batches to an exclusive new file. Incremental matcher and patch interfaces are described below; their in-memory convenience functions remain available.
 
 ## Incremental patch decoder
 
@@ -62,3 +63,24 @@ DeltaEncoder::new(signature, basis_size, max_candidate_checks=1000000, max_delta
 push returns newly encoded bytes; finish emits the remaining literal/COPY and END. Literal accumulation is capped at 64 KiB and COPY coalescing persists across pushes. Identical input/configuration produces identical bytes regardless of push partition; long literal layout may differ from the in-memory encoder. Comparison budget exhaustion uses literal fallback for the rest of the entire stream. Input/output budgets are cumulative. Failed or finished encoders cannot be resumed. Caller must discard provisional output on error.
 
 The target and delta need not be retained, but the signature plus index scale with basis block count. Clients must drain batches. The native delta command runs two bounded passes so output-budget failures happen before file creation, still requiring stable target data and no transactional or authentication guarantee.
+
+The streamed full-block index uses a 256-byte to 64-KiB membership hint. Positive hints still require complete weak-key and strong-digest checks. This bounded table does not bound total signature/index/process memory, and does not change comparison-budget accounting or short-tail semantics.
+
+## Public defaults and lifecycle
+
+| Interface | Defaults or required budgets |
+| --- | --- |
+| signature | block_size=2048, strong_length=32, max_blocks=1000000 |
+| parse_signature | max_blocks=1000000; parsed block size may exceed incremental encoders' 1 MiB cap |
+| encode | No explicit byte/count budget; caller-owned in-memory instructions |
+| delta | basis_size required; max_candidate_checks=1000000, max_delta_size=16777216 |
+| patch | max_output required; use PatchDecoder if an explicit instruction-count cap is needed |
+| SignatureEncoder::new | block_size=2048, strong_length=32, max_blocks=1000000, max_output=67108864 |
+| DeltaEncoder::new | basis_size required; max_candidate_checks=1000000, max_delta_size=16777216, max_target_size=67108864 |
+| PatchDecoder::new | basis_size/max_output required; max_instructions=1000000 |
+
+All three incremental objects accept pushes of at most 65536 bytes. Empty pushes are allowed while open. A successful finish closes the instance; any failed push/finish permanently fails it. Further calls raise DeltaError::Invalid(String). Instances own mutable state; aliases share that state. Consumers must discard provisional outputs after errors, and must call finish at EOF even after receiving useful batches or an END opcode.
+
+SignatureEncoder::output_bytes starts at zero, includes the header once emitted and includes complete records. buffered_bytes counts the pending partial block, not all input received. Counters after a failure are diagnostic only, not a resumable checkpoint.
+
+Public root failures use DeltaError::Invalid(String); messages are human diagnostics, not stable error identifiers. Catch the public error variant rather than matching exact text. Chunk-partition independence is part of the incremental contract. Exact automatic patch layout across future versions is not a canonical-format guarantee; compatible generators may choose different valid instructions. Byte-identical version comparisons in the benchmark describe those tested commits.

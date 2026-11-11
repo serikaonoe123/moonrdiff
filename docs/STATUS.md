@@ -1,6 +1,6 @@
 # MoonRdiff development status
 
-Updated 2026-11-11. Module metadata remains 0.0.1; no Mooncakes release has been published.
+Updated 2026-11-11. Module metadata remains 0.1.0; no Mooncakes release has been published.
 
 | Area | Current evidence | Remaining work |
 | --- | --- | --- |
@@ -11,7 +11,7 @@ Updated 2026-11-11. Module metadata remains 0.0.1; no Mooncakes release has been
 | Examples | Native generated-file demonstration and independent library consumer | Validate from a public registry after publication |
 | Packaging | 34-file policy; Windows/Linux archive consumers passed on JS/Native/Wasm-GC and packaged native CLI | Select release version/commit; registry acceptance after publication |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | Public source and per-milestone CI | Version review, publication authorization, registry upload and registry acceptance |
+| Release | Public source, reviewed root API and unpublished 0.1.0 candidate metadata | Candidate full CI/package evidence, publication authorization, registry upload and registry acceptance |
 
 The project plan records original dates and milestone gates; historical early checkboxes are not an assertion that current features are absent. T02/T03/T04/T06 now have algorithm, version, contract and vector evidence in FORMAT.md and VALIDATION.md. Public search has not found an identical MoonBit project, but cannot establish exclusivity against unpublished work.
 

@@ -14,6 +14,8 @@ __pycache__/
 /docs/PACKAGING.md
 /docs/BENCHMARKS.md
 /docs/LARGE-FILES.md
+/docs/API-REVIEW.md
+/docs/RELEASE-PROPOSAL-0.1.0.md
 /CHANGELOG.md
 /README.md
 /packaging/
