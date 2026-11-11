@@ -15,6 +15,8 @@ ROOT=Path(__file__).resolve().parents[1]
 approved=json.loads(args.approved_inventory.read_text(encoding='utf8'))
 assert approved['module']=='serikaonoe123/moonrdiff' and approved['version']=='0.1.0'
 assert approved['packaged_native_file_flow_passed']
+assert {x['target'] for x in approved['consumer_results']}=={'js','native','wasm-gc'}
+assert all(x['passed'] and x['public_consumer_tests']==5 for x in approved['consumer_results'])
 assert {x['path'] for x in approved['files']}==set((ROOT/'packaging/files.txt').read_text().splitlines())
 OUT=ROOT/'results'/('registry-'+uuid.uuid4().hex)
 OUT.mkdir(parents=True)

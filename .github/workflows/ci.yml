@@ -40,6 +40,16 @@ jobs:
           python scripts/check_cli.py --profile release
       - name: Archive policy and independent consumers
         run: python scripts/check_package.py
+      - name: Keep reviewable package candidate
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-candidate-${{ matrix.os }}
+          path: |
+            results/package-*/report.json
+            results/package-*/resolution.json
+            results/package-*/commands.log
+            results/package-*/serikaonoe123-moonrdiff-*.zip
       - name: Install reference tool from Ubuntu signed repository
         if: runner.os == 'Linux'
         run: |
