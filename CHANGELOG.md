@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased (0.1.1 candidate)
+
+- Remove the package README's stale prepublication wording; keep publication status in per-version release records.
+- Correct a stale API-review status paragraph. No public API, algorithm, budget or native compiler setting changes.
+- Bind registry checks to the version in the selected approved inventory, so testing released 0.1.0 remains independent of a newer candidate's example dependency.
+- Add a read-only local D8050 diagnostic record without claiming a fix or changing security settings.
+
 ## 0.1.0 — 2026-11-11
 
 - Windows/Linux release CLI 128 MiB acceptance: five fixture types, default-budget rejection, and independent manifest/bound-restore/verify checks for the modified case.

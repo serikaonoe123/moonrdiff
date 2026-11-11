@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import platform
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -10,11 +11,13 @@ import uuid
 
 parser=argparse.ArgumentParser()
 parser.add_argument('--approved-inventory',type=Path,required=True,
-                    help='Downloaded successful 0.1.0 package report from the approved source commit.')
+                    help='Downloaded successful package report from the approved source commit.')
 args=parser.parse_args()
 ROOT=Path(__file__).resolve().parents[1]
 approved=json.loads(args.approved_inventory.read_text(encoding='utf8'))
-assert approved['module']=='serikaonoe123/moonrdiff' and approved['version']=='0.1.0'
+assert approved['module']=='serikaonoe123/moonrdiff'
+VERSION=approved['version']
+assert re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?',VERSION)
 assert approved['packaged_native_file_flow_passed']
 assert {x['target'] for x in approved['consumer_results']}=={'js','native','wasm-gc'}
 assert all(x['passed'] and x['public_consumer_tests']==5 for x in approved['consumer_results'])
@@ -24,7 +27,12 @@ OUT.mkdir(parents=True)
 consumer=OUT/'consumer'
 shutil.copytree(ROOT/'examples/consumer',consumer,
                 ignore=shutil.ignore_patterns('_build','.mooncakes','pkg.generated.mbti'))
-report={'module':approved['module'],'version':'0.1.0','status':'running',
+consumer_mod=consumer/'moon.mod'
+text=consumer_mod.read_text(encoding='utf8')
+text,count=re.subn(r'serikaonoe123/moonrdiff@[^"\s]+','serikaonoe123/moonrdiff@'+VERSION,text)
+assert count==1
+consumer_mod.write_text(text,encoding='utf8')
+report={'module':approved['module'],'version':VERSION,'status':'running',
         'platform':platform.platform(),'python':platform.python_version(),
         'approved_source_commit':approved['source_commit'],'consumer_results':[]}
 def save(): (OUT/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf8')
@@ -41,7 +49,7 @@ try:
     tree=json.loads(run(['moon','tree','--json']))
     (OUT/'resolution.json').write_text(json.dumps(tree,indent=2)+'\n',encoding='utf8')
     engine=[x for x in tree['modules'] if x['name']==approved['module']]
-    assert len(engine)==1 and engine[0]['source']['kind']=='registry' and engine[0]['version']=='0.1.0'
+    assert len(engine)==1 and engine[0]['source']['kind']=='registry' and engine[0]['version']==VERSION
     # tree resolves registry metadata; a normal check installs the sources.
     run(['moon','check','--target','js','--deny-warn'])
     module=consumer/'.mooncakes/serikaonoe123/moonrdiff'
@@ -58,7 +66,7 @@ try:
         report['consumer_results'].append({'target':target,'public_consumer_tests':5,'passed':True})
         save()
     report['status']='success';save()
-    print(f'Registry-only 0.1.0 consumer and 34-file content acceptance passed: {OUT / "report.json"}')
+    print(f'Registry-only {VERSION} consumer and 34-file content acceptance passed: {OUT / "report.json"}')
 except Exception as error:
     report['status']='failed';report['error']=str(error);save()
     raise

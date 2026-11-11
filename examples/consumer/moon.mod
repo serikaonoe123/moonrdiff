@@ -7,5 +7,5 @@ preferred_target = "js"
 supported_targets = [ "js", "native", "wasm-gc" ]
 
 import {
-  "serikaonoe123/moonrdiff@0.1.0",
+  "serikaonoe123/moonrdiff@0.1.1",
 }

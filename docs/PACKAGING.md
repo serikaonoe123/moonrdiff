@@ -2,6 +2,8 @@
 
 Published version: serikaonoe123/moonrdiff@0.1.0. This script remains the archive gate; separate completed registry acceptance is recorded in RELEASE-0.1.0.md.
 
+Main currently prepares the unpublished 0.1.1 documentation candidate. check_package.py derives the archive version from moon.mod; check_registry.py binds its standalone consumer dependency to the selected approved inventory's version, so the 0.1.0 registry workflow continues to test the already published package.
+
 Run with the pinned compiler:
 
 ```sh
