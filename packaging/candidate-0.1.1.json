@@ -1,0 +1,198 @@
+{
+  "module": "serikaonoe123/moonrdiff",
+  "version": "0.1.1",
+  "source_commit": "9ed7e11ea5f298a1ba3877a8932f54e8d8bd1200",
+  "archive_bytes": 50409,
+  "archive_sha256": "b7ebd19b15650a05c68f35bd6c45e6400dbb27f7f5e22ef989f31932b4a10e5c",
+  "files": [
+    {
+      "path": "signature.mbt",
+      "bytes": 3830,
+      "sha256": "50fd5e7da89f75afbec6c2aff0a5b77b71834bc094eddae40e9c8d3b01147e2b"
+    },
+    {
+      "path": "third_party/mooncry_blake2/LICENSE",
+      "bytes": 11358,
+      "sha256": "9b2d829d4fc72eff1408d5275aabf8a8847b32c49805d5d78d45a9c1a1a7563b"
+    },
+    {
+      "path": "third_party/mooncry_blake2/NOTICE.md",
+      "bytes": 1421,
+      "sha256": "6e26ffb67f7caea42e03e108d2110b6f0e7e37ba911dcbfd34d668aee13f5c84"
+    },
+    {
+      "path": "third_party/mooncry_blake2/moon.pkg",
+      "bytes": 112,
+      "sha256": "35d3bbc7a98a835837c021d9c7705f8aea620bc8b61d16bf6fbbcb757358204b"
+    },
+    {
+      "path": "third_party/mooncry_blake2/incremental.mbt",
+      "bytes": 2027,
+      "sha256": "cac8069899c6f0e2438a3d5cdc9c4fb9f42a26a3f99eddb19db4d3cd14e3e37a"
+    },
+    {
+      "path": "third_party/mooncry_blake2/pkg.generated.mbti",
+      "bytes": 475,
+      "sha256": "a4491ef2f26d1cff7bf33789247e6be1a919c47bb4a6b48cd531f1ef7f013e8a"
+    },
+    {
+      "path": "third_party/mooncry_blake2/incremental_test.mbt",
+      "bytes": 14118,
+      "sha256": "aa3250e4e8b45a06899686fa88026e190a8822edda4be9628bda321ceeeffe23"
+    },
+    {
+      "path": "third_party/mooncry_blake2/blake2.mbt",
+      "bytes": 5097,
+      "sha256": "d49dddec621669976ba238313f6d66851ad2803b1679c7edf00bb91f64f99dcd"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1070,
+      "sha256": "1332f937d79f5b0fbcad416d08e34bdd0bcf2ac40b90c77646424e5a3ba51724"
+    },
+    {
+      "path": "cmd/moonrdiff/delta_file.mbt",
+      "bytes": 2349,
+      "sha256": "2051ea7d0ad4189f46825cf157ef30f9a9859e2ef560e2b5fae899df1dacc352"
+    },
+    {
+      "path": "cmd/moonrdiff/signature_file.mbt",
+      "bytes": 2179,
+      "sha256": "0a9908d8842d26b5424483efe4da0df334b6de336a88af4a8891495f7d2b2aaf"
+    },
+    {
+      "path": "cmd/moonrdiff/binding.mbt",
+      "bytes": 3751,
+      "sha256": "b2719afb8bf90851c9aaec458628f93c895e69b81870d6d9ca5aa3e897b94d56"
+    },
+    {
+      "path": "cmd/moonrdiff/moon.pkg",
+      "bytes": 337,
+      "sha256": "e2fe11569b0c24b789808fe3386221c0e29ae4d792af09dd374c52707ba553df"
+    },
+    {
+      "path": "cmd/moonrdiff/main.mbt",
+      "bytes": 5893,
+      "sha256": "abf102fa914d4c1d14ea3899f1e2ec64d7454844838108919eca389e6f5eeb0b"
+    },
+    {
+      "path": "cmd/moonrdiff/patch_file.mbt",
+      "bytes": 4708,
+      "sha256": "51259bdb609294df27f0ecc8419ff173490b50b3f9331e74ad2ee87cd0012a16"
+    },
+    {
+      "path": "signature_test.mbt",
+      "bytes": 6210,
+      "sha256": "75182f63582c2597072af5c7075ba1d754269e9b160aca10bce9af960e110c0e"
+    },
+    {
+      "path": "patch_stream.mbt",
+      "bytes": 4640,
+      "sha256": "644aec519cb5f3ed2b5a3b5adf7c0a2613e7be2f88405464a875804162dc755f"
+    },
+    {
+      "path": "docs/CLI.md",
+      "bytes": 8110,
+      "sha256": "f705153789b75e7f7dc0aa2a30b170bba09da0b2fb59af705b1cf65d8f129d03"
+    },
+    {
+      "path": "docs/BINDING.md",
+      "bytes": 2703,
+      "sha256": "ab8b2ab1a2d36fffc8f0dcc8b6c7321052c912601e21af55f775f70b4dd00b93"
+    },
+    {
+      "path": "docs/FORMAT.md",
+      "bytes": 11070,
+      "sha256": "7c785fb736c09b7af1935b527a4556548f941a69e65ef104c7e6b04da2630f4f"
+    },
+    {
+      "path": "delta_test.mbt",
+      "bytes": 2492,
+      "sha256": "69f47d268ef5298a8ff9e807d54b6c2ddcfcb9553229343e4282f6c0ea3359f3"
+    },
+    {
+      "path": "delta_stream.mbt",
+      "bytes": 7470,
+      "sha256": "ba014653872919d1be1edfd53c0a2b8b47b1b55f13e4759452559e5e16ba34fe"
+    },
+    {
+      "path": "matcher_test.mbt",
+      "bytes": 3232,
+      "sha256": "9508ee62e0a970b35678ea87e9941921e98c014046767a10b2a1e8a310ad7a78"
+    },
+    {
+      "path": "delta_stream_test.mbt",
+      "bytes": 4106,
+      "sha256": "5fa5f402c07969003bfe1c090a2e73c308f138a0c7e0e17de32b1158a056c873"
+    },
+    {
+      "path": "patch_stream_test.mbt",
+      "bytes": 3931,
+      "sha256": "85ffb5847f1912902eaea7fe80264a2a25eb62e3e5b92aa0879a4dbf0db77258"
+    },
+    {
+      "path": "moon.pkg",
+      "bytes": 104,
+      "sha256": "c437cad996eb74e4b705bdf3b6f8e3fe1ff641897b7b4bac76d038c7640c2e96"
+    },
+    {
+      "path": "delta.mbt",
+      "bytes": 3583,
+      "sha256": "d1cec8c21233bdf44c050008249cc43c803ba36e3e8af5ffb3394733c440ef15"
+    },
+    {
+      "path": "README.mooncakes.md",
+      "bytes": 2949,
+      "sha256": "3b19ffc84858318da978cdfa89c5060eaf776ec0cd1139e90f31da91d84f8fcc"
+    },
+    {
+      "path": "signature_stream_test.mbt",
+      "bytes": 2898,
+      "sha256": "a54ba5970b37e09d3dbc8a97a7be027e8d08cf4b4a88cc0053ca2145576502b2"
+    },
+    {
+      "path": "matcher_wbtest.mbt",
+      "bytes": 2219,
+      "sha256": "8439aa2497be7e4025deb93ec77d2da01ab8b79f0bcada6aee0b51a1fe5c9f89"
+    },
+    {
+      "path": "moon.mod",
+      "bytes": 455,
+      "sha256": "685e46c9bb6de2401d12a35714acd0f953fca8775b699e5c0847fd78ece52c83"
+    },
+    {
+      "path": "signature_stream.mbt",
+      "bytes": 3281,
+      "sha256": "92a86bafefe1ca4dffdb1ac287050f153b23dd6718aeeedf8485fc79f994cd19"
+    },
+    {
+      "path": "pkg.generated.mbti",
+      "bytes": 1978,
+      "sha256": "3ddac0cf42a9ce5eae0344dcebf915e9c211c14d5e15d23042acb098ce827ea0"
+    },
+    {
+      "path": "matcher.mbt",
+      "bytes": 5834,
+      "sha256": "bd0dd4ae5d63cd3418c36a978df1fb6e7d568ae3989c4a8bee0273819bf17725"
+    }
+  ],
+  "resolution": "local workspace pointing only at extracted archive; not Mooncakes registry",
+  "consumer_results": [
+    {
+      "target": "js",
+      "public_consumer_tests": 5,
+      "passed": true
+    },
+    {
+      "target": "native",
+      "public_consumer_tests": 5,
+      "passed": true
+    },
+    {
+      "target": "wasm-gc",
+      "public_consumer_tests": 5,
+      "passed": true
+    }
+  ],
+  "packaged_native_file_flow_passed": true
+}

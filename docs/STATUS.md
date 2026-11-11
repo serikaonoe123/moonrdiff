@@ -11,7 +11,7 @@ Updated 2026-11-11. Mooncakes 0.1.0 is published from e09db0b; Windows/Linux reg
 | Examples | Native generated-file demo and fresh registry consumers: five public tests per backend on both platforms | Broader application integrations |
 | Packaging | Published 0.1.0: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | User-approved 0.1.0 published; registry-only resolution/content/three-backend checks passed on Windows/Linux | Validate/approve the 0.1.1 documentation candidate; D8050 cause remains unconfirmed after read-only inspection |
+| Release | 0.1.0 published/registry-verified; 0.1.1 documentation candidate passed full CI/archive/large-file gates | Separate 0.1.1 publication approval and registry acceptance; D8050 cause remains unconfirmed after read-only inspection |
 
 The project plan records original dates and milestone gates; historical early checkboxes are not an assertion that current features are absent. T02/T03/T04/T06 now have algorithm, version, contract and vector evidence in FORMAT.md and VALIDATION.md. Public search has not found an identical MoonBit project, but cannot establish exclusivity against unpublished work.
 

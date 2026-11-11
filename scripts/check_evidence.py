@@ -19,6 +19,8 @@ for label in ['windows','linux']:
     assert report['fixture_report_sha256']==expected['fixtures-'+label+'.json']
 candidate=ROOT/'packaging/candidate-0.1.0.json'
 assert hashlib.sha256(candidate.read_bytes()).hexdigest()=='99cfe413492f8573d49fd63283bec8549e64588b08b57344182029f32bacb0be'
+patch_candidate=ROOT/'packaging/candidate-0.1.1.json'
+assert hashlib.sha256(patch_candidate.read_bytes()).hexdigest()=='d5454b944e8a21a37f65eab8da495f96ba0eb97849a6c6458a057844162c41ac'
 registry={
     'windows-report.json':'62a09e7ecbe9cdf7acede75b96445f506dcddfefade1472c7953079791673772',
     'windows-resolution.json':'170d01fd294e465e48adde495a9631aeda81899588fec9edb4dd27faf4106a9f',
