@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Add a 38-case deterministic edit corpus covering the complete incremental signature/delta/patch pipeline under two push partitions, including empty pushes, repeated data, short tails and 64 KiB boundaries.
+- Check exact signature/target/patch-output budgets and delta limits; nine literal sizes accept the exact delta budget and reject one byte less with the public error type.
+- Correct the repository README's installation dependency to the published 0.1.1 version. No public API or production algorithm changes.
+
 ## 0.1.1 — 2026-11-11
 
 - Remove the package README's stale prepublication wording; keep publication status in per-version release records.
