@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Record successful local Native revalidation of the original failed consumer, 27 root tests and a fresh complete archive/CLI acceptance. Historical D8050 is not currently reproduced; no targeted fix or root cause is claimed.
 - Add a 38-case deterministic edit corpus covering the complete incremental signature/delta/patch pipeline under two push partitions, including empty pushes, repeated data, short tails and 64 KiB boundaries.
 - Check exact signature/target/patch-output budgets and delta limits; nine literal sizes accept the exact delta budget and reject one byte less with the public error type.
 - Correct the repository README's installation dependency to the published 0.1.1 version. No public API or production algorithm changes.
