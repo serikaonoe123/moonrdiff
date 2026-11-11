@@ -1,6 +1,6 @@
 # API review for the 0.1.0 candidate
 
-Scope: the public root package in pkg.generated.mbti, its three backend builds and the native CLI contracts. Module 0.1.0 is an unpublished pre-1.0 candidate; this review is not a promise of 1.x compatibility or a registry-installation result. The third_party/mooncry_blake2 package remains an attributed implementation dependency, not the supported application integration surface.
+Scope: the public root package in pkg.generated.mbti, its three backend builds and the native CLI contracts. Module 0.1.0 was reviewed as a pre-1.0 candidate and is now published; this review is not a promise of 1.x compatibility. Registry installation evidence is recorded separately in RELEASE-0.1.0.md. The third_party/mooncry_blake2 package remains an attributed implementation dependency, not the supported application integration surface.
 
 The existing root signatures were retained. No new error variants, renamed parameters or budget defaults were introduced. FORMAT.md now lists actual defaults, required budgets and mutable-object lifecycle. The review corrected stale claims that all APIs were in memory and that no binding manifest existed.
 
@@ -20,4 +20,4 @@ The independent consumer now has five public-only test groups: the README in-mem
 
 Local isolated JS/Wasm-GC checks and full cloud outcomes are recorded in VALIDATION.md. The known local isolated-native MSVC failure is not retried through alternate permissions/toolchains. Publication requires a concrete tested commit and package content inventory, then explicit applicable authorization; registry-consumer acceptance follows upload and remains pending until then.
 
-Candidate commit e09db0b passed full Windows/Linux CI 42955589065. Both platforms ran five consumer groups on each backend and passed the extracted native CLI flow. The actual archives were downloaded and every file was checked against that commit; the 34 content records match across platforms. The concrete version/commit/content proposal is in RELEASE-PROPOSAL-0.1.0.md. Registry resolution remains a post-publication gate.
+Candidate commit e09db0b passed full Windows/Linux CI 42955589065. Both platforms ran five consumer groups on each backend and passed the extracted native CLI flow. The actual archives were downloaded and every file was checked against that commit; the 34 content records match across platforms. The concrete version/commit/content proposal is in RELEASE-PROPOSAL-0.1.0.md. That post-publication gate has since passed on Windows/Linux; see RELEASE-0.1.0.md.

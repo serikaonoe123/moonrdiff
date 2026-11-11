@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (module candidate 0.1.0)
+## 0.1.0 — 2026-11-11
 
 - Windows/Linux release CLI 128 MiB acceptance: five fixture types, default-budget rejection, and independent manifest/bound-restore/verify checks for the modified case.
 
@@ -16,4 +16,4 @@
 - Reuse bounded BLAKE2 compression workspaces/local lanes and reduce ring-index arithmetic; add same-runner release comparisons and full release CLI acceptance alongside debug CI.
 - Preserve usage/format/budget error messages in release CLI builds through explicit diagnostic formatting.
 
-Not yet a Mooncakes release. API stabilization, performance improvements and registry-consumer validation remain pending.
+Published to Mooncakes from e09db0b with the approved 34-file inventory. Windows/Linux registry consumers verified all installed source hashes and passed five public tests on JS, Native and Wasm-GC. See docs/RELEASE-0.1.0.md for publication details and retained local Native/compiler and package-README limitations.

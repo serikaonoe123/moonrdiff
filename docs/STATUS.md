@@ -1,6 +1,6 @@
 # MoonRdiff development status
 
-Updated 2026-11-11. Module metadata remains 0.1.0; no Mooncakes release has been published.
+Updated 2026-11-11. Mooncakes 0.1.0 is published from e09db0b; Windows/Linux registry acceptance passed. See RELEASE-0.1.0.md.
 
 | Area | Current evidence | Remaining work |
 | --- | --- | --- |
@@ -8,11 +8,11 @@ Updated 2026-11-11. Module metadata remains 0.1.0; no Mooncakes release has been
 | Incremental APIs | SignatureEncoder, DeltaEncoder, PatchDecoder with state/budget checks; Windows/Linux release 128 MiB sample paths passed | Wider resource boundaries and larger real application inputs |
 | Native CLI | Windows/Linux debug/release acceptance; specific usage/format/budget diagnostics preserved in release | Input snapshot/transactional publication deliberately not promised |
 | Binding | Strict optional manifest, standard BLAKE2b-256, preflight/replay checks; both native platforms passed 128 MiB modified-file bound restore | Distributed manifest creation and publisher authentication not provided |
-| Examples | Native generated-file demonstration and independent library consumer | Validate from a public registry after publication |
-| Packaging | 0.1.0 candidate e09db0b: 34-file policy, five consumer groups per backend on both platforms, packaged CLI passed; actual ZIPs downloaded/audited | Registry acceptance after publication |
+| Examples | Native generated-file demo and fresh registry consumers: five public tests per backend on both platforms | Broader application integrations |
+| Packaging | Published 0.1.0: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | Reviewed root API, full candidate CI/archive evidence and concrete 0.1.0 proposal | First MoonRdiff publication authorization, registry upload and registry acceptance |
+| Release | User-approved 0.1.0 published; registry-only resolution/content/three-backend checks passed on Windows/Linux | Local MSVC D8050 environment diagnosis; package README candidate wording in a future patch |
 
 The project plan records original dates and milestone gates; historical early checkboxes are not an assertion that current features are absent. T02/T03/T04/T06 now have algorithm, version, contract and vector evidence in FORMAT.md and VALIDATION.md. Public search has not found an identical MoonBit project, but cannot establish exclusivity against unpublished work.
 
-The planned first representative synthetic benchmark gate and controlled release comparisons have passed; see BENCHMARKS.md for tested commits/runs, archived measurements and limitations. LARGE-FILES.md records the separate five-case Windows/Linux 128 MiB gate, including default-budget refusals and a modified-file bound restore. The latest same-release prefilter comparison reduced 128 MiB random delta time 8.74 -> 3.80 s (56.5%) and compressed 3.75 -> 2.70 s (28%). Input and output hashes are unchanged; the extra hint table is capped at 64 KiB. Favorable cases were mixed, and unmodified-stage timing anomalies remain recorded rather than discarded. The earlier COPY-patch anomaly was not reproduced in its ten-pair follow-up. Commands remain slower than packaged rdiff, and random targets cost more bytes than full transfer. API review and the concrete 0.1.0 candidate proposal are complete; publication authorization and registry acceptance remain required. The module is unpublished.
+The planned first representative synthetic benchmark gate and controlled release comparisons have passed; see BENCHMARKS.md for tested commits/runs, archived measurements and limitations. LARGE-FILES.md records the separate five-case Windows/Linux 128 MiB gate, including default-budget refusals and a modified-file bound restore. The latest same-release prefilter comparison reduced 128 MiB random delta time 8.74 -> 3.80 s (56.5%) and compressed 3.75 -> 2.70 s (28%). Input and output hashes are unchanged; the extra hint table is capped at 64 KiB. Favorable cases were mixed, and unmodified-stage timing anomalies remain recorded rather than discarded. The earlier COPY-patch anomaly was not reproduced in its ten-pair follow-up. Commands remain slower than packaged rdiff, and random targets cost more bytes than full transfer. API review, the approved first upload and registry acceptance are complete. The module is published; retained local MSVC and package-README wording limitations are described in RELEASE-0.1.0.md.

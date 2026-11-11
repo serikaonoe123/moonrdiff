@@ -19,4 +19,12 @@ for label in ['windows','linux']:
     assert report['fixture_report_sha256']==expected['fixtures-'+label+'.json']
 candidate=ROOT/'packaging/candidate-0.1.0.json'
 assert hashlib.sha256(candidate.read_bytes()).hexdigest()=='99cfe413492f8573d49fd63283bec8549e64588b08b57344182029f32bacb0be'
-print('Original artifact bytes retained: four large-file snapshots and the 0.1.0 candidate inventory.')
+registry={
+    'windows-report.json':'62a09e7ecbe9cdf7acede75b96445f506dcddfefade1472c7953079791673772',
+    'windows-resolution.json':'170d01fd294e465e48adde495a9631aeda81899588fec9edb4dd27faf4106a9f',
+    'linux-report.json':'ba29b5c6388e8ca97eba2662db121e2d1642b0a9eeb43fce0dfc721502604852',
+    'linux-resolution.json':'3fff3f99e57cb34869bc862ad48c4b6c0f520135d551e7649233762c8002e668',
+}
+for name,sha in registry.items():
+    assert hashlib.sha256((ROOT/'packaging/registry-0.1.0'/name).read_bytes()).hexdigest()==sha,name
+print('Original large-file, candidate and published registry evidence bytes retained.')
