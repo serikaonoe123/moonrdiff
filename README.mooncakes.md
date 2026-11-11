@@ -39,6 +39,8 @@ moon run cmd/moonrdiff --target native -- --help
 
 Commands: signature, delta, patch, verify and manifest. Existing output paths are refused; input/output limits default to 64 MiB. See [CLI](docs/CLI.md), [format contract](docs/FORMAT.md), and [binding manifests](docs/BINDING.md).
 
+Windows Server 2025 and Ubuntu 24.04 release CLI builds passed five synthetic 128 MiB cases with explicitly raised budgets, plus bound restore/verify of the modified-file case. This is sample acceptance, not general larger-file support or a streaming guarantee for verify.
+
 ## Compatibility and limits
 
 Supports the RK/BLAKE2 signature profile and standard rdiff literal/COPY/END delta instructions, with Int32 parameter limits. It does not implement the rsync network protocol or publisher authentication. Binding manifests require a trusted source. Input stability and partial-output handling are described in the CLI contract; no transactional or snapshot guarantee is made.

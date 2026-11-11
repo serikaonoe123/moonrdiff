@@ -89,7 +89,7 @@ Complete immutable snapshots retain every sample, all reference timings/RSS, has
 - [Computed comparison](../benchmarks/release-2026-11-10/comparison.json), SHA-256 `720c49f8827d45cc637d7150cd773273878a7d8e02f4b1ca0f8ba961ae456c21`.
 - [Alternating COPY-patch follow-up](../benchmarks/release-2026-11-10/patch-followup.json), SHA-256 `fd3cc3b03533161dadb19cccfd6183ce886607e85891052da38353b6ec4e4044`.
 
-The optimized release commands remain slower than packaged rdiff, whose validation/sync work differs. Random targets still increase transmission bytes. More independent runs, application data, profiling and Windows large-file acceptance remain useful; these results do not claim a universal speedup or multi-gigabyte support.
+The optimized release commands remain slower than packaged rdiff, whose validation/sync work differs. Random targets still increase transmission bytes. More independent runs, application data and profiling remain useful; these results do not claim a universal speedup or multi-gigabyte support. The separate Windows/Linux 128 MiB correctness gate is now documented in [LARGE-FILES.md](LARGE-FILES.md); it is not a Windows performance comparison.
 
 ## Historical default-debug baseline: 2026-11-10
 

@@ -2,6 +2,8 @@
 
 ## Unreleased (module candidate 0.0.1)
 
+- Windows/Linux release CLI 128 MiB acceptance: five fixture types, default-budget rejection, and independent manifest/bound-restore/verify checks for the modified case.
+
 - Bounded streamed full-block lookup prefilter; same-release Linux comparison reduces the sampled 128 MiB random delta time from 8.74 to 3.80 s while preserving exact patch bytes. Reports retain small regressions/timing anomalies and table-memory cost.
 
 - RK/BLAKE2 signatures and rdiff-compatible delta encoding/decoding.

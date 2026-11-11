@@ -1,6 +1,6 @@
 # 文件命令行使用说明
 
-MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，文件适配使用固定版本 `moonbitlang/async@0.19.3`（Apache-2.0）。signature、delta、patch 命令均已逐块处理文件。delta 仍在内存中保留摘要与索引；verify 仍完整读入两个文件。默认每个输入和结果均限制为 64 MiB。Linux 已通过 128 MiB 级样本的摘要、差量和还原验收，运行时显式提高预算；该结果不涵盖 Windows 同等大小或更大文件。
+MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，文件适配使用固定版本 `moonbitlang/async@0.19.3`（Apache-2.0）。signature、delta、patch 命令均已逐块处理文件。delta 仍在内存中保留摘要与索引；verify 仍完整读入两个文件。默认每个输入和结果均限制为 64 MiB。Windows Server 2025 和 Ubuntu 24.04 云端 release 构建均已通过五类 128 MiB 级样本的摘要、差量和还原验收，运行时显式提高预算；不代表更大文件或所有运行环境均已验证。
 
 ## 构建与示例
 
@@ -57,6 +57,8 @@ verify 逐字节比较两个文件，适合手上有预期结果时验收；它�
 64 MiB 是单文件默认预算，总进程内存还包括多个输入、摘要索引、输出和运行时开销。提高预算不等于验证了相应的大文件能力。
 
 Linux 的 1/16/128 MiB 合成基准已验证相同、局部修改、插入删除、随机和 gzip 数据共 15 组。128 MiB 级运行显式设为 `--max-input 536870912 --max-output 536870912`；并验证默认输入预算、仅提高输入预算时的默认输出预算会报错且不创建输出。这只是当前样本验收，不表示 512 MiB 或任意大文件已测。完整仓库中的 `docs/BENCHMARKS.md` 和 `benchmarks/2026-11-10-linux.json` 保留原始结果。随机数据可能比整文件传输更大；当前 debug 构建的摘要与差量计算显著慢于参考 rdiff。
+
+另有 Windows/Linux 专用 128 MiB 验收，覆盖五类未绑定还原及局部修改样本的绑定还原、清单独立哈希与 CLI verify，并检查默认 verify/manifest 输入预算仍会拒绝超限文件。协议及具体提交、云端报告见完整仓库的 `docs/LARGE-FILES.md`。它是正确性与预算验收，不是跨平台性能比较；verify 仍会将两个文件完整读入内存。
 
 ## 验证
 
