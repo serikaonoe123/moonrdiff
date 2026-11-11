@@ -4,7 +4,7 @@
 
 当前进度见 [状态清单](docs/STATUS.md)。归档内容和独立消费者验证见 [打包验收](docs/PACKAGING.md)，性能评测方法与实测记录见 [基准说明](docs/BENCHMARKS.md)；目前尚未发布到 Mooncakes。
 
-原生性能运行建议用 `moon build cmd/moonrdiff --target native --release`，执行文件在 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。本轮同机、同为 release 的三次采样中，128 MiB 摘要耗时下降约 28%–30%，相同/局部修改/插入删除的差量耗时下降约 37%–40%；随机目标改善较小，仍慢于参考 rdiff。报告保留全部场景及还原耗时的异常结果。
+原生性能运行建议用 `moon build cmd/moonrdiff --target native --release`，执行文件在 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。最新同机、同为 release 的三次采样中，128 MiB 随机目标的差量耗时从 8.74 秒降到 3.80 秒（约减少 56.5%），压缩样本约减少 28%。这来自最多 64 KiB 的查找预筛选表，输出字节保持一致；随机补丁仍比整文件传输大，命令仍慢于参考 rdiff。报告保留其他场景的小幅退化及计时异常。
 
 目标是让备份、同步和资源更新程序通过旧文件摘要计算差量，再利用旧文件还原新版。目前实现 **RK/BLAKE2 分块摘要生成、读写，自动差量匹配，以及 rdiff 补丁格式的内存编解码**；支持从旧文件摘要与新文件自动生成补丁，也保留显式指令编码接口。解码器支持 literal/copy/end 指令及其全部参数宽度，并检查截断、范围和输出预算。
 

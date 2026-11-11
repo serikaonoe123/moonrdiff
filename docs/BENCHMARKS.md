@@ -30,7 +30,33 @@ The 128 MiB tier explicitly raises CLI budgets to 512 MiB. Each case then confir
 
 The script saves per-case progress after correctness checks and preserves failed-case data on the runner. The benchmark workflow uploads reports, command logs, hardware and tool records, not redundant large generated files. Inputs can be reconstructed with the committed generator and hashes. Archive/package inventory remains unchanged.
 
-The workflow runs the fixed baseline first, then the candidate, so cloud-host variation and ordering remain limitations. Its comparison script requires matching input, signature and delta hashes for all 15 cases, successful restores, all 20 default-limit controls per version and equal compiler/configuration metadata. The historical release baseline only prints opaque error constructors: its checks require the expected constructor, exit 2, empty stdout and no output file. The candidate additionally must print the specific budget reason; reports explicitly distinguish those diagnostic checks. It records regressions too, without a timing pass/fail threshold. Results from that workflow must be inspected before making code-speedup claims.
+The workflow runs the fixed baseline first, then the candidate, so cloud-host variation and ordering remain limitations. Its comparison script requires matching input, signature and delta hashes for all 15 cases, successful restores, all 20 default-limit controls per version and equal compiler/configuration metadata. Both current versions must emit the specific budget reason, exit 2, empty stdout and no output file. Only the older 79b1824 release baseline in historical runs uses explicitly recorded opaque-constructor checks. The comparison records regressions too, without a timing pass/fail threshold. Results from each workflow must be inspected before making code-speedup claims.
+
+## Verified streamed-lookup prefilter: 2026-11-11
+
+[Run 42949042760](https://github.com/serikaonoe123/moonrdiff/actions/runs/42949042760) compared previous milestone `c439ae9dc7631fd627842b73222cbc1b6470133a` with `150ce03a2e0ffb94568c4e6f1734c6170c712fcd`, both release builds on one Intel Xeon 6973P-C VM with 4 logical CPUs. Python was 3.12.16; compiler/reference versions remain pinned above. Each version passed 15 cases with three samples per command and 20 specific-reason budget controls. All input/signature/delta hashes matched across versions. Downloaded artifact records were checked against all 30 official log entries.
+
+The streamed matcher now rejects impossible full-block map lookups with a per-encoder membership hint. The table has 64-16384 UInt32 slots (256 bytes-64 KiB of table storage). Hint collisions still require the complete weak-key lookup and strong digest check; short-tail handling and candidate/output budgets are unchanged. This is a bounded memory tradeoff, not a process-RSS bound or authentication mechanism.
+
+128 MiB nominal delta medians, seconds, three samples:
+
+| Case | Previous release | Prefilter release | Time change |
+| --- | ---: | ---: | --- |
+| identical | 1.88 | 1.76 | 6.4% lower |
+| modified | 1.98 | 1.77 | 10.6% lower |
+| insert-delete | 1.76 | 1.77 | 0.6% higher |
+| random | 8.74 | 3.80 | 56.5% lower |
+| compressed | 3.75 | 2.70 | 28.0% lower |
+
+At 16 MiB, random delta time was 0.91 -> 0.56 s and compressed 0.41 -> 0.28 s. Favorable cases were mixed: identical 0.23 -> 0.22, modified 0.22 -> 0.22, insert-delete 0.22 -> 0.23 s. All patch byte costs are unchanged; an unrelated random target still produces a larger first exchange than full transfer. No automatic transport selection was added.
+
+Unmodified stages also fluctuated: 16 MiB random signature was 0.11 -> 0.29 s, 16 MiB insert-delete patch was 0.10 -> 0.29 s, and 1 MiB identical signature was 0.00 -> 0.11 s. Their cause is unconfirmed; the original samples remain public and no end-to-end improvement for every workload is claimed. GNU time resolution and fixed-order shared-runner behavior limit small ratios. Do not compare absolute times against the previous AMD-runner milestone to attribute this change; use the paired versions within this run.
+
+Candidate 128 MiB delta RSS maxima were 9992-10852 KiB across cases, versus 9764-10916 KiB baseline. Those observations do not establish a memory reduction. Immutable reports retain all measurements and unfavorable cases:
+
+- [Previous milestone report](../benchmarks/prefilter-2026-11-11/baseline.json), SHA-256 `5b5629964cf1a164220589f15d164957b7b851a007056abf51e92685b7230780`.
+- [Prefilter candidate report](../benchmarks/prefilter-2026-11-11/candidate.json), SHA-256 `6bdb036f2ac917a0acd513c1712b27df4aaab7c9280a7751504c07a7a2ae227f`.
+- [Computed comparison](../benchmarks/prefilter-2026-11-11/comparison.json), SHA-256 `eff441b1d385bae9d5cb802fe43c7af3f022e3667b1220db3ded2f91634ffe15`.
 
 ## Verified release optimization: 2026-11-10
 
