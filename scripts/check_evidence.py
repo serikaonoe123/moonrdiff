@@ -52,4 +52,8 @@ for name, sha in source_update.items():
     }
     for case in report['cases']:
         assert case['target_sha256'] == case['restored_sha256'] == case['selected_result_sha256']
+verify_evidence = {'linux-memory.json': 'a0d7bc356e92d8622f0021e00c760d7d09dc531994479fc4c25e9c6446591cc9', 'windows-large.json': 'a83fd3fdb368e05608afe82b29ff63a3e890c8b5deaa5765dcfdd3290d6dfd7f', 'windows-fixtures.json': 'f6026d4fe1c7f017d38e11cb7dae019e469e1f202e8dbb6fa645c5101ed49c29', 'linux-large.json': 'bc2f1fde9727ce75483684a4ebdefb494f481848bf620ed3ebc3313bcf226d62', 'linux-fixtures.json': '39aa397f47f3594874d90a4eb1284ddf9e89c1f7681655eec384a7a63cb6c0f5'}
+for name, sha in verify_evidence.items():
+    original = (ROOT/"benchmarks/verify-2026-11-11"/name).read_bytes()
+    assert hashlib.sha256(original).hexdigest() == sha, name
 print('Original large-file, source-update, candidate and published registry evidence bytes retained.')

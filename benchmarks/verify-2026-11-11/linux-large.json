@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "status": "success",
+  "profile": "release",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "python": "3.12.16",
+  "nominal_mib": 128,
+  "full_128mib_acceptance": true,
+  "records": [
+    {
+      "nominal_mib": 128,
+      "scenario": "identical",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "signature_sha256": "6b9268a9cb6e25f71739785b6ed7fe0eaff3cda07f465c2f7d38c232b281cc58",
+      "delta_sha256": "a3febdbf4bf219d1475f578ec1abf92fd859dd4b2aec1713d6d2080354accd64",
+      "signature_bytes": 1179660,
+      "delta_bytes": 14,
+      "restore_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "restore_verified": true,
+      "default_budget_controls": [
+        {
+          "reason": "Input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Target byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Patch input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Output budget exceeded",
+          "no_output": true
+        }
+      ]
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "modified",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "1cb5620b16d3dca5c34f39a2cc39a7b5d58078d1695f91394914e2be66e96769",
+      "signature_sha256": "6b9268a9cb6e25f71739785b6ed7fe0eaff3cda07f465c2f7d38c232b281cc58",
+      "delta_sha256": "7b227a215febfdee7e014667275811c4e9569115835a776b2edafc32196e3313",
+      "signature_bytes": 1179660,
+      "delta_bytes": 4124,
+      "restore_sha256": "1cb5620b16d3dca5c34f39a2cc39a7b5d58078d1695f91394914e2be66e96769",
+      "restore_verified": true,
+      "default_budget_controls": [
+        {
+          "reason": "Input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Target byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Patch input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Output budget exceeded",
+          "no_output": true
+        }
+      ],
+      "bound_restore_verified": true,
+      "manifest_independent_hashes_verified": true,
+      "cli_verify_matched": true,
+      "default_verify_manifest_rejected": true
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "insert-delete",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "9b25dc2319b40b08785fd633e64cbba8f2ba2ad8910df456665ebcd6ce7f32a8",
+      "signature_sha256": "6b9268a9cb6e25f71739785b6ed7fe0eaff3cda07f465c2f7d38c232b281cc58",
+      "delta_sha256": "c8e21523e718d17670e72da723e4e3a0e1864ec08b9f214fab1a154ef554897e",
+      "signature_bytes": 1179660,
+      "delta_bytes": 8220,
+      "restore_sha256": "9b25dc2319b40b08785fd633e64cbba8f2ba2ad8910df456665ebcd6ce7f32a8",
+      "restore_verified": true,
+      "default_budget_controls": [
+        {
+          "reason": "Input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Target byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Patch input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Output budget exceeded",
+          "no_output": true
+        }
+      ]
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "random",
+      "basis_bytes": 134217728,
+      "target_bytes": 134217728,
+      "basis_sha256": "29ece375715f45b589459bcdd71fd4d67ce2065189007ada10c84271b7fc49cd",
+      "target_sha256": "94c87eebe9fe12cb1cf96a93c14216e59d4ee405ce706ce9929a4a306468a6c5",
+      "signature_sha256": "6b9268a9cb6e25f71739785b6ed7fe0eaff3cda07f465c2f7d38c232b281cc58",
+      "delta_sha256": "f48f818ebd8096519fd3ac3660e96f06bbe74fb16d97c493debd28f58eb2c05c",
+      "signature_bytes": 1179660,
+      "delta_bytes": 134227973,
+      "restore_sha256": "94c87eebe9fe12cb1cf96a93c14216e59d4ee405ce706ce9929a4a306468a6c5",
+      "restore_verified": true,
+      "default_budget_controls": [
+        {
+          "reason": "Input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Target byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Patch input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Output budget exceeded",
+          "no_output": true
+        }
+      ]
+    },
+    {
+      "nominal_mib": 128,
+      "scenario": "compressed",
+      "basis_bytes": 134258691,
+      "target_bytes": 134254658,
+      "basis_sha256": "bd8ebf120a29957e0e59473fd7c4a40f32bd532d2af77ef9d2136b90054f1775",
+      "target_sha256": "5bb2f172ce5f9bc9f2b2dfdd82dd1b760da366edaef29690388f08f979326add",
+      "signature_sha256": "5ac4d95baafb9facc80daebb61bb28d455a110b4d84e7283e2b293122a855a67",
+      "delta_sha256": "90360e8af0c4469572e1b6f5fb3dc286462a1263356d3cd409c7a98681c30069",
+      "signature_bytes": 1180056,
+      "delta_bytes": 33554492,
+      "restore_sha256": "5bb2f172ce5f9bc9f2b2dfdd82dd1b760da366edaef29690388f08f979326add",
+      "restore_verified": true,
+      "default_budget_controls": [
+        {
+          "reason": "Input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Target byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Patch input byte limit exceeded",
+          "no_output": true
+        },
+        {
+          "reason": "Output budget exceeded",
+          "no_output": true
+        }
+      ]
+    }
+  ],
+  "scope": "Generated files; correctness and default-budget rejection, not performance, snapshots or multi-gigabyte acceptance.",
+  "source_commit": "22310484d612fb19b200eca242e5d7bb189d9ff6",
+  "executable_sha256": "1233062c14c8eb08ea8f4fe53e6f96f55856cb664990c27586df0a857c777768",
+  "compiler": "moon 0.1.20261023 (3778465 2026-10-23) ~/.moon/bin/moon\nmoonc v0.10.17+d971670cd (2026-10-23) ~/.moon/bin/moonc\nmoonrun 0.1.20261023 (3778465 2026-10-23) ~/.moon/bin/moonrun\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg\n",
+  "fixture_report": "results/benchmark-11af7cebc3104ea0a757e22d88cb5d32/report.json",
+  "fixture_report_sha256": "39aa397f47f3594874d90a4eb1284ddf9e89c1f7681655eec384a7a63cb6c0f5"
+}

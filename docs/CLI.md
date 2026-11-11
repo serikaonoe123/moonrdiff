@@ -84,3 +84,7 @@ moon run cmd/moonrdiff --target native -- patch old.bin update.delta restored.bi
 ```
 
 manifest 记录三个普通文件的身份；它本身不证明补丁能还原目标，patch 的第一遍预演才验证这一关系。成功的绑定还原会返回 manifest_verified=true。清单最多 16 KiB，摘要按 64 KiB 分块读取，使用标准 BLAKE2b-256。预期结果与补丁不配对时，在预演阶段报错且不创建输出。若第二遍输入变化或写入失败，可能留下新结果文件并报告失败；不提供快照或事务承诺。
+
+## 开发版分块 verify 验收
+
+提交 2231048 已通过 Windows/Linux debug/release 完整检查及新一轮 128 MiB release 验收。Linux 4 MiB 与 32 MiB 样本的 verify 子进程峰值 RSS 分别为 3264、3584 KiB；这是两个进程的观测值，不是跨平台内存上限或前后版本性能对照。原始记录保存在完整仓库 benchmarks/verify-2026-11-11/，具体 run 和边界见 VALIDATION.md。Mooncakes 0.1.1 未随此开发版变更重新发布。
