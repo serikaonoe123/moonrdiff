@@ -1,0 +1,41 @@
+name: Registry consumer acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/check_registry.py', '.github/workflows/registry.yml']
+permissions:
+  contents: read
+jobs:
+  registry-consumer:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f
+        with:
+          version: '0.10.17+d971670cd'
+          core-version: '0.10.17+d971670cd'
+      - run: python scripts/check_evidence.py
+      - name: Install only from registry and verify approved bytes
+        run: python scripts/check_registry.py --approved-inventory packaging/candidate-0.1.0.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: registry-consumer-${{ matrix.os }}
+          path: |
+            results/registry-*/report.json
+            results/registry-*/resolution.json
+            results/registry-*/commands.log

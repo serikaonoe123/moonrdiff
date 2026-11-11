@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import platform
 from pathlib import Path
 import shutil
 import subprocess
@@ -24,6 +25,7 @@ consumer=OUT/'consumer'
 shutil.copytree(ROOT/'examples/consumer',consumer,
                 ignore=shutil.ignore_patterns('_build','.mooncakes','pkg.generated.mbti'))
 report={'module':approved['module'],'version':'0.1.0','status':'running',
+        'platform':platform.platform(),'python':platform.python_version(),
         'approved_source_commit':approved['source_commit'],'consumer_results':[]}
 def save(): (OUT/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf8')
 def run(command):
@@ -33,12 +35,15 @@ def run(command):
     result.check_returncode()
     return result.stdout
 try:
+    report['compiler']=subprocess.check_output(['moon','version','--all'],text=True)
     # No MoonRdiff workspace member or local dependency is created here.
     run(['moon','update'])
     tree=json.loads(run(['moon','tree','--json']))
     (OUT/'resolution.json').write_text(json.dumps(tree,indent=2)+'\n',encoding='utf8')
     engine=[x for x in tree['modules'] if x['name']==approved['module']]
     assert len(engine)==1 and engine[0]['source']['kind']=='registry' and engine[0]['version']=='0.1.0'
+    # tree resolves registry metadata; a normal check installs the sources.
+    run(['moon','check','--target','js','--deny-warn'])
     module=consumer/'.mooncakes/serikaonoe123/moonrdiff'
     assert module.is_dir() and not module.is_symlink()
     installed=module.resolve()
