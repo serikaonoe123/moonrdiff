@@ -40,3 +40,5 @@ python scripts/demo_source_update.py
 首次交换量 = 摘要 + 补丁 + 绑定清单。报告另列摘要可复用时的补丁加清单大小。比较的是文件字节，不包含网络协议、传输压缩、身份认证等额外开销，也不是速度或内存性能测试。ZIP 本身已显著缩小完整新版，两种格式的比例应分别解读。其他输入可能没有差量收益。
 
 本地报告保留于 results/source-update-d156c4fb4b484d8c83ce510e8f51e7cb/report.json。Windows/Linux 常规 CI 会重新生成同一提交对并校验还原结果；云端执行结果以对应 run 为准。本示例没有改变 Mooncakes 已发布版本。
+
+提交 `e24a0814b4787880cf8e256385197ae63ea0c181` 已通过 [Windows/Linux CI 42987094337](https://github.com/serikaonoe123/moonrdiff/actions/runs/42987094337)。两平台均通过 TAR/ZIP 绑定还原、原文件保持和完整回归。该次云端 TAR 数字与上表相同；ZIP 完整新版为 51,883 字节，首次交换为 16,388 字节（31.59%）。保留本地与云端各自数字，不假定压缩输出字节跨环境一致。公开日志与摘要另保存在 results/source-update-ci-full.log 和 results/source-update-ci.json。
