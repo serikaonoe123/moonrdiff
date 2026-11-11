@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Extend the source-update example with TAR.GZ and verified full-file delivery when its complete file/identity cost is lower. Report offline planning, signature reuse and already-sent signature costs separately.
+
 - Add a reproducible source-bundle update example using two committed project snapshots, TAR/ZIP inputs, separated sender/receiver directories, bound restores and file-byte transfer accounting; run it on Windows/Linux CI.
 
 - Record successful local Native revalidation of the original failed consumer, 27 root tests and a fresh complete archive/CLI acceptance. Historical D8050 is not currently reproduced; no targeted fix or root cause is claimed.

@@ -41,6 +41,14 @@ jobs:
           python scripts/check_cli.py --profile release
       - name: Source bundle update example
         run: python scripts/demo_source_update.py
+      - name: Keep source update reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-update-evidence-${{ matrix.os }}
+          path: |
+            results/source-update-*/report.json
+            results/source-update-*/commands.log
       - name: Archive policy and independent consumers
         run: python scripts/check_package.py
       - name: Keep reviewable package candidate

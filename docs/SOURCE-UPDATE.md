@@ -14,7 +14,7 @@ python scripts/demo_source_update.py
 
 需要保留 Git 历史。浅克隆缺少指定提交时，先获取对应历史；脚本自身不联网。默认旧版为 `e09db0b71ef6386f30aa5e5aebd2a2c619013be9`，新版为 `4013e9ca62b54eb314a0444f902962eebbdd039f`。可用 `--basis-ref`、`--target-ref` 选择其他含 packaging/files.txt 的本项目提交，或用 `--profile debug` 运行已构建的 debug CLI。
 
-脚本按各提交的文件清单读取 Git blob，排序后生成 TAR 和逐文件压缩的 ZIP。归档时间与文件权限固定；报告记录完整提交、文件 SHA-256、Python/zlib 版本和 CLI 二进制 SHA-256。ZIP 字节可能随 zlib 版本变化，不承诺跨运行环境的压缩字节完全一致。脚本不解压归档，不覆盖已有文件，不发布软件包。
+脚本按各提交的文件清单读取 Git blob，排序后生成 TAR、逐文件压缩的 ZIP 和整包压缩的 TAR.GZ。归档时间与文件权限固定；报告记录完整提交、文件 SHA-256、Python/zlib 版本和 CLI 二进制 SHA-256。压缩字节可能随运行环境变化，不承诺跨环境完全一致。脚本不解压归档，不覆盖已有文件，不发布软件包。
 
 ## 数据流与校验
 
@@ -26,9 +26,9 @@ python scripts/demo_source_update.py
 
 发送端目录分离说明调用参数与文件布局，并不对整个进程提供文件系统访问隔离。当前清单生成仍需同时访问三份文件，尚未实现纯分布式清单生成。清单必须来自可信渠道；它不认证发布者。
 
-输出保存在新建的 results/source-update-唯一编号/，包含两种格式的文件、原始命令输出与 report.json。失败会保留已生成文件及失败状态，不自动重试。
+输出保存在新建的 results/source-update-唯一编号/，包含三种格式的文件、原始命令输出与 report.json。失败会保留已生成文件及失败状态，不自动重试。CI 另提供体积较小的 source-update-evidence 平台产物，只包含报告和日志。
 
-## 本地样本结果
+## 初始双格式样本结果（保留记录）
 
 2026-11-11 Windows 本地 release CLI 运行：
 
@@ -42,3 +42,15 @@ python scripts/demo_source_update.py
 本地报告保留于 results/source-update-d156c4fb4b484d8c83ce510e8f51e7cb/report.json。Windows/Linux 常规 CI 会重新生成同一提交对并校验还原结果；云端执行结果以对应 run 为准。本示例没有改变 Mooncakes 已发布版本。
 
 提交 `e24a0814b4787880cf8e256385197ae63ea0c181` 已通过 [Windows/Linux CI 42987094337](https://github.com/serikaonoe123/moonrdiff/actions/runs/42987094337)。两平台均通过 TAR/ZIP 绑定还原、原文件保持和完整回归。该次云端 TAR 数字与上表相同；ZIP 完整新版为 51,883 字节，首次交换为 16,388 字节（31.59%）。保留本地与云端各自数字，不假定压缩输出字节跨环境一致。公开日志与摘要另保存在 results/source-update-ci-full.log 和 results/source-update-ci.json。
+
+## 差量不合算时选择完整文件
+
+当前示例仍先验证每份补丁可以绑定还原，再模拟传输前的方案选择；这不是核心库或 CLI 自动提供的网络传输功能。两种方案都计入目标身份信息：差量使用现有绑定清单，整文件使用示例专用 full-target.json，记录目标大小和 BLAKE2b-256。整文件副本通过独占新建落盘，再检查该信息、逐字节结果与 CLI verify。两种清单的来源都必须可信，示例不提供发布者认证；真实传输还需计入应用协议和认证的额外开销。
+
+报告包含三个成本视角；相同成本时选择整文件：
+
+- offline_plan：在任何数据尚未发送前，比较“摘要 + 补丁 + 绑定清单”与“完整新版 + 整文件目标清单”。
+- signature_reuse_plan：摘要已可复用时，只比较剩余负载，摘要本次计费为零。
+- signature_already_sent_total_bytes：本轮已经发送摘要时，将摘要字节加回所选负载，避免漏算已经发生的开销。不能把离线预先规划的整文件成本套用到这个阶段。
+
+2026-11-11 本地三格式报告 results/source-update-c86aec3f14d14f25a8ab118307c1f876/report.json：TAR、ZIP 选择差量；TAR.GZ 完整新版 40,728 字节，目标清单 134 字节，整文件合计 40,862 字节，低于差量首次交换的 41,875 字节，因此实际示例验证了整文件交付分支。所有三种格式的补丁还原和所选交付结果均与目标一致。该结果不保证其他压缩数据一定选择同一方案，也不代表真实网络节省量或计算成本收益。

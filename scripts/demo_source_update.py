@@ -3,6 +3,7 @@
 No network, archive extraction, existing-file overwrite or registry upload.
 """
 import argparse
+import gzip
 import hashlib
 import io
 import json
@@ -45,6 +46,8 @@ def snapshot(ref):
 
 
 def bundle(files, kind):
+    if kind == 'tar.gz':
+        return gzip.compress(bundle(files, 'tar'), compresslevel=9, mtime=0)
     output = io.BytesIO()
     if kind == 'tar':
         with tarfile.open(fileobj=output, mode='w', format=tarfile.USTAR_FORMAT) as archive:
@@ -105,7 +108,7 @@ def main():
 
     save()
     try:
-        for kind in ['tar', 'zip']:
+        for kind in ['tar', 'zip', 'tar.gz']:
             directory = out / kind
             receiver, sender = directory / 'receiver', directory / 'sender'
             receiver.mkdir(parents=True)
@@ -130,14 +133,54 @@ def main():
             if basis.read_bytes() != old:
                 raise AssertionError('Original bundle changed.')
             first = sig.stat().st_size + delta.stat().st_size + manifest.stat().st_size
+            payload = delta.stat().st_size + manifest.stat().st_size
+            # A full-file delivery also needs target identity metadata. This
+            # sidecar is example-only; both metadata sources must be trusted.
+            full_manifest = receiver / 'full-target.json'
+            full_manifest.write_text(json.dumps({
+                'schema': 'moonrdiff-example-full-v1', 'bytes': len(new),
+                'blake2b256': hashlib.blake2b(new, digest_size=32).hexdigest(),
+            }, sort_keys=True, separators=(',', ':')) + '\n', encoding='utf8')
+            full_cost = len(new) + full_manifest.stat().st_size
+            # Offline planning: neither signature nor payload has been sent yet.
+            # Ties choose the simpler full-file delivery. This is an example
+            # policy, not an automatic transfer feature of the core CLI.
+            choice = 'delta' if first < full_cost else 'full'
+            if choice == 'full':
+                selected = receiver / ('full-delivery.' + kind)
+                with selected.open('xb') as stream:
+                    stream.write(target.read_bytes())
+                identity = json.loads(full_manifest.read_text(encoding='utf8'))
+                delivered = selected.read_bytes()
+                if (len(delivered) != identity['bytes'] or
+                        hashlib.blake2b(delivered, digest_size=32).hexdigest() != identity['blake2b256']):
+                    raise AssertionError('Full-file delivery identity mismatch.')
+                records.append(run(['verify', str(target), str(selected)], directory))
+            else:
+                selected = restored
+            if selected.read_bytes() != new:
+                raise AssertionError('Selected delivery differs from target.')
+            after_signature_choice = 'delta' if payload < full_cost else 'full'
             case = {
                 'format': kind, 'basis_bytes': len(old), 'target_bytes': len(new),
                 'basis_sha256': digest(old), 'target_sha256': digest(new),
                 'restored_sha256': digest(restored.read_bytes()),
                 'signature_bytes': sig.stat().st_size, 'delta_bytes': delta.stat().st_size,
                 'manifest_bytes': manifest.stat().st_size,
+                'full_target_manifest_bytes': full_manifest.stat().st_size,
+                'full_delivery_bytes': full_cost,
                 'first_exchange_bytes': first, 'first_exchange_ratio': first / len(new),
-                'delta_plus_manifest_bytes': delta.stat().st_size + manifest.stat().st_size,
+                'delta_plus_manifest_bytes': payload,
+                'offline_plan': {
+                    'choice': choice,
+                    'file_bytes': first if choice == 'delta' else full_cost,
+                },
+                'signature_reuse_plan': {
+                    'choice': after_signature_choice,
+                    'remaining_file_bytes': min(payload, full_cost),
+                },
+                'signature_already_sent_total_bytes': sig.stat().st_size + min(payload, full_cost),
+                'selected_result_sha256': digest(selected.read_bytes()),
                 'matched': True, 'original_preserved': True,
                 'sender_directory_has_no_basis': not (sender / basis.name).exists(),
                 'commands': records,
@@ -145,7 +188,8 @@ def main():
             report['cases'].append(case)
             save()
             print(json.dumps({key: case[key] for key in [
-                'format', 'target_bytes', 'first_exchange_bytes', 'first_exchange_ratio', 'matched'
+                'format', 'target_bytes', 'first_exchange_bytes', 'first_exchange_ratio',
+                'offline_plan', 'signature_reuse_plan', 'matched'
             ]}), flush=True)
         report['status'] = 'success'
         save()
