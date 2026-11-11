@@ -5,6 +5,8 @@
 pub struct DeltaEncoder {
   priv signature : Signature
   priv index : Map[UInt32, Array[Int32]]
+  priv prefilter : FixedArray[UInt32]
+  priv filter_mask : UInt32
   priv tail : Int32
   priv tail_power : UInt32
   priv full_count : Int32
@@ -47,8 +49,19 @@ pub fn DeltaEncoder::new(
     raise Invalid("Basis size disagrees with signature count")
   }
   let index : Map[UInt32, Array[Int32]] = Map([])
+  // A bounded membership hint avoids most map probes on unrelated windows.
+  // False positives still go through the original weak/strong checks.
+  let mut slots = 64
+  while slots < full_count && slots < 16384 {
+    slots *= 2
+  }
+  let prefilter = FixedArray::make(slots, 0U)
+  let filter_mask = (slots - 1).reinterpret_as_uint()
   for i in 0..<full_count {
     let weak = signature.blocks[i].weak
+    let slot = (weak & filter_mask).reinterpret_as_int()
+    prefilter[slot] = prefilter[slot] |
+      (1U << ((weak >> 16) & 31U).reinterpret_as_int())
     match index.get(weak) {
       Some(values) => values.push(i)
       None => index[weak] = [i]
@@ -65,6 +78,8 @@ pub fn DeltaEncoder::new(
   {
     signature,
     index,
+    prefilter,
+    filter_mask,
     tail,
     tail_power: rk_power(tail),
     full_count,
@@ -143,7 +158,13 @@ fn DeltaEncoder::flush_literals(self : DeltaEncoder) -> Unit raise DeltaError {
 fn DeltaEncoder::step(self : DeltaEncoder) -> Unit raise DeltaError {
   let mut matched = -1
   let mut length = self.signature.block_size
-  if self.count == length && self.checks < self.max_checks {
+  if self.count == length &&
+    self.checks < self.max_checks &&
+    (
+      self.prefilter[(self.weak & self.filter_mask).reinterpret_as_int()] &
+      (1U << ((self.weak >> 16) & 31U).reinterpret_as_int())
+    ) !=
+    0U {
     match self.index.get(self.weak) {
       Some(indices) => {
         let strong = @crypto.blake2b(self.window(length), 32)

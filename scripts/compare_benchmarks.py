@@ -2,6 +2,11 @@
 import json
 from pathlib import Path
 import statistics
+import argparse
+
+parser=argparse.ArgumentParser()
+parser.add_argument('--baseline-commit',default='79b18247f0b30438c0474cfe80f60fd406554558')
+args=parser.parse_args()
 
 ROOT=Path(__file__).resolve().parents[1]
 reports={}
@@ -15,7 +20,7 @@ for path in (ROOT/'results').glob('benchmark-*/report.json'):
 assert set(reports)=={'baseline','candidate'}
 before=reports['baseline'][1]
 after=reports['candidate'][1]
-assert before['source_commit']=='79b18247f0b30438c0474cfe80f60fd406554558'
+assert before['source_commit']==args.baseline_commit
 for field in ['seed','block_size','strong_length','python','platform','cpu','logical_cpus',
               'compiler','reference_version','zlib_compile_version','zlib_runtime_version']:
     assert before[field]==after[field],field
@@ -36,7 +41,8 @@ def index(report):
     return records
 old,new=index(before),index(after)
 assert len(before['rejection_diagnostics'])==len(after['rejection_diagnostics'])==20
-assert all(not x['specific_reason_verified'] for x in before['rejection_diagnostics'])
+legacy=args.baseline_commit=='79b18247f0b30438c0474cfe80f60fd406554558'
+assert all(x['specific_reason_verified']==(not legacy) for x in before['rejection_diagnostics'])
 assert all(x['specific_reason_verified'] for x in after['rejection_diagnostics'])
 records=[]
 for key in sorted(expected):
@@ -56,7 +62,7 @@ report={'schema_version':1,'status':'success','profile':'release','repetitions':
         'baseline_commit':before['source_commit'],'candidate_commit':after['source_commit'],
         'baseline_executable_sha256':before['executable_sha256'],
         'candidate_executable_sha256':after['executable_sha256'],
-        'rejection_diagnostics':'Historical baseline verifies opaque error constructors; candidate verifies specific budget reasons. Both require exit 2, empty stdout and no output file.',
+        'rejection_diagnostics':('Historical baseline verifies opaque error constructors; candidate verifies specific budget reasons.' if legacy else 'Both versions verify specific budget reasons.')+' Both require exit 2, empty stdout and no output file.',
         'limitations':'Fixed order on one runner, median of three; no confidence intervals or isolated algorithm ranking. Ratios near timer resolution are not meaningful.',
         'records':records}
 path=ROOT/'results/performance-comparison.json'
