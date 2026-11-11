@@ -32,4 +32,6 @@ Original acceptance and generator reports are preserved without modification:
 - [Linux acceptance](../benchmarks/large-files-2026-11-11/linux.json), SHA-256 `d6921765cad78265cef29e75e01bed1e8f72a7e5c3280be52b3046513add5289`.
 - [Windows fixtures](../benchmarks/large-files-2026-11-11/fixtures-windows.json) and [Linux fixtures](../benchmarks/large-files-2026-11-11/fixtures-linux.json).
 
+The snapshot directory has a Git -text attribute so Windows CRLF bytes survive commits/checkouts. Regular Windows/Linux CI audits all four original SHA-256 values with scripts/check_evidence.py; parsing equivalent JSON is not a substitute for that byte check.
+
 This closes the planned Windows 128 MiB sample gap for these release CLI paths. It does not establish debug-build 128 MiB acceptance, every Windows/Linux environment, larger files or bound restoration of every fixture type. Bind/verify large-file paths were checked on the modified fixture; unbound restore covered all five types.

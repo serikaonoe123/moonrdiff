@@ -1,1 +1,3 @@
 * text=auto eol=lf
+# Evidence snapshots must retain artifact bytes, including Windows CRLF.
+benchmarks/large-files-2026-11-11/*.json -text
