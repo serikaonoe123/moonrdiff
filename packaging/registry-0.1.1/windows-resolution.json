@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "status": "success",
+  "error": null,
+  "root": 1,
+  "modules": [
+    {
+      "name": "moonbitlang/async",
+      "version": "0.19.3",
+      "source": {
+        "kind": "registry"
+      },
+      "workspace_member": false
+    },
+    {
+      "name": "moonrdiff-example/consumer",
+      "version": "0.0.1",
+      "source": {
+        "kind": "local",
+        "path": "D:\\a\\moonrdiff\\moonrdiff\\results\\registry-1b1e9e58c11f4634ab34a6bf6708d323\\consumer"
+      },
+      "workspace_member": false
+    },
+    {
+      "name": "serikaonoe123/moonrdiff",
+      "version": "0.1.1",
+      "source": {
+        "kind": "registry"
+      },
+      "workspace_member": false
+    }
+  ],
+  "edges": [
+    {
+      "from": 1,
+      "to": 2,
+      "name": "serikaonoe123/moonrdiff",
+      "kind": "regular"
+    },
+    {
+      "from": 2,
+      "to": 0,
+      "name": "moonbitlang/async",
+      "kind": "regular"
+    }
+  ],
+  "logs": []
+}

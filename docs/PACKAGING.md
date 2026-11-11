@@ -1,8 +1,8 @@
 # Packaging and independent-consumer acceptance
 
-Published version: serikaonoe123/moonrdiff@0.1.0. This script remains the archive gate; separate completed registry acceptance is recorded in RELEASE-0.1.0.md.
+Published version: serikaonoe123/moonrdiff@0.1.1. This script remains the archive gate; separate completed registry acceptance is recorded in RELEASE-0.1.1.md.
 
-Main currently prepares the unpublished 0.1.1 documentation candidate. check_package.py derives the archive version from moon.mod; check_registry.py binds its standalone consumer dependency to the selected approved inventory's version, so the 0.1.0 registry workflow continues to test the already published package.
+Main records the published 0.1.1 documentation patch. check_package.py derives the archive version from moon.mod; check_registry.py binds its standalone consumer dependency to the selected approved inventory's version, so the 0.1.0 registry workflow continues to test the already published package.
 
 Run with the pinned compiler:
 
@@ -23,7 +23,7 @@ Each test preserves its report, resolution record and complete command output un
 
 Successful package checks also retain that actual ZIP beside the report, which records the source commit and module version read from moon.mod. This supports review of a concrete candidate archive and its 34-file content inventory.
 
-After authorized publication, use `python scripts/check_registry.py --approved-inventory PATH_TO_SUCCESSFUL_PACKAGE_REPORT`. It creates a fresh standalone consumer, requires registry resolution of exactly 0.1.0, compares all approved source-file hashes in the downloaded module and runs the five public tests on all three backends. It contains no publishing or credential-changing commands. It passed Windows/Linux registry acceptance after the 0.1.0 upload; source-only resolution and byte comparisons are recorded separately from this archive gate.
+After authorized publication, use `python scripts/check_registry.py --approved-inventory PATH_TO_SUCCESSFUL_PACKAGE_REPORT`. It creates a fresh standalone consumer, requires registry resolution of exactly the version in the selected approved inventory, compares all approved source-file hashes in the downloaded module and runs the five public tests on all three backends. It contains no publishing or credential-changing commands. It passed Windows/Linux registry acceptance after the 0.1.0 and 0.1.1 uploads; source-only resolution and byte comparisons are recorded separately from this archive gate.
 
 Before public publication: select a concrete tested commit/version; recheck package inventory and metadata; finish representative benchmark/large-file acceptance; review API status and release notes; then obtain the applicable publication authorization. After publication, run a new consumer that resolves from Mooncakes, without a local MoonRdiff workspace member. The current consumer deliberately cannot prove registry availability.
 

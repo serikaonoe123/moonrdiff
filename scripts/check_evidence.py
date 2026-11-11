@@ -29,4 +29,12 @@ registry={
 }
 for name,sha in registry.items():
     assert hashlib.sha256((ROOT/'packaging/registry-0.1.0'/name).read_bytes()).hexdigest()==sha,name
+registry_patch={
+    'linux-report.json':'7c0611bac1f8cf124924db1f656df710c14dc044103107266ede55d05fd0a167',
+    'linux-resolution.json':'83e3ed91e4bfb6ec53a6ebb277faf029896daabdfe692f323d99ef410c7cedc5',
+    'windows-report.json':'08194e950ab6bc23bd1b6f000dd9f7f83b1755e7351f4e0d57fce0ff7e6ab667',
+    'windows-resolution.json':'7e6bcc8807945e655383fa953e633110ac3a0c7ef2bc826cec48f3ddece031b7',
+}
+for name,sha in registry_patch.items():
+    assert hashlib.sha256((ROOT/'packaging/registry-0.1.1'/name).read_bytes()).hexdigest()==sha,name
 print('Original large-file, candidate and published registry evidence bytes retained.')

@@ -1,0 +1,27 @@
+{
+  "module": "serikaonoe123/moonrdiff",
+  "version": "0.1.1",
+  "status": "success",
+  "platform": "Windows-2025Server-10.0.26100-SP0",
+  "python": "3.12.10",
+  "approved_source_commit": "9ed7e11ea5f298a1ba3877a8932f54e8d8bd1200",
+  "consumer_results": [
+    {
+      "target": "js",
+      "public_consumer_tests": 5,
+      "passed": true
+    },
+    {
+      "target": "native",
+      "public_consumer_tests": 5,
+      "passed": true
+    },
+    {
+      "target": "wasm-gc",
+      "public_consumer_tests": 5,
+      "passed": true
+    }
+  ],
+  "compiler": "moon 0.1.20261023 (3778465 2026-10-23) ~\\.moon\\bin\\moon.exe\nmoonc v0.10.17+d971670cd (2026-10-23) \\\\?\\C:\\Users\\runneradmin\\.moon\\bin\\moonc.exe\nmoonrun 0.1.20261023 (3778465 2026-10-23) \\\\?\\C:\\Users\\runneradmin\\.moon\\bin\\moonrun.exe\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg\n",
+  "registry_content_matches_approved_inventory": true
+}
