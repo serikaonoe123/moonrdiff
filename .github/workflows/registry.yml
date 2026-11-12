@@ -5,7 +5,7 @@ on:
       version:
         description: Published version with an approved committed inventory
         type: choice
-        options: ['0.1.0', '0.1.1']
+        options: ['0.1.0', '0.1.1', '0.1.2']
         default: '0.1.0'
   push:
     branches: [main]
@@ -38,7 +38,7 @@ jobs:
           core-version: '0.10.17+d971670cd'
       - run: python scripts/check_evidence.py
       - name: Install only from registry and verify approved bytes
-        run: python -c "import os, subprocess; v=os.environ['REGISTRY_ACCEPTANCE_VERSION']; assert v in ['0.1.0','0.1.1']; subprocess.run(['python','scripts/check_registry.py','--approved-inventory','packaging/candidate-'+v+'.json'],check=True)"
+        run: python -c "import os, subprocess; v=os.environ['REGISTRY_ACCEPTANCE_VERSION']; assert v in ['0.1.0','0.1.1','0.1.2']; subprocess.run(['python','scripts/check_registry.py','--approved-inventory','packaging/candidate-'+v+'.json'],check=True)"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

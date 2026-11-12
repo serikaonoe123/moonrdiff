@@ -1,4 +1,5 @@
 * text=auto eol=lf
+packaging/candidate-0.1.2.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 benchmarks/verify-2026-11-11/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 benchmarks/source-update-2026-11-11/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Evidence snapshots must retain artifact bytes, including Windows CRLF.

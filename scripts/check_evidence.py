@@ -18,6 +18,9 @@ for label in ['windows','linux']:
     assert report['status']=='success' and report['full_128mib_acceptance']
     assert report['fixture_report_sha256']==expected['fixtures-'+label+'.json']
 candidate=ROOT/'packaging/candidate-0.1.0.json'
+candidate_012 = (ROOT/'packaging/candidate-0.1.2.json').read_bytes()
+assert hashlib.sha256(candidate_012).hexdigest() == '1156780057f1506bee8c6c587f9435369d5b0cce12db8adc80b745c8a92d68f5'
+assert json.loads(candidate_012)['source_commit'] == '287872c13b6f2865b3657c10d66ce6eff88cff30'
 assert hashlib.sha256(candidate.read_bytes()).hexdigest()=='99cfe413492f8573d49fd63283bec8549e64588b08b57344182029f32bacb0be'
 patch_candidate=ROOT/'packaging/candidate-0.1.1.json'
 assert hashlib.sha256(patch_candidate.read_bytes()).hexdigest()=='d5454b944e8a21a37f65eab8da495f96ba0eb97849a6c6458a057844162c41ac'

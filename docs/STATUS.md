@@ -1,6 +1,6 @@
 # MoonRdiff development status
 
-Updated 2026-11-11. Mooncakes 0.1.1 documentation patch is published from 9ed7e11; Windows/Linux registry acceptance passed. See RELEASE-0.1.1.md; original 0.1.0 evidence remains retained.
+Updated 2026-11-12. Mooncakes 0.1.1 documentation patch is published from 9ed7e11; Windows/Linux registry acceptance passed. See RELEASE-0.1.1.md; original 0.1.0 evidence remains retained. Unpublished 0.1.2 candidate 287872c passed full/large-file CI; its exact 34-file proposal is in RELEASE-PROPOSAL-0.1.2.md and awaits separate publication approval.
 
 | Area | Current evidence | Remaining work |
 | --- | --- | --- |
