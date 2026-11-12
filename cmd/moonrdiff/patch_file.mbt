@@ -9,7 +9,7 @@ async fn patch_file(
   chunk_size : Int32,
   max_instructions : Int32,
   binding : Binding?,
-) -> Unit {
+) -> Json {
   guard chunk_size >= 1 && chunk_size <= 65536 else {
     raise Usage("Chunk size must be 1..65536")
   }
@@ -138,15 +138,12 @@ async fn patch_file(
       file.sync(only_data=false)
     }
   }
-  @stdio.stdout.write(
-    (
-      {
-        "command": "patch",
-        "output_bytes": written,
-        "incremental": true,
-        "manifest_verified": binding is Some(_),
-        "chunk_size": chunk_size,
-      } : Json).stringify() +
-    "\n",
-  )
+  (
+    {
+      "command": "patch",
+      "output_bytes": written,
+      "incremental": true,
+      "manifest_verified": binding is Some(_),
+      "chunk_size": chunk_size,
+    } : Json)
 }

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Stage native signature/delta/patch/manifest outputs beside their destination, synchronize and close before no-replace publication, and emit success JSON only after publication and empty-directory cleanup.
+- Preserve staging evidence on failure; report finalization errors separately when output has already been published. No crash-durability, snapshot or directory-tamper guarantee is added.
+- Add a controlled late-destination race checking no overwrite, no premature success JSON and retention of the complete staged result.
+
 ## 0.1.2 — 2026-11-12
 
 - Compare native CLI verify inputs in paired 64 KiB reads, retaining JSON fields, exit codes and per-input budgets; add EOF/mismatch/budget controls and Linux verify RSS measurements.

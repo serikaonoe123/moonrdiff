@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import uuid
 import argparse
+import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--skip-links', action='store_true', help='Explicit local-only restriction; CI does not pass this option.')
@@ -252,6 +253,42 @@ invoke('patch',basis,delta,absent,'--manifest',bad_association,code=2)
 assert not absent.exists()
 invoke('manifest',basis,target,delta,absent,'--max-output','1',code=2)
 assert not absent.exists()
+
+# A late destination conflict must preserve data and emit no success JSON.
+# All files are generated here; no permission changes or input mutations.
+stage_basis = OUT/'stage-basis.bin'
+with stage_basis.open('xb') as stream:
+    for _ in range(512):
+        stream.write(bytes(range(256)) * 256)
+stage_reference = OUT/'stage-reference.sig'
+invoke('signature', stage_basis, stage_reference)
+assert not list(OUT.glob(stage_reference.name + '.moonrdiff-stage-*'))
+stage_destination = OUT/'stage-race.sig'
+process = subprocess.Popen([str(EXE), 'signature', str(stage_basis), str(stage_destination)],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+deadline = time.monotonic() + 30
+observed = None
+while time.monotonic() < deadline and process.poll() is None:
+    candidates = list(OUT.glob(stage_destination.name + '.moonrdiff-stage-*'))
+    if candidates and (candidates[0]/'data').is_file() and (candidates[0]/'data').stat().st_size > 0:
+        observed = candidates[0]
+        break
+    time.sleep(0.001)
+if observed is None:
+    stdout, stderr = process.communicate(timeout=30)
+    raise AssertionError(('Did not observe staging', process.returncode, stdout, stderr))
+assert not stage_destination.exists()
+marker = b'existing destination from concurrent writer'
+with stage_destination.open('xb') as stream:
+    stream.write(marker)
+stdout, stderr = process.communicate(timeout=30)
+assert process.returncode == 2 and not stdout, (process.returncode, stdout, stderr)
+assert b'Output was not published' in stderr
+assert stage_destination.read_bytes() == marker
+assert (observed/'data').read_bytes() == stage_reference.read_bytes()
+checks.append({'command': 'staged-publication-conflict', 'exit': 2,
+               'no_success_json': True, 'destination_preserved': True,
+               'staged_complete_output_retained': True})
 
 report = {'platform': os.name, 'checks': checks, 'passed': True,
           'profile': args.profile,

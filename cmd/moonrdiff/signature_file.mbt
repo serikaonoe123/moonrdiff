@@ -8,7 +8,7 @@ async fn signature_file(
   block_size : Int32,
   strong_length : Int32,
   chunk_size : Int32,
-) -> Unit {
+) -> Json {
   guard chunk_size >= 1 && chunk_size <= 65536 else {
     raise Usage("Chunk size must be 1..65536")
   }
@@ -57,15 +57,12 @@ async fn signature_file(
     raise Usage("Input size changed while reading")
   }
   output.sync(only_data=false)
-  @stdio.stdout.write(
-    (
-      {
-        "command": "signature",
-        "basis_size": size.to_int(),
-        "signature_bytes": encoder.output_bytes(),
-        "incremental": true,
-        "chunk_size": chunk_size,
-      } : Json).stringify() +
-    "\n",
-  )
+  (
+    {
+      "command": "signature",
+      "basis_size": size.to_int(),
+      "signature_bytes": encoder.output_bytes(),
+      "incremental": true,
+      "chunk_size": chunk_size,
+    } : Json)
 }

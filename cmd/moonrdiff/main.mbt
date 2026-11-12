@@ -111,6 +111,35 @@ async fn verify_files(
 }
 
 ///|
+/// Same-parent staging; failures preserve evidence and never retry publication.
+async fn publish_output(
+  destination : String,
+  writer : async (String) -> Json,
+) -> Unit {
+  guard !@fs.exists(destination) else { raise Usage("Output already exists") }
+  let directory = destination + ".moonrdiff-stage-" + @async.now().to_string()
+  @fs.mkdir(directory, permission=0o700)
+  let staged = directory + "/data"
+  let mut published = false
+  try {
+    let result = writer(staged)
+    @fs.rename(staged, destination, replace=false)
+    published = true
+    @fs.rmdir(directory, recursive=false)
+    @stdio.stdout.write(result.stringify() + "\n")
+  } catch {
+    error => {
+      let state = if published {
+        "Output was published; finalization failed. Inspect: "
+      } else {
+        "Output was not published. Staging evidence: "
+      }
+      raise Usage(state + directory + "\n" + diagnostic(error))
+    }
+  }
+}
+
+///|
 async fn execute(args : Array[String]) -> Int32 {
   if args.length() == 2 && args[1] == "--help" {
     @stdio.stdout.write(help())
@@ -178,48 +207,57 @@ async fn execute(args : Array[String]) -> Int32 {
     raise Usage("delta requires --basis-size")
   }
   if command == "manifest" {
-    manifest_file(args[2], args[3], args[4], args[5], input_limit, output_limit)
+    publish_output(args[5], path => {
+      manifest_file(args[2], args[3], args[4], path, input_limit, output_limit)
+    })
     return 0
   }
   if command == "signature" {
-    signature_file(
-      args[2],
-      args[3],
-      input_limit,
-      output_limit,
-      options.get("--block-size").unwrap_or(2048),
-      options.get("--strong-length").unwrap_or(32),
-      options.get("--chunk-size").unwrap_or(65536),
-    )
+    publish_output(args[3], path => {
+      signature_file(
+        args[2],
+        path,
+        input_limit,
+        output_limit,
+        options.get("--block-size").unwrap_or(2048),
+        options.get("--strong-length").unwrap_or(32),
+        options.get("--chunk-size").unwrap_or(65536),
+      )
+    })
     return 0
   }
   if command == "patch" {
-    patch_file(
-      args[2],
-      args[3],
-      args[4],
-      input_limit,
-      output_limit,
-      options.get("--chunk-size").unwrap_or(65536),
-      options.get("--max-instructions").unwrap_or(1000000),
-      match manifest_path {
-        Some(path) => Some(read_binding(path))
-        None => None
-      },
-    )
+    let binding = match manifest_path {
+      Some(path) => Some(read_binding(path))
+      None => None
+    }
+    publish_output(args[4], path => {
+      patch_file(
+        args[2],
+        args[3],
+        path,
+        input_limit,
+        output_limit,
+        options.get("--chunk-size").unwrap_or(65536),
+        options.get("--max-instructions").unwrap_or(1000000),
+        binding,
+      )
+    })
     return 0
   }
   if command == "delta" {
-    delta_file(
-      args[2],
-      args[3],
-      args[4],
-      input_limit,
-      output_limit,
-      options["--basis-size"],
-      options.get("--max-checks").unwrap_or(1000000),
-      options.get("--chunk-size").unwrap_or(65536),
-    )
+    publish_output(args[4], path => {
+      delta_file(
+        args[2],
+        args[3],
+        path,
+        input_limit,
+        output_limit,
+        options["--basis-size"],
+        options.get("--max-checks").unwrap_or(1000000),
+        options.get("--chunk-size").unwrap_or(65536),
+      )
+    })
     return 0
   }
   if command == "verify" {
@@ -243,7 +281,7 @@ async fn main {
   let code = execute(@env.args()) catch {
     error => {
       @stdio.stderr.write(
-        "moonrdiff: \{diagnostic(error)}\nNo existing output was overwritten. A partial new file may remain if writing failed.\n",
+        "moonrdiff: \{diagnostic(error)}\nNo existing output was overwritten. Inspect any reported staging or output paths.\n",
       )
       2
     }

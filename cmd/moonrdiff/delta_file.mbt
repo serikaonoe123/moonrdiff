@@ -9,7 +9,7 @@ async fn delta_file(
   basis_size : Int32,
   checks : Int32,
   chunk_size : Int32,
-) -> Unit {
+) -> Json {
   guard chunk_size >= 1 && chunk_size <= 65536 else {
     raise Usage("Chunk size must be 1..65536")
   }
@@ -71,14 +71,11 @@ async fn delta_file(
       file.sync(only_data=false)
     }
   }
-  @stdio.stdout.write(
-    (
-      {
-        "command": "delta",
-        "output_bytes": written,
-        "incremental": true,
-        "chunk_size": chunk_size,
-      } : Json).stringify() +
-    "\n",
-  )
+  (
+    {
+      "command": "delta",
+      "output_bytes": written,
+      "incremental": true,
+      "chunk_size": chunk_size,
+    } : Json)
 }

@@ -110,7 +110,7 @@ async fn manifest_file(
   output : String,
   limit : Int32,
   output_limit : Int32,
-) -> Unit {
+) -> Json {
   let binding = Binding::{
     schema_version: 1,
     algorithm: "blake2b-256",
@@ -128,5 +128,5 @@ async fn manifest_file(
   defer file.close()
   file.write(data)
   file.sync(only_data=false)
-  @stdio.stdout.write("{\"command\":\"manifest\",\"schema_version\":1}\n")
+  ({ "command": "manifest", "schema_version": 1 } : Json)
 }
