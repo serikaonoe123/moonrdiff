@@ -1,6 +1,6 @@
 # MoonRdiff development status
 
-Updated 2026-11-12. Mooncakes 0.1.1 documentation patch is published from 9ed7e11; Windows/Linux registry acceptance passed. See RELEASE-0.1.1.md; original 0.1.0 evidence remains retained. Unpublished 0.1.2 candidate 287872c passed full/large-file CI; its exact 34-file proposal is in RELEASE-PROPOSAL-0.1.2.md and awaits separate publication approval.
+Updated 2026-11-12. Mooncakes 0.1.2 is published from 287872c; Windows/Linux registry acceptance 43157315047 passed. See RELEASE-0.1.2.md. Original 0.1.0/0.1.1 evidence remains retained.
 
 | Area | Current evidence | Remaining work |
 | --- | --- | --- |
@@ -9,9 +9,9 @@ Updated 2026-11-12. Mooncakes 0.1.1 documentation patch is published from 9ed7e1
 | Native CLI | Chunked verify passed Windows/Linux debug/release and 128 MiB gates on 2231048; original JSON/exit codes/budgets retained; Linux 4/32 MiB RSS samples archived | Broader workload profiling; input snapshot/transactional publication deliberately not promised |
 | Binding | Strict optional manifest, standard BLAKE2b-256, preflight/replay checks; both native platforms passed 128 MiB modified-file bound restore | Distributed manifest creation and publisher authentication not provided |
 | Examples | Fixed-Git-source TAR/ZIP/TAR.GZ updates and verified delta/full-file choice passed Windows/Linux CI 42988522025; original reports archived with byte audits | External application integrations and broader real application data |
-| Packaging | Published 0.1.1: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
+| Packaging | Published 0.1.2: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | User-approved 0.1.0 and 0.1.1 published/registry-verified; local original/fresh Native consumers and packaged CLI now pass without security/flag changes | Historical D8050 is not currently reproduced; root cause remains unconfirmed |
+| Release | User-approved 0.1.0/0.1.1/0.1.2 published/registry-verified; local original/fresh Native consumers and packaged CLI now pass without security/flag changes | Historical D8050 is not currently reproduced; root cause remains unconfirmed |
 
 The project plan records original dates and milestone gates; historical early checkboxes are not an assertion that current features are absent. T02/T03/T04/T06 now have algorithm, version, contract and vector evidence in FORMAT.md and VALIDATION.md. Public search has not found an identical MoonBit project, but cannot establish exclusivity against unpublished work.
 

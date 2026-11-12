@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.2 candidate — 2026-11-12 (unpublished)
+## 0.1.2 — 2026-11-12
 
 - Compare native CLI verify inputs in paired 64 KiB reads, retaining JSON fields, exit codes and per-input budgets; add EOF/mismatch/budget controls and Linux verify RSS measurements.
 
@@ -11,7 +11,9 @@
 - Record successful local Native revalidation of the original failed consumer, 27 root tests and a fresh complete archive/CLI acceptance. Historical D8050 is not currently reproduced; no targeted fix or root cause is claimed.
 - Add a 38-case deterministic edit corpus covering the complete incremental signature/delta/patch pipeline under two push partitions, including empty pushes, repeated data, short tails and 64 KiB boundaries.
 - Check exact signature/target/patch-output budgets and delta limits; nine literal sizes accept the exact delta budget and reject one byte less with the public error type.
-- Correct the repository README's installation dependency to the published 0.1.1 version. No public API or production algorithm changes.
+- Update the repository entry documentation to the current published version. No public API or production algorithm changes.
+
+Published from 287872c with the approved 34-file inventory. Windows/Linux registry consumers verified all installed source hashes and five groups on every backend. See docs/RELEASE-0.1.2.md.
 
 ## 0.1.1 — 2026-11-11
 

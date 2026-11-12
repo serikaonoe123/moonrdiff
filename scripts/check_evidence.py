@@ -59,4 +59,7 @@ verify_evidence = {'linux-memory.json': 'a0d7bc356e92d8622f0021e00c760d7d09dc531
 for name, sha in verify_evidence.items():
     original = (ROOT/"benchmarks/verify-2026-11-11"/name).read_bytes()
     assert hashlib.sha256(original).hexdigest() == sha, name
+registry_012 = {'linux-report.json': '486370bf19d4cd1cd71027f6deebfd11362ddf8f3c07d5a8ebfee62d11350fa4', 'linux-resolution.json': 'b8466a0e787197b2181010a08d19b398cde7da9eff5d6a6e617e9d832ad9b495', 'windows-report.json': 'eabf62f45f8757ac3ee911dd8a09c221cbc584ba15dfe4151ef7fc7128f80fdd', 'windows-resolution.json': 'd2a97bb6e2b6924bb399a2e2586d3f5ce94248aa312f10dbc7fa07f8aed298ec'}
+for name, sha in registry_012.items():
+    assert hashlib.sha256((ROOT/"packaging/registry-0.1.2"/name).read_bytes()).hexdigest() == sha, name
 print('Original large-file, source-update, candidate and published registry evidence bytes retained.')
