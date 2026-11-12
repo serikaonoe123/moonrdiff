@@ -1,6 +1,6 @@
 name = "serikaonoe123/moonrdiff"
 
-version = "0.1.1"
+version = "0.1.2"
 
 license = "MIT AND Apache-2.0"
 

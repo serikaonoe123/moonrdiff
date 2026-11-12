@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 candidate — 2026-11-12 (unpublished)
 
 - Compare native CLI verify inputs in paired 64 KiB reads, retaining JSON fields, exit codes and per-input budgets; add EOF/mismatch/budget controls and Linux verify RSS measurements.
 
