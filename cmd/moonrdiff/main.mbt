@@ -130,7 +130,9 @@ async fn publish_output(
   } catch {
     error => {
       let state = if published {
-        "Output was published; finalization failed. Inspect: "
+        "Output was published; finalization failed. Output: " +
+        destination +
+        "\nStaging path: "
       } else {
         "Output was not published. Staging evidence: "
       }
