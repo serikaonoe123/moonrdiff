@@ -30,6 +30,8 @@ moon run cmd/source-demo --target native
 
 输出保存在新建的 results/source-update-moonbit-唯一编号/，包含三种格式的文件、report.json 中的 CLI JSON 响应，以及 commands.log 中的命令、退出码和错误输出。失败会保留已生成文件及失败状态，不自动重试。CI 另提供体积较小的 source-update-evidence 平台产物，只包含报告和日志。
 
+MoonBit 迁移提交 `ec66b300770e288e33649a7fcf618412f474d53e` 已通过 [Windows/Linux CI 44050006186](https://github.com/serikaonoe123/moonrdiff/actions/runs/44050006186)。两平台均完成三种归档的绑定还原，TAR/ZIP 选择差量、TAR.GZ 选择整文件；下载报告的输入清单、摘要与成本字段已独立核对。TAR.GZ 在两平台的压缩字节略有不同，保留各自结果。
+
 ## 初始双格式样本结果（旧 Python 后端，保留记录）
 
 2026-11-11 Windows 本地 release CLI 运行：
