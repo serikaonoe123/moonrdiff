@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
       - uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f
@@ -24,7 +24,7 @@ jobs:
       - run: moon update
       - run: moon build cmd/moonrdiff --target native --release --deny-warn
       - name: Check out fixed pre-optimization source
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: c439ae9dc7631fd627842b73222cbc1b6470133a
           path: results/baseline-source
@@ -47,9 +47,10 @@ jobs:
         run: python scripts/benchmark.py --profile release --label candidate --repetitions 3
       - name: Compare matched inputs and unchanged output bytes
         run: python scripts/compare_benchmarks.py --baseline-commit c439ae9dc7631fd627842b73222cbc1b6470133a
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
+          archive: true
           name: benchmark-reports
           path: |
             results/**/report.json

@@ -23,13 +23,14 @@ jobs:
     env:
       REGISTRY_ACCEPTANCE_VERSION: ${{ inputs.version || '0.1.0' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
-      - uses: actions/setup-python@v5
+          package-manager-cache: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
       - uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f
@@ -39,9 +40,10 @@ jobs:
       - run: python scripts/check_evidence.py
       - name: Install only from registry and verify approved bytes
         run: python -c "import os, subprocess; v=os.environ['REGISTRY_ACCEPTANCE_VERSION']; assert v in ['0.1.0','0.1.1','0.1.2']; subprocess.run(['python','scripts/check_registry.py','--approved-inventory','packaging/candidate-'+v+'.json'],check=True)"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
+          archive: true
           name: registry-consumer-${{ matrix.os }}
           path: |
             results/registry-*/report.json
