@@ -12,9 +12,9 @@ moon build cmd/moonrdiff --target native
 moon run cmd/demo --target native
 ```
 
-下列 MoonBit 演示与 Python 验收脚本从完整 GitHub 仓库运行，精简 Mooncakes 源码包不包含 cmd/demo 或 scripts 目录。演示程序只生成虚构文件，通过原生命令行依次生成摘要、计算补丁、还原、校验。每次使用新的 `results/demo-moonbit-*` 目录，保留全部结果。报告同时给出摘要、补丁与绑定清单合计大小，避免把单独补丁大小误当作首次交换成本。
+下列演示与开发验收程序从完整 GitHub 仓库运行，精简 Mooncakes 源码包不包含 cmd/demo、cmd/cli-check 或 scripts 目录。演示程序只生成虚构文件，通过原生命令行依次生成摘要、计算补丁、还原、校验。每次使用新的 `results/demo-moonbit-*` 目录，保留全部结果。报告同时给出摘要、补丁与绑定清单合计大小，避免把单独补丁大小误当作首次交换成本。
 
-性能运行可使用 `moon build cmd/moonrdiff --target native --release`，可执行文件位于 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。省略 `--release` 时仍生成 debug 文件，MoonBit 演示默认使用它；完整仓库中的验收脚本可用 `python scripts/check_cli.py --profile release` 检查 release 文件。性能对照必须记录并使用相同构建模式。
+性能运行可使用 `moon build cmd/moonrdiff --target native --release`，可执行文件位于 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。省略 `--release` 时仍生成 debug 文件，MoonBit 演示默认使用它；完整仓库可用 `moon run cmd/cli-check --target native -- --profile release` 检查 release 文件。性能对照必须记录并使用相同构建模式。
 
 ## 文件命令
 
@@ -72,7 +72,11 @@ Linux 的 1/16/128 MiB 合成基准已验证相同、局部修改、插入删除
 python scripts/check.py
 ```
 
-包含核心库三后端检查与原生文件验收。云端 Windows/Linux 均运行默认链接防覆盖测试。本地受权限限制时，可以仅运行 `python scripts/check_cli.py --skip-links`；报告会明确标记跳过链接测试，不能把它当成完整验收。
+包含核心库三后端检查与原生文件验收。命令行验收调度、生成数据、边界/预算/错误检查与并发写入由 MoonBit 的 cmd/cli-check 执行；其末尾仍调用 Python 3.12+ 的 scripts/check_cli_oracle.py，以 hashlib/struct 独立检查完整 8 MiB 摘要、复制结果和绑定文件身份。这份开发验收仍需要 Python，产品 CLI 和两个演示不需要。
+
+单独验收已构建的 debug CLI 可用 `moon run cmd/cli-check --target native`。云端 Windows/Linux 均运行默认链接防覆盖测试；测试专用的小型 C 适配仅调用系统创建硬链接，不修改访问权限。若本地链接创建受限，停止该操作后，可以显式运行 `moon run cmd/cli-check --target native -- --skip-links`；报告会记录跳过链接测试，不能把它当成完整验收。
+
+验收仅在新建的 `results/cli-moonbit-*` 中生成数据，每个 CLI 调用设置 30 秒超时，失败保留报告和命令日志，不自动重试或清理。成功的 schema 2 报告另列独立参考校验结果；Windows/Linux CI 均保存小型 cli-acceptance-evidence 产物。
 
 摘要生成的工作缓冲区由块大小、读取分块和当前输出批次决定，不保留整个文件或累计摘要；这不等于对进程峰值内存作恒定数值保证。Linux CI 使用 GNU time 分别测量 4 MiB 与 32 MiB 虚构输入的原生子进程峰值 RSS，结果保存在产物中。
 

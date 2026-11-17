@@ -40,7 +40,19 @@ jobs:
         run: |
           moon build cmd/moonrdiff --target native --release --deny-warn
           moon test --package serikaonoe123/moonrdiff/cmd/moonrdiff --target native --release --deny-warn
-          python scripts/check_cli.py --profile release
+          moon run cmd/cli-check --target native -- --profile release
+      - name: Keep native CLI acceptance reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          archive: true
+          name: cli-acceptance-evidence-${{ matrix.os }}
+          path: |
+            results/cli-moonbit-*/report.json
+            results/cli-moonbit-*/commands.log
+            results/cli-moonbit-*/stage-race.stdout
+            results/cli-moonbit-*/stage-race.stderr
+          if-no-files-found: ignore
       - name: MoonBit file update demonstration
         run: moon run cmd/demo --target native -- --profile release
       - name: Source bundle update example
