@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add four publication-boundary fault tests in native debug/release, and include the completed output path in post-publication failure diagnostics. Tests simulate writer failures without exhausting disk or adding public fault controls.
+
 - Stage native signature/delta/patch/manifest outputs beside their destination, synchronize and close before no-replace publication, and emit success JSON only after publication and empty-directory cleanup.
 - Preserve staging evidence on failure; report finalization errors separately when output has already been published. No crash-durability, snapshot or directory-tamper guarantee is added.
 - Add a controlled late-destination race checking no overwrite, no premature success JSON and retention of the complete staged result.
