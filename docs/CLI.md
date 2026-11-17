@@ -12,7 +12,7 @@ moon build cmd/moonrdiff --target native
 moon run cmd/demo --target native
 ```
 
-下列 MoonBit 演示与 Python 验收脚本从完整 GitHub 仓库运行，精简 Mooncakes 源码包不包含 scripts 目录。演示脚本只生成虚构文件，通过原生命令行依次生成摘要、计算补丁、还原、校验。每次使用新的 `results/demo-*` 目录，保留全部结果。报告同时给出摘要与补丁合计大小，避免把单独补丁大小误当作首次交换成本。
+下列 MoonBit 演示与 Python 验收脚本从完整 GitHub 仓库运行，精简 Mooncakes 源码包不包含 cmd/demo 或 scripts 目录。演示程序只生成虚构文件，通过原生命令行依次生成摘要、计算补丁、还原、校验。每次使用新的 `results/demo-moonbit-*` 目录，保留全部结果。报告同时给出摘要、补丁与绑定清单合计大小，避免把单独补丁大小误当作首次交换成本。
 
 性能运行可使用 `moon build cmd/moonrdiff --target native --release`，可执行文件位于 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。省略 `--release` 时仍生成 debug 文件，MoonBit 演示默认使用它；完整仓库中的验收脚本可用 `python scripts/check_cli.py --profile release` 检查 release 文件。性能对照必须记录并使用相同构建模式。
 

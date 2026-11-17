@@ -14,7 +14,20 @@
 
 核心算法、原生 CLI 和主文件更新演示均由 MoonBit 实现。Python 用于开发验收、独立参考对照及性能测量；正在逐步将面向使用者的辅助示例迁到 MoonBit。
 
-## 构建与测试
+## 纯 MoonBit 快速演示
+
+使用固定 MoonBit 工具链从完整仓库运行，无需 Python（原生构建仍需 C 编译器）：
+
+```sh
+moon update
+moon build cmd/moonrdiff --target native
+moon run cmd/demo --target native
+```
+
+程序生成测试文件，完成摘要、差量、绑定还原及逐字节校验，并将结果保留在 `results/demo-moonbit-*`。精简 Mooncakes 包不包含演示程序；使用库或原生 CLI 本身无需 Python。
+
+## 完整开发验收
+
 
 BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-2.0 许可、来源与修改记录，见 [第三方说明](third_party/mooncry_blake2/NOTICE.md)。其整块边界修复经过 Python hashlib 与 rdiff 对照验证；当前无需外部注册表依赖。
 

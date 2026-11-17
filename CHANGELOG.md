@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace the Python file-update demo with cmd/demo in MoonBit, preserving original fixture bytes and the actual CLI/binding flow; delete the old script and add a Python-free usage entry point. Other Python development tools remain for staged migration.
+
 - Add four publication-boundary fault tests in native debug/release, and include the completed output path in post-publication failure diagnostics. Tests simulate writer failures without exhausting disk or adding public fault controls.
 
 - Stage native signature/delta/patch/manifest outputs beside their destination, synchronize and close before no-replace publication, and emit success JSON only after publication and empty-directory cleanup.
