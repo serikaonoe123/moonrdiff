@@ -36,7 +36,8 @@ BLOCK=4096
 LIMIT=512*1024*1024
 SEED=20261110
 records=[]
-report={'schema_version':2,'generation_only':args.generate_only,'seed':SEED,
+report={'schema_version':3,'negative_output_policy':'distinct-per-control-v1',
+        'generation_only':args.generate_only,'seed':SEED,
         'profile':args.profile,'label':args.label,'repetitions':args.repetitions,
         'zlib_compile_version':zlib.ZLIB_VERSION,'zlib_runtime_version':zlib.ZLIB_RUNTIME_VERSION,
         'python':platform.python_version(),'platform':platform.platform(),
@@ -123,6 +124,7 @@ def timed(command,directory,label,output):
             'samples':samples}
 
 def rejected(command,output,reason):
+    assert not output.exists(),('Rejection output already exists',output)
     result=subprocess.run(command,capture_output=True,text=True,timeout=60)
     with (OUT/'commands.log').open('a',encoding='utf8') as stream:
         stream.write(json.dumps(command)+'\n'+result.stdout+result.stderr+'\n')
@@ -132,7 +134,8 @@ def rejected(command,output,reason):
     # the candidate must emit the specific reason, plus exit 2 and no output.
     expected=('moonrdiff.DeltaError.Invalid' if reason=='Output budget exceeded' else 'moonrdiff.CliError.Usage') if legacy else reason
     assert result.returncode==2 and expected in result.stderr and not result.stdout and not output.exists(),(command,result.returncode,result.stderr)
-    report.setdefault('rejection_diagnostics',[]).append({'reason':reason,'specific_reason_verified':not legacy,'expected_diagnostic':expected})
+    report.setdefault('rejection_diagnostics',[]).append({'reason':reason,'specific_reason_verified':not legacy,'expected_diagnostic':expected,
+                                                       'output':output.relative_to(OUT).as_posix()})
     return True
 
 try:
@@ -167,12 +170,16 @@ try:
                                'ref_delta_bytes':rdelta.stat().st_size,'ref_first_exchange_bytes':rsig.stat().st_size+rdelta.stat().st_size,
                                'full_transfer_bytes':new.stat().st_size,'restores_verified':True})
                 if new.stat().st_size>67108864:
-                    absent=directory/'must-not-exist'
+                    # Failed commands retain staging directories. Each control
+                    # must have its own final path, even within one clock tick.
+                    sig_input,delta_input,patch_input,patch_output=[
+                        directory/f'must-not-exist-{name}' for name in
+                        ['signature-input','delta-input','patch-input','patch-output']]
                     record['default_limit_controls']=[
-                        rejected([str(EXE),'signature',str(old),str(absent)],absent,'Input byte limit exceeded'),
-                        rejected([str(EXE),'delta',str(sig),str(new),str(absent),'--basis-size',str(old.stat().st_size)],absent,'Target byte limit exceeded'),
-                        rejected([str(EXE),'patch',str(old),str(delta),str(absent)],absent,'Patch input byte limit exceeded'),
-                        rejected([str(EXE),'patch',str(old),str(delta),str(absent),'--max-input',str(LIMIT)],absent,'Output budget exceeded')]
+                        rejected([str(EXE),'signature',str(old),str(sig_input)],sig_input,'Input byte limit exceeded'),
+                        rejected([str(EXE),'delta',str(sig),str(new),str(delta_input),'--basis-size',str(old.stat().st_size)],delta_input,'Target byte limit exceeded'),
+                        rejected([str(EXE),'patch',str(old),str(delta),str(patch_input)],patch_input,'Patch input byte limit exceeded'),
+                        rejected([str(EXE),'patch',str(old),str(delta),str(patch_output),'--max-input',str(LIMIT)],patch_output,'Output budget exceeded')]
             records.append(record);save()
             if not args.generate_only: print('BENCH_RESULT '+json.dumps(record),flush=True)
             print(f'Completed {mib}MiB {scenario}',flush=True)

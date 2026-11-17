@@ -1,6 +1,6 @@
 """Compare controlled release measurements, requiring identical fixtures/bytes."""
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import statistics
 import argparse
 
@@ -44,6 +44,20 @@ assert len(before['rejection_diagnostics'])==len(after['rejection_diagnostics'])
 legacy=args.baseline_commit=='79b18247f0b30438c0474cfe80f60fd406554558'
 assert all(x['specific_reason_verified']==(not legacy) for x in before['rejection_diagnostics'])
 assert all(x['specific_reason_verified'] for x in after['rejection_diagnostics'])
+for report in [before,after]:
+    assert report['schema_version'] in [2,3]
+    if report['schema_version']==3:
+        assert report['negative_output_policy']=='distinct-per-control-v1'
+        outputs=[x['output'] for x in report['rejection_diagnostics']]
+        assert len(outputs)==len(set(outputs))==20,'Reused negative-control output'
+        expected_reasons=['Input byte limit exceeded','Target byte limit exceeded',
+                          'Patch input byte limit exceeded','Output budget exceeded']
+        control_cases=[x['scenario'] for x in report['records'] if x['nominal_mib']==128]
+        for position,entry in enumerate(report['rejection_diagnostics']):
+            path=PurePosixPath(entry['output'])
+            assert not path.is_absolute() and '..' not in path.parts and '\\' not in entry['output'] and ':' not in entry['output']
+            assert path.parent.as_posix()=='128MiB-'+control_cases[position//4]
+            assert entry['reason']==expected_reasons[position%4]
 records=[]
 for key in sorted(expected):
     a,b=old[key],new[key]
