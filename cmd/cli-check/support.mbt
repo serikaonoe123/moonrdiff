@@ -139,7 +139,20 @@ async fn Harness::ok(self : Harness, args : Array[String]) -> Json {
 
 ///|
 async fn Harness::reject(self : Harness, args : Array[String]) -> String {
-  self.invoke(args, code=2).errors
+  // Each generated-output negative control gets its own destination. Failed
+  // commands retain staging directories, whose names have millisecond clocks.
+  let sentinel = self.directory + "/must-not-exist"
+  let output = sentinel + "-\{self.checks.length()}"
+  let creates_output = args.contains(sentinel)
+  let unique_args = args.map(arg => if arg == sentinel { output } else { arg })
+  if creates_output {
+    ensure(!@fs.exists(output), "Negative-control output already exists")
+  }
+  let result = self.invoke(unique_args, code=2)
+  if creates_output {
+    ensure(!@fs.exists(output), "Rejected command created its final output")
+  }
+  result.errors
 }
 
 ///|

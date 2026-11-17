@@ -73,10 +73,15 @@ try:
                 (['delta',sig,target,absent,'--basis-size',str(basis.stat().st_size)],'Target byte limit exceeded'),
                 (['patch',basis,delta,absent],'Patch input byte limit exceeded'),
                 (['patch',basis,delta,absent,'--max-input',LIMIT],'Output budget exceeded')]
-            for command,reason in commands:
+            for index,(command,reason) in enumerate(commands):
+                # Failed commands retain millisecond-named staging directories.
+                # Isolate controls rather than depending on scheduling delays.
+                rejected_output=directory/f'must-not-exist-budget-{index}'
+                command=[rejected_output if item==absent else item for item in command]
                 run([EXE,*command],code=2,reason=reason)
-                assert not absent.exists()
-                row['default_budget_controls'].append({'reason':reason,'no_output':True})
+                assert not rejected_output.exists()
+                row['default_budget_controls'].append({'reason':reason,'no_output':True,
+                                                      'output':rejected_output.name})
         if case=='modified':
             assert invoke('verify',target,restored,'--max-input',LIMIT)['matched']
             manifest=directory/'binding.json'
@@ -95,8 +100,9 @@ try:
             row['cli_verify_matched']=True
             if args.size_mib==128:
                 run([EXE,'verify',target,restored],code=2,reason='Input byte limit exceeded')
-                run([EXE,'manifest',basis,target,delta,absent],code=2,reason='Manifest input byte limit exceeded')
-                assert not absent.exists()
+                rejected_manifest=directory/'must-not-exist-manifest-budget'
+                run([EXE,'manifest',basis,target,delta,rejected_manifest],code=2,reason='Manifest input byte limit exceeded')
+                assert not rejected_manifest.exists()
                 row['default_verify_manifest_rejected']=True
         records.append(row);save()
         print('LARGE_FILE_RESULT '+json.dumps(row),flush=True)
