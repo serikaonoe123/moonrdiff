@@ -4,6 +4,8 @@
 
 - Migrate native CLI acceptance orchestration to cmd/cli-check in MoonBit, preserving boundary/budget/error, alias, race and bound-restore controls. Keep a small independent Python hashlib/struct oracle and a test-only OS hard-link adapter; remove the former Python orchestration script. CLI debug/release CI now uses the new runner and retains small reports/logs.
 
+- Give generated-output negative controls distinct paths so retained staging directories cannot mask the intended budget diagnostics in rapid consecutive calls. Keep strict diagnostics, no-final-output checks and the product's existing collision refusal.
+
 - Replace the Python source-archive demo with native MoonBit cmd/source-demo and Git archive, retaining fixed snapshots, three formats, bound restore, verified full-file fallback and all transfer-cost views. Schema 2 explicitly records Git/BLAKE2b-256 identities; historical Python/SHA-256 reports remain separate. Both user-facing demos now run without Python.
 
 - Replace the Python file-update demo with cmd/demo in MoonBit, preserving original fixture bytes and the actual CLI/binding flow; delete the old script and add a Python-free usage entry point. Other Python development tools remain for staged migration.
