@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/process",
+  "moonbitlang/async/stdio",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/encoding/utf8",
+  "serikaonoe123/moonrdiff/third_party/mooncry_blake2" @crypto,
+}
+
+pkgtype(kind: "executable")
+
+supported_targets = "native"

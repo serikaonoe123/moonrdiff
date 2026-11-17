@@ -44,7 +44,7 @@ jobs:
       - name: MoonBit file update demonstration
         run: moon run cmd/demo --target native -- --profile release
       - name: Source bundle update example
-        run: python scripts/demo_source_update.py
+        run: moon run cmd/source-demo --target native
       - name: Keep source update reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

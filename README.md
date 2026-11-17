@@ -12,7 +12,7 @@
 
 **已提供 Windows/Linux 原生文件命令行；摘要生成、差量计算和补丁还原已支持分块文件处理；差量计算仍需把摘要及其索引放在内存中。**
 
-核心算法、原生 CLI 和主文件更新演示均由 MoonBit 实现。Python 用于开发验收、独立参考对照及性能测量；正在逐步将面向使用者的辅助示例迁到 MoonBit。
+核心算法、原生 CLI、文件更新与源码归档演示均由 MoonBit 实现。Python 用于开发验收、独立参考对照及性能测量。
 
 ## 纯 MoonBit 快速演示
 
@@ -81,7 +81,7 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 
 ## 文件命令行
 
-实际集成流程见 [源码归档更新示例](docs/SOURCE-UPDATE.md)：从两个固定 Git 提交生成 TAR/ZIP，完成摘要、差量、绑定还原和校验，并报告计入摘要与清单的传输量。
+实际集成流程见 [源码归档更新示例](docs/SOURCE-UPDATE.md)：用 MoonBit 调用 Git，从两个固定提交生成 TAR/ZIP/TAR.GZ，完成摘要、差量、绑定还原和校验，并报告计入摘要与清单的传输量。支持差量不合算时选择整文件，运行无需 Python。
 
 见 [文件命令行使用说明](docs/CLI.md)。执行 `moon build cmd/moonrdiff --target native` 后，可运行 `moon run cmd/demo --target native` 完成虚构数据的摘要、补丁、还原及逐字节校验。已有输出一律拒绝覆盖，默认每个输入和结果限制为 64 MiB。
 

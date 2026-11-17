@@ -4,17 +4,19 @@
 
 ## 运行
 
-从完整 GitHub 仓库运行，使用固定工具链 MoonBit `0.10.17+d971670cd` 和 Python 3.12+：
+从完整 GitHub 仓库运行，使用固定工具链 MoonBit `0.10.17+d971670cd`、原生 C 编译器，以及支持 `git archive --mtime` 和 TAR/ZIP/TAR.GZ 的 Git。演示入口由 MoonBit 实现，无需 Python：
 
 ```sh
 moon update
 moon build cmd/moonrdiff --target native --release --deny-warn
-python scripts/demo_source_update.py
+moon run cmd/source-demo --target native
 ```
 
-需要保留 Git 历史。浅克隆缺少指定提交时，先获取对应历史；脚本自身不联网。默认旧版为 `e09db0b71ef6386f30aa5e5aebd2a2c619013be9`，新版为 `4013e9ca62b54eb314a0444f902962eebbdd039f`。可用 `--basis-ref`、`--target-ref` 选择其他含 packaging/files.txt 的本项目提交，或用 `--profile debug` 运行已构建的 debug CLI。
+需要保留 Git 历史。浅克隆缺少指定提交时，先获取对应历史；演示本身不联网。默认旧版为 `e09db0b71ef6386f30aa5e5aebd2a2c619013be9`，新版为 `4013e9ca62b54eb314a0444f902962eebbdd039f`。可在命令后加 `-- --basis-ref <提交> --target-ref <提交>` 选择其他含 packaging/files.txt 的本项目提交，或加 `-- --profile debug` 运行已构建的 debug CLI。
 
-脚本按各提交的文件清单读取 Git blob，排序后生成 TAR、逐文件压缩的 ZIP 和整包压缩的 TAR.GZ。归档时间与文件权限固定；报告记录完整提交、文件 SHA-256、Python/zlib 版本和 CLI 二进制 SHA-256。压缩字节可能随运行环境变化，不承诺跨环境完全一致。脚本不解压归档，不覆盖已有文件，不发布软件包。
+程序核对各提交的文件清单与普通 Git blob，通过 `git archive --mtime=@0` 生成 TAR、逐文件压缩的 ZIP 和整包压缩的 TAR.GZ。报告格式为 `schema_version: 2`、归档后端为 `git-archive-mtime0-v1`，记录完整提交、Git blob ID、每个文件和 CLI 二进制的 BLAKE2b-256，以及 Git 版本。压缩字节可能随 Git/运行环境变化，不承诺跨环境完全一致；Git 归档头和压缩输出也不与下方旧版 Python 报告混作同一字节基准。旧报告的 SHA-256 字段保持原含义。
+
+演示使用小型输入，将归档读入内存做内容比较；归档生成后拒绝超过 64 MiB 的结果，文件读取前检查同一大小上限。这不是严格限制 Git 子进程输出内存的机制，也不是核心 CLI 的大文件或内存性能测试。程序不解压归档，不覆盖已有文件，不发布软件包。
 
 ## 数据流与校验
 
@@ -22,13 +24,13 @@ python scripts/demo_source_update.py
 2. 发送端目录仅准备摘要与新归档，delta 命令只接收这两份输入和旧文件大小。
 3. 离线清单准备步骤访问旧归档、新归档和补丁，生成绑定清单。
 4. 接收端利用旧归档、补丁和清单还原到新文件。
-5. CLI verify、Python 逐字节比较和 SHA-256 确认还原结果，并检查旧归档未变。
+5. CLI verify、MoonBit 逐字节比较和 BLAKE2b-256 确认还原结果，并检查旧归档未变。
 
 发送端目录分离说明调用参数与文件布局，并不对整个进程提供文件系统访问隔离。当前清单生成仍需同时访问三份文件，尚未实现纯分布式清单生成。清单必须来自可信渠道；它不认证发布者。
 
-输出保存在新建的 results/source-update-唯一编号/，包含三种格式的文件、原始命令输出与 report.json。失败会保留已生成文件及失败状态，不自动重试。CI 另提供体积较小的 source-update-evidence 平台产物，只包含报告和日志。
+输出保存在新建的 results/source-update-moonbit-唯一编号/，包含三种格式的文件、report.json 中的 CLI JSON 响应，以及 commands.log 中的命令、退出码和错误输出。失败会保留已生成文件及失败状态，不自动重试。CI 另提供体积较小的 source-update-evidence 平台产物，只包含报告和日志。
 
-## 初始双格式样本结果（保留记录）
+## 初始双格式样本结果（旧 Python 后端，保留记录）
 
 2026-11-11 Windows 本地 release CLI 运行：
 
@@ -39,7 +41,7 @@ python scripts/demo_source_update.py
 
 首次交换量 = 摘要 + 补丁 + 绑定清单。报告另列摘要可复用时的补丁加清单大小。比较的是文件字节，不包含网络协议、传输压缩、身份认证等额外开销，也不是速度或内存性能测试。ZIP 本身已显著缩小完整新版，两种格式的比例应分别解读。其他输入可能没有差量收益。
 
-本地报告保留于 results/source-update-d156c4fb4b484d8c83ce510e8f51e7cb/report.json。Windows/Linux 常规 CI 会重新生成同一提交对并校验还原结果；云端执行结果以对应 run 为准。本示例没有改变 Mooncakes 已发布版本。
+本地报告保留于 results/source-update-d156c4fb4b484d8c83ce510e8f51e7cb/report.json。当前 Windows/Linux 常规 CI 使用 MoonBit/Git 后端重新生成同一提交对并校验还原结果；云端执行结果以对应 run 为准。本示例没有改变 Mooncakes 已发布版本。
 
 提交 `e24a0814b4787880cf8e256385197ae63ea0c181` 已通过 [Windows/Linux CI 42987094337](https://github.com/serikaonoe123/moonrdiff/actions/runs/42987094337)。两平台均通过 TAR/ZIP 绑定还原、原文件保持和完整回归。该次云端 TAR 数字与上表相同；ZIP 完整新版为 51,883 字节，首次交换为 16,388 字节（31.59%）。保留本地与云端各自数字，不假定压缩输出字节跨环境一致。公开日志与摘要另保存在 results/source-update-ci-full.log 和 results/source-update-ci.json。
 

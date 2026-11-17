@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace the Python source-archive demo with native MoonBit cmd/source-demo and Git archive, retaining fixed snapshots, three formats, bound restore, verified full-file fallback and all transfer-cost views. Schema 2 explicitly records Git/BLAKE2b-256 identities; historical Python/SHA-256 reports remain separate. Both user-facing demos now run without Python.
+
 - Replace the Python file-update demo with cmd/demo in MoonBit, preserving original fixture bytes and the actual CLI/binding flow; delete the old script and add a Python-free usage entry point. Other Python development tools remain for staged migration.
 
 - Add four publication-boundary fault tests in native debug/release, and include the completed output path in post-publication failure diagnostics. Tests simulate writer failures without exhausting disk or adding public fault controls.

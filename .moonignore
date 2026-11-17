@@ -8,6 +8,7 @@ __pycache__/
 /cmd/moonrdiff/publication_wbtest.mbt
 /cmd/probe/
 /cmd/demo/
+/cmd/source-demo/
 /examples/
 /docs/PROJECT-PLAN.md
 /docs/VALIDATION.md
