@@ -12,6 +12,8 @@
 
 **已提供 Windows/Linux 原生文件命令行；摘要生成、差量计算和补丁还原已支持分块文件处理；差量计算仍需把摘要及其索引放在内存中。**
 
+核心算法、原生 CLI 和主文件更新演示均由 MoonBit 实现。Python 用于开发验收、独立参考对照及性能测量；正在逐步将面向使用者的辅助示例迁到 MoonBit。
+
 ## 构建与测试
 
 BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-2.0 许可、来源与修改记录，见 [第三方说明](third_party/mooncry_blake2/NOTICE.md)。其整块边界修复经过 Python hashlib 与 rdiff 对照验证；当前无需外部注册表依赖。
@@ -68,7 +70,7 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 
 实际集成流程见 [源码归档更新示例](docs/SOURCE-UPDATE.md)：从两个固定 Git 提交生成 TAR/ZIP，完成摘要、差量、绑定还原和校验，并报告计入摘要与清单的传输量。
 
-见 [文件命令行使用说明](docs/CLI.md)。执行 `moon build cmd/moonrdiff --target native` 后，可运行 `python scripts/demo.py` 完成虚构数据的摘要、补丁、还原及逐字节校验。已有输出一律拒绝覆盖，默认每个输入和结果限制为 64 MiB。
+见 [文件命令行使用说明](docs/CLI.md)。执行 `moon build cmd/moonrdiff --target native` 后，可运行 `moon run cmd/demo --target native` 完成虚构数据的摘要、补丁、还原及逐字节校验。已有输出一律拒绝覆盖，默认每个输入和结果限制为 64 MiB。
 
 ## 分块摘要接口
 
