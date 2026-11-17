@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Replace scripts/check.py with the MoonBit cmd/check JS entry point, retaining all 14 ordered checks and stopping on the first failure. Stream child output and retain structured reports, with explicit local link-skip forwarding. Node process/filesystem adapters avoid Windows native self-relinking and normalize signed exit codes.
+
 - Migrate native CLI acceptance orchestration to cmd/cli-check in MoonBit, preserving boundary/budget/error, alias, race and bound-restore controls. Keep a small independent Python hashlib/struct oracle and a test-only OS hard-link adapter; remove the former Python orchestration script. CLI debug/release CI now uses the new runner and retains small reports/logs.
 
 - Give generated-output negative controls distinct paths so retained staging directories cannot mask the intended budget diagnostics in rapid consecutive calls. Keep strict diagnostics, no-final-output checks and the product's existing collision refusal.

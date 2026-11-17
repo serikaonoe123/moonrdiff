@@ -37,7 +37,7 @@ BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-
 
 ```sh
 moon update
-python scripts/check.py
+moon run cmd/check --target js
 moon run cmd/probe --target js -- encode-fixture
 ```
 

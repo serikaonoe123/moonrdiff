@@ -35,7 +35,7 @@ jobs:
       - name: Refresh official dependency index
         run: moon update
       - name: Check, build and test
-        run: python scripts/check.py
+        run: moon run cmd/check --target js
       - name: Release native CLI acceptance
         run: |
           moon build cmd/moonrdiff --target native --release --deny-warn
@@ -49,6 +49,7 @@ jobs:
           name: cli-acceptance-evidence-${{ matrix.os }}
           path: |
             results/cli-moonbit-*/report.json
+            results/check-moonbit-*/report.json
             results/cli-moonbit-*/commands.log
             results/cli-moonbit-*/stage-race.stdout
             results/cli-moonbit-*/stage-race.stderr

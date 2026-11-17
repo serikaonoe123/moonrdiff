@@ -69,10 +69,12 @@ Linux 的 1/16/128 MiB 合成基准已验证相同、局部修改、插入删除
 ## 验证
 
 ```sh
-python scripts/check.py
+moon run cmd/check --target js
 ```
 
 包含核心库三后端检查与原生文件验收。命令行验收调度、生成数据、边界/预算/错误检查与并发写入由 MoonBit 的 cmd/cli-check 执行；其末尾仍调用 Python 3.12+ 的 scripts/check_cli_oracle.py，以 hashlib/struct 独立检查完整 8 MiB 摘要、复制结果和绑定文件身份。这份开发验收仍需要 Python，产品 CLI 和两个演示不需要。
+
+总入口 cmd/check 同样由 MoonBit 编写，使用 Node.js 22 运行 JS 后端。它按原顺序执行版本、格式、三后端检查/测试/构建、原生 CLI 验收、接口生成及 Git 接口差异检查，共 14 步；任何失败立即停止，不重试。结果保存在 results/check-moonbit-*，CI 将其与 CLI 小型报告一起保存。Node 适配仅负责启动参数数组和文件写入，不使用 shell。该开发入口不包含在精简 Mooncakes 包中。显式传入 `-- --skip-links` 可仅向本地 CLI 验收转发已有的链接跳过选项，报告会记录限制。
 
 单独验收已构建的 debug CLI 可用 `moon run cmd/cli-check --target native`。云端 Windows/Linux 均运行默认链接防覆盖测试；测试专用的小型 C 适配仅调用系统创建硬链接，不修改访问权限。若本地链接创建受限，停止该操作后，可以显式运行 `moon run cmd/cli-check --target native -- --skip-links`；报告会记录跳过链接测试，不能把它当成完整验收。
 

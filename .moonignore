@@ -10,6 +10,7 @@ __pycache__/
 /cmd/demo/
 /cmd/source-demo/
 /cmd/cli-check/
+/cmd/check/
 /examples/
 /docs/PROJECT-PLAN.md
 /docs/VALIDATION.md
