@@ -16,6 +16,8 @@ const application = path.join(root, 'examples', 'resource-cache');
 const sha = data => createHash('sha256').update(data).digest('hex');
 const bytes = file => fs.readFileSync(file);
 const log = path.join(out, 'commands.log');
+const approvedBytes = bytes(path.join(root, 'packaging', 'candidate-0.1.3.json'));
+const approved = JSON.parse(approvedBytes);
 // Independent TAR reader: verify the archive, not only Git's source inventory.
 function verifyTar(file, inventory) {
   const data = bytes(file), pending = new Map(inventory.map(i => [i.path, i]));
@@ -55,17 +57,25 @@ function run(program, args, cwd = root, expected = 0) {
   fs.appendFileSync(log, JSON.stringify([program, ...args]) + '\n' + r.stdout + r.stderr + '\n');
   assert.ifError(r.error);
   assert.equal(r.signal, null);
-  assert.equal(r.status, expected, r.stderr);
+  assert.equal(r.status, expected, r.stderr || r.stdout);
   return r.stdout;
 }
 const resolution = JSON.parse(run('moon', ['tree', '--json'], application));
-const engine = resolution.modules.filter(m => m.name === 'serikaonoe123/moonrdiff');
+const engine = resolution.modules.filter(m => m.name === approved.module);
 assert.equal(engine.length, 1);
-assert.equal(engine[0].version, '0.1.2');
+assert.equal(engine[0].version, approved.version);
 assert.equal(engine[0].source.kind, 'registry');
 fs.writeFileSync(path.join(out, 'resolution.json'), JSON.stringify(resolution, null, 2));
 run('moon', ['fmt', '--check'], application);
 run('moon', ['check', '--target', 'js', '--deny-warn'], application);
+const installed = path.join(application, '.mooncakes', approved.module);
+const approvedPaths = fs.readFileSync(path.join(root, 'packaging', 'files.txt'), 'utf8').trim().split(/\r?\n/);
+assert.deepEqual(approved.files.map(item => item.path).sort(), approvedPaths.sort());
+for (const item of approved.files) {
+  const data = bytes(path.join(installed, item.path));
+  assert.equal(data.length, item.bytes, item.path);
+  assert.equal(sha(data), item.sha256, item.path);
+}
 function app(args, expected = 0) {
   const text = run('moon', ['run', '.', '--target', 'js', '--release', '--', ...args], application, expected);
   if (expected !== 0) assert.equal(text, '', 'failure must not emit success JSON');
@@ -91,8 +101,13 @@ const target = path.join(out, 'new-source.tar');
 const original = path.join(out, 'old-source.tar');
 const expectedHash = sha(bytes(target));
 const report = {
-  schema_version: 2, application: 'independent MoonBit JS resource-cache consumer',
-  package: 'serikaonoe123/moonrdiff@0.1.2', resolution: 'registry',
+  schema_version: 3, application: 'independent MoonBit JS resource-cache consumer',
+  package: `${approved.module}@${approved.version}`, resolution: 'registry',
+  registry_inventory: {
+    source_commit: approved.source_commit,
+    sha256: sha(approvedBytes),
+    files_verified: approved.files.length,
+  },
   source_repository: 'https://github.com/serikaonoe123/moonffi-lab',
   source_license: 'MIT; each archive contains its original LICENSE',
   archive_checkout_policy: 'command-local core.autocrlf=false, core.eol=lf',

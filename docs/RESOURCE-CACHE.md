@@ -1,6 +1,6 @@
 # 独立资源缓存应用
 
-`examples/resource-cache/` 是单独的 MoonBit 模块，导入公开发布的 `serikaonoe123/moonrdiff@0.1.2`，只使用根包公开接口，不引用本仓库源码或内部 BLAKE2 实现。更新流程、传输选择和校验由 MoonBit 编写；Node.js 内置文件接口与 `crypto` 提供本地读写和 SHA-256。
+`examples/resource-cache/` 是单独的 MoonBit 模块，导入公开发布的 `serikaonoe123/moonrdiff@0.1.3`，只调用根包公开接口。MoonBit 实现更新流程、传输选择和校验。Node.js 内置文件接口与 `crypto` 提供本地读写和 SHA-256。
 
 本例更新的是 MoonFFI Lab 的源码包缓存。它使用真实的跨项目数据，仍属于同一作者的集成示例，不代表第三方采用、网络服务或生产部署。
 
@@ -25,7 +25,7 @@ cd ../..
 node scripts/check_resource_cache.mjs ../moonffi-lab
 ```
 
-已有包含这两个提交的克隆可直接传入路径。脚本要求依赖来自注册表，拒绝用本地工作区代替。它运行独立模块的格式、检查及真实文件流程；报告保存在 `results/resource-cache-*/report.json`，失败保留日志和现有数据，不自动重试、删除或修改权限。
+已有包含这两个提交的克隆可直接传入路径。脚本要求从 Mooncakes 解析并安装 0.1.3，校验发布清单中 34 个已安装文件的大小和 SHA-256，再运行真实文件流程。`results/resource-cache-*/report.json` 的 schema 3 记录清单哈希、发布源码提交和验收文件数。失败时可查看同目录的命令日志。[0.1.3 发布清单](../packaging/candidate-0.1.3.json)
 
 ## 三步应用流程
 
@@ -49,7 +49,7 @@ moon run . --target js --release -- apply OLD_CACHE MANIFEST_JSON PAYLOAD_BIN TR
 
 本地固定换行和零时间戳后的结果：新 TAR 102400 字节；历史更新的 offer/差量/清单分别为 4477/47252/302 字节，合计 52031 字节，直接完整下载含清单为 102701 字节。空缓存回退完整下载，实际交换 102854 字节（其中 offer 153 字节）；这比一开始直接下载更贵。这里只是一个真实源码包样本，不是通用节省比例、时间或内存性能结论。云端结果单独记录在 VALIDATION.md。
 
-固定日期修复提交 `ea251d0` 通过 [Windows/Linux 完整 CI 44264366022](https://github.com/serikaonoe123/moonrdiff/actions/runs/44264366022) 和 [128 MiB 回归 44264366140](https://github.com/serikaonoe123/moonrdiff/actions/runs/44264366140)。下载报告经独立核对，两平台旧/新 TAR 摘要与上述本地样本完全相同，新 TAR SHA-256 为 `b0562320079911603ee18cd5c52e54ba062c3a2846c6161b539102987d79045b`，两种交付成本也相同。每平台均通过两个实际文件流程和 17 项拒绝检查；归档保留 34 文件及三后端消费者通过。
+0.1.2 的固定日期基线在 Windows/Linux 上得到相同的旧、新 TAR 摘要和传输量。升级到 0.1.3 后，本地测试得到相同的归档、两条更新结果和 17 项拒绝检查记录。两种交付都还原出 SHA-256 为 `b0562320079911603ee18cd5c52e54ba062c3a2846c6161b539102987d79045b` 的目标 TAR。[0.1.2 两平台基线](https://github.com/serikaonoe123/moonrdiff/actions/runs/44264366022)
 
 验收覆盖历史版本差量更新、空缓存完整下载，两者均逐字节还原并保留旧缓存。17 项拒绝检查覆盖错误可信摘要、损坏内容、错误目标大小/摘要、未知清单版本/交付类型、超预算、差量旧缓存错误、已有目标不覆盖；每次失败使用独立输出路径并要求不产生成功 JSON。
 
