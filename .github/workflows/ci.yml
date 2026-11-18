@@ -58,6 +58,27 @@ jobs:
         run: moon run cmd/demo --target native -- --profile release
       - name: Source bundle update example
         run: moon run cmd/source-demo --target native
+      - name: Fixed MoonFFI Lab source for public-package application
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: serikaonoe123/moonffi-lab
+          ref: 20b608d6d8546873d5d66786dc8e12642dd70e9c
+          path: results/resource-cache-source
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Independent registry resource-cache application
+        run: node scripts/check_resource_cache.mjs results/resource-cache-source
+      - name: Keep resource-cache acceptance reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          archive: true
+          name: resource-cache-evidence-${{ matrix.os }}
+          path: |
+            results/resource-cache-*/report.json
+            results/resource-cache-*/resolution.json
+            results/resource-cache-*/commands.log
+          if-no-files-found: ignore
       - name: Keep source update reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

@@ -1,0 +1,21 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonrdiff-example/resource-cache"
+
+import {
+  "moonbitlang/core/json",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+type Manifest derive(ToJson, @json.FromJson)
+
+type Offer derive(ToJson, @json.FromJson)
+
+type ReadResult derive(@json.FromJson)
+
+// Type aliases
+
+// Traits

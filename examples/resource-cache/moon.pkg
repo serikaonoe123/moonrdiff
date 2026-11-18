@@ -1,0 +1,11 @@
+import {
+  "serikaonoe123/moonrdiff" @rdiff,
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/encoding/hex",
+  "moonbitlang/core/encoding/utf8",
+}
+
+pkgtype(kind: "executable")
+
+supported_targets = "js"

@@ -1,6 +1,6 @@
 # MoonRdiff development status
 
-Updated 2026-11-17. Mooncakes 0.1.2 is published from 287872c; Windows/Linux registry acceptance 43157315047 passed. See RELEASE-0.1.2.md. Original 0.1.0/0.1.1 evidence remains retained.
+Updated 2026-11-18. Mooncakes 0.1.2 is published from 287872c; Windows/Linux registry acceptance 43157315047 passed. See RELEASE-0.1.2.md. Original 0.1.0/0.1.1 evidence remains retained.
 
 | Area | Current evidence | Remaining work |
 | --- | --- | --- |
@@ -9,6 +9,7 @@ Updated 2026-11-17. Mooncakes 0.1.2 is published from 287872c; Windows/Linux reg
 | Native CLI | Development staged outputs passed Windows/Linux debug/release, late destination conflicts and 128 MiB gates on 6d35ef4; published 0.1.2 remains unchanged | Four publication-fault tests passed Windows/Linux debug/release on 8a44e0e; actual disk-full/fsync-failure and crash-durability remain unverified |
 | Binding | Strict optional manifest, standard BLAKE2b-256, preflight/replay checks; both native platforms passed 128 MiB modified-file bound restore | Distributed manifest creation and publisher authentication not provided |
 | Examples | Both user-facing demos run in MoonBit without Python; fixed-Git-source TAR/ZIP/TAR.GZ demo passed Windows/Linux CI 44050006186, including both delta and full delivery | External application integrations and broader real application data; continue evaluating Python development-tool migrations |
+| Resource-cache consumer | Independent MoonBit JS module resolves published 0.1.2 from registry; two fixed MoonFFI Lab source versions pass delta/full flows and 17 rejection controls locally | Windows/Linux CI pending; same-author integration only, no third-party deployment or production cache durability evidence |
 | Development tooling | Native CLI acceptance runs in MoonBit with a small independent Python hashlib/struct oracle; Windows debug/release each passed 125 checks and Linux each passed 126 with default links, in CI 44055861932 | Other Python development tools remain; 128 MiB CI 44055861763 passed after isolating negative-control output paths |
 | Check entry point | MoonBit cmd/check on Node22 preserves all 14 ordered steps; default Windows/Linux CI 44081050069 passed with links enabled and independent oracles retained | Other Python packaging/reference/benchmark tools remain |
 | Packaging | Published 0.1.2: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |

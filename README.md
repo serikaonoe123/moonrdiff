@@ -83,6 +83,8 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 
 实际集成流程见 [源码归档更新示例](docs/SOURCE-UPDATE.md)：用 MoonBit 调用 Git，从两个固定提交生成 TAR/ZIP/TAR.GZ，完成摘要、差量、绑定还原和校验，并报告计入摘要与清单的传输量。支持差量不合算时选择整文件，运行无需 Python。
 
+[独立资源缓存应用](docs/RESOURCE-CACHE.md)使用已发布的 Mooncakes 0.1.2 和 MoonFFI Lab 两个固定版本的真实源码包，演示发布端只接收摘要和新文件、可信目标摘要校验、新缓存写入及完整下载回退。应用流程由 MoonBit 实现，Node.js 提供文件和 SHA-256 适配；它是同一作者两个项目之间的集成示例，尚无第三方部署证据。
+
 见 [文件命令行使用说明](docs/CLI.md)。执行 `moon build cmd/moonrdiff --target native` 后，可运行 `moon run cmd/demo --target native` 完成虚构数据的摘要、补丁、还原及逐字节校验。已有输出一律拒绝覆盖，默认每个输入和结果限制为 64 MiB。
 
 ## 分块摘要接口
