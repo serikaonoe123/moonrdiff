@@ -16,7 +16,7 @@ Updated 2026-11-18. Mooncakes 0.1.2 is published from 287872c; Windows/Linux reg
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
 | Release | User-approved 0.1.0/0.1.1/0.1.2 published/registry-verified; local original/fresh Native consumers and packaged CLI now pass without security/flag changes | Historical D8050 is not currently reproduced; root cause remains unconfirmed |
 
-Main now prepares unpublished 0.1.3 (native CLI staged output); candidate package/full CI acceptance and a fixed release inventory are in progress. Registry examples and resource-cache application continue to use published 0.1.2. See RELEASE-PROPOSAL-0.1.3.md; no 0.1.3 registry upload is authorized yet.
+Unpublished 0.1.3 is frozen at 79a958d: full CI 44267566097, 128 MiB acceptance 44267566157 and published-0.1.2 registry regression 44267638263 passed Windows/Linux. Both actual candidate ZIPs contain the same 34 files / 150757 source bytes; root API remains unchanged. The original Linux candidate report is retained as packaging/candidate-0.1.3.json with a fixed content lock. Registry examples/resource-cache still use published 0.1.2. See RELEASE-PROPOSAL-0.1.3.md; upload and 0.1.3 registry acceptance await explicit approval.
 
 Benchmark schema-3 path isolation passed controlled run 44082843263: both versions passed 15 cases and 20 distinct-path budget controls. Eight report-copy compatibility/rejection checks passed. This updates acceptance stability, not algorithm performance.
 

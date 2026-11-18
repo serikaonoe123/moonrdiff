@@ -21,6 +21,10 @@ candidate=ROOT/'packaging/candidate-0.1.0.json'
 candidate_012 = (ROOT/'packaging/candidate-0.1.2.json').read_bytes()
 assert hashlib.sha256(candidate_012).hexdigest() == '1156780057f1506bee8c6c587f9435369d5b0cce12db8adc80b745c8a92d68f5'
 assert json.loads(candidate_012)['source_commit'] == '287872c13b6f2865b3657c10d66ce6eff88cff30'
+candidate_013 = (ROOT/'packaging/candidate-0.1.3.json').read_bytes()
+assert hashlib.sha256(candidate_013).hexdigest() == 'd41406121cf6274bf5d1327c94d49e3cd15a560a86d7a66410c3554679b22a75'
+assert json.loads(candidate_013)['source_commit'] == '79a958d6e55a634daf4f680b999bdfc78d5f9320'
+assert json.loads(candidate_013)['version'] == '0.1.3'
 assert hashlib.sha256(candidate.read_bytes()).hexdigest()=='99cfe413492f8573d49fd63283bec8549e64588b08b57344182029f32bacb0be'
 patch_candidate=ROOT/'packaging/candidate-0.1.1.json'
 assert hashlib.sha256(patch_candidate.read_bytes()).hexdigest()=='d5454b944e8a21a37f65eab8da495f96ba0eb97849a6c6458a057844162c41ac'

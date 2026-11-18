@@ -4,7 +4,7 @@
 
 已发布到 Mooncakes：`serikaonoe123/moonrdiff@0.1.2`，见 [发布及注册表安装验收记录](docs/RELEASE-0.1.2.md)。当前进度见 [状态清单](docs/STATUS.md)，归档内容见 [打包验收](docs/PACKAGING.md)，性能方法与实测记录见 [基准说明](docs/BENCHMARKS.md)。
 
-main 正在验收 0.1.3 候选版，主要改进原生命令的暂存输出和失败诊断；尚未上传该版本，见 [候选发布方案](docs/RELEASE-PROPOSAL-0.1.3.md)。下方注册表安装示例仍使用已发布的 0.1.2。
+main 的 0.1.3 候选版已通过固定提交验收，主要改进原生命令的暂存输出和失败诊断；尚未上传该版本，具体内容和待批准范围见 [候选发布方案](docs/RELEASE-PROPOSAL-0.1.3.md)。下方注册表安装示例仍使用已发布的 0.1.2。
 
 在应用的 `moon.mod` 的 `import` 块中加入 `"serikaonoe123/moonrdiff@0.1.2"`，然后运行 `moon check --target js` 安装并检查。包别名配置与使用代码见下方库示例；[独立消费者](examples/consumer/consumer_test.mbt)已从注册表在 Windows/Linux 的三个后端验收。
 
