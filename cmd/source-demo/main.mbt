@@ -112,6 +112,45 @@ async fn snapshot(
 }
 
 ///|
+fn check_tar_epoch(data : Bytes) -> Unit raise {
+  let mut offset = 0
+  while offset + 512 <= data.length() {
+    let mut empty = true
+    for i in 0..<512 {
+      if data[offset + i] != 0 {
+        empty = false
+      }
+    }
+    if empty {
+      return
+    }
+    for i in 136..<148 {
+      guard data[offset + i] == 0 ||
+        data[offset + i] == 32 ||
+        data[offset + i] == 48 else {
+        fail("Git TAR timestamp is not epoch zero")
+      }
+    }
+    let mut size = 0
+    for i in 124..<136 {
+      let byte = data[offset + i].to_int()
+      if byte == 0 || byte == 32 {
+        continue
+      }
+      guard byte >= 48 && byte <= 55 && size <= 67108864 / 8 else {
+        fail("Invalid Git TAR size")
+      }
+      size = size * 8 + byte - 48
+    }
+    guard offset + 512 + size <= data.length() else {
+      fail("Truncated Git TAR")
+    }
+    offset += 512 + (size + 511) / 512 * 512
+  }
+  fail("Missing Git TAR end")
+}
+
+///|
 async fn archive(
   log : @fs.File,
   root : String,
@@ -119,7 +158,13 @@ async fn archive(
   paths : Array[String],
   kind : String,
 ) -> Bytes {
-  let args = ["archive", "--format=" + kind, "--mtime=@0"]
+  // DOS ZIP dates cannot represent 1970; use its valid lower year instead.
+  let date = if kind == "zip" {
+    "1980-01-01T00:00:00Z"
+  } else {
+    "1970-01-01T00:00:00Z"
+  }
+  let args = ["archive", "--format=" + kind, "--mtime=" + date]
   if kind != "tar" {
     args.push("-9")
   }
@@ -130,6 +175,9 @@ async fn archive(
   }
   let data = git(log, root, args)
   guard data.length() <= 67108864 else { fail("Demo archive exceeds 64 MiB") }
+  if kind == "tar" {
+    check_tar_epoch(data)
+  }
   data
 }
 
@@ -204,7 +252,7 @@ async fn run_demo(args : Array[String]) -> Unit {
   let report : Json = {
     "schema_version": 2,
     "status": "running",
-    "archive_backend": "git-archive-mtime0-v1",
+    "archive_backend": "git-archive-explicit-dates-v2",
     "hash_algorithm": "blake2b-256",
     "profile": profile,
     "cases": cases,

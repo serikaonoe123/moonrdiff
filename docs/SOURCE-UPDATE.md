@@ -14,7 +14,9 @@ moon run cmd/source-demo --target native
 
 需要保留 Git 历史。浅克隆缺少指定提交时，先获取对应历史；演示本身不联网。默认旧版为 `e09db0b71ef6386f30aa5e5aebd2a2c619013be9`，新版为 `4013e9ca62b54eb314a0444f902962eebbdd039f`。可在命令后加 `-- --basis-ref <提交> --target-ref <提交>` 选择其他含 packaging/files.txt 的本项目提交，或加 `-- --profile debug` 运行已构建的 debug CLI。
 
-程序核对各提交的文件清单与普通 Git blob，通过 `git archive --mtime=@0` 生成 TAR、逐文件压缩的 ZIP 和整包压缩的 TAR.GZ。报告格式为 `schema_version: 2`、归档后端为 `git-archive-mtime0-v1`，记录完整提交、Git blob ID、每个文件和 CLI 二进制的 BLAKE2b-256，以及 Git 版本。压缩字节可能随 Git/运行环境变化，不承诺跨环境完全一致；Git 归档头和压缩输出也不与下方旧版 Python 报告混作同一字节基准。旧报告的 SHA-256 字段保持原含义。
+程序核对各提交的文件清单与普通 Git blob，通过 `git archive` 生成 TAR、逐文件压缩的 ZIP 和整包压缩的 TAR.GZ。TAR/TAR.GZ 明确指定 `--mtime=1970-01-01T00:00:00Z`；ZIP 使用其 DOS 日期范围内的 `--mtime=1980-01-01T00:00:00Z`。报告格式为 `schema_version: 2`、归档后端为 `git-archive-explicit-dates-v2`，记录完整提交、Git blob ID、每个文件和 CLI 二进制的 BLAKE2b-256，以及 Git 版本。压缩字节及 ZIP 日期表示可能随 Git/时区/运行环境变化，不承诺跨环境完全一致；Git 归档头和压缩输出也不与下方旧版 Python 报告混作同一字节基准。旧报告的 SHA-256 字段保持原含义。
+
+2026-11-18 归档核查发现，旧 `git-archive-mtime0-v1` 使用的 `--mtime=@0` 实际产生运行时间，并未达到固定零时间的意图。现在使用已验证有效的完整 UTC 日期，并在 MoonBit 中检查 TAR 头部的零时间戳；旧运行的还原和成本记录保留，但不作为固定时间或跨运行同一输入的证据。ZIP 不声明为 1970 年，避免用不可表示的年份构造 DOS 日期。
 
 演示使用小型输入，将归档读入内存做内容比较；归档生成后拒绝超过 64 MiB 的结果，文件读取前检查同一大小上限。这不是严格限制 Git 子进程输出内存的机制，也不是核心 CLI 的大文件或内存性能测试。程序不解压归档，不覆盖已有文件，不发布软件包。
 

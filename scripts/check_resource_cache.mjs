@@ -16,6 +16,40 @@ const application = path.join(root, 'examples', 'resource-cache');
 const sha = data => createHash('sha256').update(data).digest('hex');
 const bytes = file => fs.readFileSync(file);
 const log = path.join(out, 'commands.log');
+// Independent TAR reader: verify the archive, not only Git's source inventory.
+function verifyTar(file, inventory) {
+  const data = bytes(file), pending = new Map(inventory.map(i => [i.path, i]));
+  const string = b => b.toString('utf8').split('\0')[0];
+  const octal = b => Number.parseInt(string(b).trim() || '0', 8);
+  let offset = 0, ended = false;
+  while (offset + 512 <= data.length) {
+    const header = data.subarray(offset, offset + 512);
+    if (header.every(b => b === 0)) {
+      assert(data.subarray(offset).every(b => b === 0)); ended = true; break;
+    }
+    let checksum = 0;
+    for (let i = 0; i < 512; i++) checksum += i >= 148 && i < 156 ? 32 : header[i];
+    assert.equal(checksum, octal(header.subarray(148, 156)));
+    const name = string(header.subarray(0, 100));
+    assert.equal(string(header.subarray(345, 500)), '', 'no long path prefix expected');
+    const size = octal(header.subarray(124, 136));
+    assert(Number.isSafeInteger(size) && size >= 0 && offset + 512 + size <= data.length);
+    assert.equal(octal(header.subarray(136, 148)), 0, 'TAR timestamp must be epoch zero');
+    const kind = header[156];
+    if (kind === 0 || kind === 48) {
+      const item = pending.get(name); assert(item, 'unexpected/duplicate member: ' + name);
+      assert.equal(size, item.bytes);
+      assert.equal(sha(data.subarray(offset + 512, offset + 512 + size)), item.sha256, name);
+      pending.delete(name);
+    } else if (kind === 53) {
+      assert.equal(name, 'core/'); assert.equal(size, 0);
+    } else {
+      assert.equal(kind, 103, 'only Git global PAX metadata may accompany files');
+    }
+    offset += 512 + Math.ceil(size / 512) * 512;
+  }
+  assert(ended && pending.size === 0, 'incomplete TAR');
+}
 function run(program, args, cwd = root, expected = 0) {
   const r = spawnSync(program, args, { cwd, encoding: 'utf8', shell: false, timeout: 120000, maxBuffer: 8 * 1024 * 1024 });
   fs.appendFileSync(log, JSON.stringify([program, ...args]) + '\n' + r.stdout + r.stderr + '\n');
@@ -48,19 +82,21 @@ for (const [i, revision] of revisions.entries()) {
     return { path: name, bytes: r.stdout.length, sha256: sha(r.stdout) };
   });
   const archive = path.join(out, i ? 'new-source.tar' : 'old-source.tar');
-  run('git', ['-c', 'core.autocrlf=false', '-c', 'core.eol=lf', 'archive', '--format=tar', '--mtime=@0', '-o', archive, revision, 'LICENSE', 'moon.mod', 'core'], source);
-  fixtures.push({ revision, archive: path.basename(archive), bytes: bytes(archive).length, sha256: sha(bytes(archive)), inventory });
+  run('git', ['-c', 'core.autocrlf=false', '-c', 'core.eol=lf', 'archive', '--format=tar', '--mtime=1970-01-01T00:00:00Z', '-o', archive, revision, 'LICENSE', 'moon.mod', 'core'], source);
+  verifyTar(archive, inventory);
+  fixtures.push({ revision, archive: path.basename(archive), bytes: bytes(archive).length, sha256: sha(bytes(archive)), inventory, archive_members_verified: true, archive_mtime: 0 });
 }
 const empty = path.join(out, 'empty-cache'); fs.writeFileSync(empty, '');
 const target = path.join(out, 'new-source.tar');
 const original = path.join(out, 'old-source.tar');
 const expectedHash = sha(bytes(target));
 const report = {
-  schema_version: 1, application: 'independent MoonBit JS resource-cache consumer',
+  schema_version: 2, application: 'independent MoonBit JS resource-cache consumer',
   package: 'serikaonoe123/moonrdiff@0.1.2', resolution: 'registry',
   source_repository: 'https://github.com/serikaonoe123/moonffi-lab',
   source_license: 'MIT; each archive contains its original LICENSE',
   archive_checkout_policy: 'command-local core.autocrlf=false, core.eol=lf',
+  archive_backend: 'git-archive-explicit-epoch-v2',
   source_commit: run('git', ['rev-parse', 'HEAD']).trim(),
   node_version: process.version,
   moon_version: run('moon', ['version', '--all']).trim(),

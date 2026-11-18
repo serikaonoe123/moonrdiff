@@ -15,7 +15,7 @@
 | v0.1.0-rc.1 | `23893d5bb3a231a21df10db506d8da821a7e984d` |
 | v0.1.0-rc.2 | `20b608d6d8546873d5d66786dc8e12642dd70e9c` |
 
-只从这两个 Git 提交归档 `LICENSE`、`moon.mod`、`core/`，不读取工作区改动。TAR 时间固定为零，归档命令单次指定 `core.autocrlf=false`、`core.eol=lf`，避免平台换行转换；不修改 Git 配置。每份归档保留原始 MIT 许可证。报告列出每个源文件的字节数及 SHA-256、归档摘要、Git 版本和依赖解析来源。生成的源码包留在 `results/`，不随 Mooncakes 包分发。
+只从这两个 Git 提交归档 `LICENSE`、`moon.mod`、`core/`，不读取工作区改动。使用完整 UTC 日期 `--mtime=1970-01-01T00:00:00Z`，并独立读取 TAR，核对头部校验和、零时间戳、完整文件清单和每个成员的字节数/SHA-256。归档命令单次指定 `core.autocrlf=false`、`core.eol=lf`，避免平台换行转换；不修改 Git 配置。每份归档保留原始 MIT 许可证。schema-2 报告记录明确日期后端 `git-archive-explicit-epoch-v2`、源文件清单、归档摘要、Git 版本和依赖解析来源。生成的源码包留在 `results/`，不随 Mooncakes 包分发。早期 schema-1 的 `@0` 实际写入运行时间，原报告保留，不作为固定归档基准。
 
 ```sh
 git clone https://github.com/serikaonoe123/moonffi-lab.git ../moonffi-lab
@@ -47,7 +47,7 @@ moon run . --target js --release -- apply OLD_CACHE MANIFEST_JSON PAYLOAD_BIN TR
 
 `first_delta_bytes = offer_bytes + delta_bytes + delta_manifest_bytes`；`direct_full_bytes = target_bytes + full_manifest_bytes`。offer 已发送后才决定交付方式，因此 `actual_exchange_bytes` 即使回退完整下载，也保留已发送的 offer 成本；`selected_remaining_bytes` 单列后续发送量。JSON 中十六进制摘要的开销按实际文件计入。没有省略清单或把已发送的摘要当成免费。
 
-本地固定换行后的结果：新 TAR 102400 字节；历史更新的 offer/差量/清单分别为 4477/57604/302 字节，合计 62383 字节，直接完整下载含清单为 102701 字节。空缓存回退完整下载，实际交换 102854 字节（其中 offer 153 字节）；这比一开始直接下载更贵。这里只是一个真实源码包样本，不是通用节省比例、时间或内存性能结论。云端结果单独记录在 VALIDATION.md。
+本地固定换行和零时间戳后的结果：新 TAR 102400 字节；历史更新的 offer/差量/清单分别为 4477/47252/302 字节，合计 52031 字节，直接完整下载含清单为 102701 字节。空缓存回退完整下载，实际交换 102854 字节（其中 offer 153 字节）；这比一开始直接下载更贵。这里只是一个真实源码包样本，不是通用节省比例、时间或内存性能结论。云端结果单独记录在 VALIDATION.md。
 
 验收覆盖历史版本差量更新、空缓存完整下载，两者均逐字节还原并保留旧缓存。17 项拒绝检查覆盖错误可信摘要、损坏内容、错误目标大小/摘要、未知清单版本/交付类型、超预算、差量旧缓存错误、已有目标不覆盖；每次失败使用独立输出路径并要求不产生成功 JSON。
 
