@@ -1,22 +1,22 @@
 # MoonRdiff development status
 
-Updated 2026-11-18. Mooncakes 0.1.2 is published from 287872c; Windows/Linux registry acceptance 43157315047 passed. See RELEASE-0.1.2.md. Original 0.1.0/0.1.1 evidence remains retained.
+Updated 2026-11-18. Mooncakes 0.1.3 is published from 79a958d; Windows/Linux registry acceptance 44272240210 passed. See RELEASE-0.1.3.md. Original 0.1.0/0.1.1/0.1.2 evidence remains retained.
 
 | Area | Current evidence | Remaining work |
 | --- | --- | --- |
 | Format/core | RK/BLAKE2 signatures, rdiff patch codec, full four-way interoperability | Broader adversarial/randomized and boundary evaluation |
 | Incremental APIs | SignatureEncoder, DeltaEncoder, PatchDecoder with state/budget checks; Windows/Linux release 128 MiB sample paths passed; new 38-case partitioned-pipeline and exact-budget regression passed all three backends on both platforms in CI 42963384904 (4013e9c) | Wider resource boundaries and larger real application inputs |
-| Native CLI | Development staged outputs passed Windows/Linux debug/release, late destination conflicts and 128 MiB gates on 6d35ef4; published 0.1.2 remains unchanged | Four publication-fault tests passed Windows/Linux debug/release on 8a44e0e; actual disk-full/fsync-failure and crash-durability remain unverified |
+| Native CLI | Published 0.1.3 includes staged outputs, late destination conflicts and explicit post-publication errors; frozen 79a958d passed Windows/Linux debug/release and 128 MiB acceptance | Four publication-boundary simulations passed; actual disk-full/fsync-failure and crash-durability remain unverified |
 | Binding | Strict optional manifest, standard BLAKE2b-256, preflight/replay checks; both native platforms passed 128 MiB modified-file bound restore | Distributed manifest creation and publisher authentication not provided |
 | Examples | Both original user-facing demos run in MoonBit without Python; TAR/ZIP/TAR.GZ explicit-date backend passed Windows/Linux CI 44264366022 after correcting abbreviated-time parsing | External application integrations and broader real application data; continue evaluating Python development-tool migrations |
 | Resource-cache consumer | Independent MoonBit JS module resolves registry 0.1.2; fixed MoonFFI Lab TARs pass member/hash/epoch checks, both update flows and 17 controls on Windows/Linux in CI 44264366022; input hashes and costs match across platforms | Same-author integration only; broader data, third-party deployment and production cache durability remain unverified |
 | Development tooling | Native CLI acceptance runs in MoonBit with a small independent Python hashlib/struct oracle; Windows debug/release each passed 125 checks and Linux each passed 126 with default links, in CI 44055861932 | Other Python development tools remain; 128 MiB CI 44055861763 passed after isolating negative-control output paths |
 | Check entry point | MoonBit cmd/check on Node22 preserves all 14 ordered steps; default Windows/Linux CI 44081050069 passed with links enabled and independent oracles retained | Other Python packaging/reference/benchmark tools remain |
-| Packaging | Published 0.1.2: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
+| Packaging | Published 0.1.3: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | User-approved 0.1.0/0.1.1/0.1.2 published/registry-verified; local original/fresh Native consumers and packaged CLI now pass without security/flag changes | Historical D8050 is not currently reproduced; root cause remains unconfirmed |
+| Release | User-approved 0.1.0/0.1.1/0.1.2/0.1.3 published/registry-verified; local original/fresh Native consumers and packaged CLI pass without security/flag changes | Historical D8050 is not currently reproduced; root cause remains unconfirmed |
 
-Unpublished 0.1.3 is frozen at 79a958d: full CI 44267566097, 128 MiB acceptance 44267566157 and published-0.1.2 registry regression 44267638263 passed Windows/Linux. Both actual candidate ZIPs contain the same 34 files / 150757 source bytes; root API remains unchanged. The original Linux candidate report is retained as packaging/candidate-0.1.3.json with a fixed content lock. Registry examples/resource-cache still use published 0.1.2. See RELEASE-PROPOSAL-0.1.3.md; upload and 0.1.3 registry acceptance await explicit approval.
+Published 0.1.3 is frozen at 79a958d: full CI 44267566097, 128 MiB acceptance 44267566157 and old-0.1.2 registry regression 44267638263 passed Windows/Linux. Official publication returned exit 0 / 200 OK with the approved 34 files / 150757 source bytes; registry 44272240210 verifies 0.1.3 on both platforms and all three backends. Original candidate/registry reports are content-locked. Registry defaults and the basic consumer now use 0.1.3; the resource-cache case stays pinned to its reproducible 0.1.2 baseline. See RELEASE-0.1.3.md.
 
 Benchmark schema-3 path isolation passed controlled run 44082843263: both versions passed 15 cases and 20 distinct-path budget controls. Eight report-copy compatibility/rejection checks passed. This updates acceptance stability, not algorithm performance.
 

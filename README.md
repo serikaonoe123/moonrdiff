@@ -2,11 +2,11 @@
 
 纯 MoonBit 远程差量基础库，处于早期开发阶段。
 
-已发布到 Mooncakes：`serikaonoe123/moonrdiff@0.1.2`，见 [发布及注册表安装验收记录](docs/RELEASE-0.1.2.md)。当前进度见 [状态清单](docs/STATUS.md)，归档内容见 [打包验收](docs/PACKAGING.md)，性能方法与实测记录见 [基准说明](docs/BENCHMARKS.md)。
+已发布到 Mooncakes：`serikaonoe123/moonrdiff@0.1.3`，见 [发布及注册表安装验收记录](docs/RELEASE-0.1.3.md)。当前进度见 [状态清单](docs/STATUS.md)，归档内容见 [打包验收](docs/PACKAGING.md)，性能方法与实测记录见 [基准说明](docs/BENCHMARKS.md)。
 
-main 的 0.1.3 候选版已通过固定提交验收，主要改进原生命令的暂存输出和失败诊断；尚未上传该版本，具体内容和待批准范围见 [候选发布方案](docs/RELEASE-PROPOSAL-0.1.3.md)。下方注册表安装示例仍使用已发布的 0.1.2。
+0.1.3 主要改进原生命令的暂存输出和失败诊断，公共库接口和差量格式不变。Windows/Linux 已从注册表安装并核对全部批准文件，具体发布范围见 [已批准方案](docs/RELEASE-PROPOSAL-0.1.3.md)。
 
-在应用的 `moon.mod` 的 `import` 块中加入 `"serikaonoe123/moonrdiff@0.1.2"`，然后运行 `moon check --target js` 安装并检查。包别名配置与使用代码见下方库示例；[独立消费者](examples/consumer/consumer_test.mbt)已从注册表在 Windows/Linux 的三个后端验收。
+在应用的 `moon.mod` 的 `import` 块中加入 `"serikaonoe123/moonrdiff@0.1.3"`，然后运行 `moon check --target js` 安装并检查。包别名配置与使用代码见下方库示例；[独立消费者](examples/consumer/consumer_test.mbt)已从注册表在 Windows/Linux 的三个后端验收。
 
 原生性能运行建议用 `moon build cmd/moonrdiff --target native --release`，执行文件在 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。最新同机、同为 release 的三次采样中，128 MiB 随机目标的差量耗时从 8.74 秒降到 3.80 秒（约减少 56.5%），压缩样本约减少 28%。这来自最多 64 KiB 的查找预筛选表，输出字节保持一致；随机补丁仍比整文件传输大，命令仍慢于参考 rdiff。报告保留其他场景的小幅退化及计时异常。
 
@@ -65,7 +65,7 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 // restored == b"world!hello"
 ```
 
-导入模块 `serikaonoe123/moonrdiff` 为 `@rdiff`；上述函数会抛出 `DeltaError`，由调用者处理。Mooncakes 依赖版本为 `0.1.2`。
+导入模块 `serikaonoe123/moonrdiff` 为 `@rdiff`；上述函数会抛出 `DeltaError`，由调用者处理。Mooncakes 依赖版本为 `0.1.3`。
 
 单个长度、偏移和输出预算上限为 Int32 正数范围，同时受实际后端可分配内存限制。格式中的更大整数会明确报错；内存便利接口会持有传入的数据，分块接口的缓冲与索引行为见下文。严格拒绝 end 后的多余数据。
 

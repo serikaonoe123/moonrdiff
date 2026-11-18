@@ -1,8 +1,8 @@
 # Packaging and independent-consumer acceptance
 
-Published version: serikaonoe123/moonrdiff@0.1.2; completed Windows/Linux registry acceptance is recorded in RELEASE-0.1.2.md. Main prepares the unpublished 0.1.3 candidate; its exact release scope and acceptance state are tracked in RELEASE-PROPOSAL-0.1.3.md.
+Published version: serikaonoe123/moonrdiff@0.1.3, from fixed source 79a958d; completed Windows/Linux registry acceptance is recorded in RELEASE-0.1.3.md. The approved 34-file inventory remains in packaging/candidate-0.1.3.json; earlier version records are retained.
 
-check_package.py derives the candidate archive version from moon.mod. Its independent workspace must resolve MoonRdiff only to the extracted candidate archive, even when examples/consumer still declares the published 0.1.2 dependency. check_registry.py instead binds its standalone dependency to the selected approved inventory's version. Local candidate acceptance does not establish registry availability of 0.1.3.
+check_package.py derives the archive version from moon.mod. Its independent workspace must resolve MoonRdiff only to the extracted archive; examples/consumer now declares published 0.1.3. check_registry.py instead binds its standalone dependency to the selected approved inventory's version. Archive acceptance is separate from the completed 0.1.3 registry installation gate.
 
 Run with the pinned compiler:
 
@@ -23,7 +23,7 @@ Each test preserves its report, resolution record and complete command output un
 
 Successful package checks also retain that actual ZIP beside the report, which records the source commit and module version read from moon.mod. This supports review of a concrete candidate archive and its 34-file content inventory.
 
-After authorized publication, use `python scripts/check_registry.py --approved-inventory PATH_TO_SUCCESSFUL_PACKAGE_REPORT`. It creates a fresh standalone consumer, requires registry resolution of exactly the version in the selected approved inventory, compares all approved source-file hashes in the downloaded module and runs the five public tests on all three backends. It contains no publishing or credential-changing commands. It passed Windows/Linux registry acceptance after the 0.1.0, 0.1.1 and 0.1.2 uploads; source-only resolution and byte comparisons are recorded separately from this archive gate.
+After authorized publication, use `python scripts/check_registry.py --approved-inventory PATH_TO_SUCCESSFUL_PACKAGE_REPORT`. It creates a fresh standalone consumer, requires registry resolution of exactly the version in the selected approved inventory, compares all approved source-file hashes in the downloaded module and runs the five public tests on all three backends. It contains no publishing or credential-changing commands. It passed Windows/Linux registry acceptance after the 0.1.0, 0.1.1, 0.1.2 and 0.1.3 uploads; source-only resolution and byte comparisons are recorded separately from this archive gate. The registry workflow defaults to published 0.1.3 and retains manual historical-version options.
 
 Before public publication: select a concrete tested commit/version; recheck package inventory and metadata; finish representative benchmark/large-file acceptance; review API status and release notes; then obtain the applicable publication authorization. After publication, run a new consumer that resolves from Mooncakes, without a local MoonRdiff workspace member. The current consumer deliberately cannot prove registry availability.
 

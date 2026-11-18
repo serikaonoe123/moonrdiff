@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.1.3 — 2026-11-18
 
-- Prepare 0.1.3 with same-parent native CLI staging and explicit post-publication failure diagnostics; public root API, wire formats and dependency versions remain unchanged. Publication is pending approval and registry acceptance.
+- Publish 0.1.3 with same-parent native CLI staging and explicit post-publication failure diagnostics; public root API, wire formats and dependency versions remain unchanged. Approved 34-file contents passed Windows/Linux registry acceptance; see docs/RELEASE-0.1.3.md.
 - Add an independent MoonBit resource-cache application using published 0.1.2 and fixed MoonFFI Lab source data; verify both delivery modes, trusted identities and 17 refusal controls. The application remains repository-only.
 - Correct Git archive timestamp generation with explicit UTC dates and verify actual TAR timestamps/members. Preserve earlier measurements separately; repository demos remain outside the published package.
 

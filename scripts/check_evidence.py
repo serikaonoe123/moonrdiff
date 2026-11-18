@@ -66,4 +66,12 @@ for name, sha in verify_evidence.items():
 registry_012 = {'linux-report.json': '486370bf19d4cd1cd71027f6deebfd11362ddf8f3c07d5a8ebfee62d11350fa4', 'linux-resolution.json': 'b8466a0e787197b2181010a08d19b398cde7da9eff5d6a6e617e9d832ad9b495', 'windows-report.json': 'eabf62f45f8757ac3ee911dd8a09c221cbc584ba15dfe4151ef7fc7128f80fdd', 'windows-resolution.json': 'd2a97bb6e2b6924bb399a2e2586d3f5ce94248aa312f10dbc7fa07f8aed298ec'}
 for name, sha in registry_012.items():
     assert hashlib.sha256((ROOT/"packaging/registry-0.1.2"/name).read_bytes()).hexdigest() == sha, name
+registry_013 = {
+    'linux-report.json': '389e73ab953ab1fb995bdc84831cf08c864e767ff830eb9e5936fe7b30430c8d',
+    'linux-resolution.json': '7e3fc509d574bd2818acc1ec5954a2201ae2878accdbdbe8c806339dd244c3a9',
+    'windows-report.json': 'ff2ecd150dfe16cc0f8dbb2743a87d5dfca51aaaca4e3f0c668b4b354d01d6ee',
+    'windows-resolution.json': 'e6d689952ff951c2d67c4580b60b8e7e963e5249ea2f0f50afd2985427501124',
+}
+for name, sha in registry_013.items():
+    assert hashlib.sha256((ROOT/'packaging/registry-0.1.3'/name).read_bytes()).hexdigest() == sha, name
 print('Original large-file, source-update, candidate and published registry evidence bytes retained.')
