@@ -69,10 +69,12 @@ const report = {
 };
 function reject(name, args, output, diagnostic) {
   assert(!fs.existsSync(output));
+  const basisBefore = sha(bytes(args[1]));
   app(args, 2);
   const recorded = fs.readFileSync(log, 'utf8');
   assert(recorded.slice(recorded.lastIndexOf('["moon"')).includes(diagnostic), diagnostic);
   assert(!fs.existsSync(output));
+  assert.equal(sha(bytes(args[1])), basisBefore);
   assert.equal(sha(bytes(original)), fixtures[0].sha256);
   report.controls.push({ name, diagnostic, output_absent: true, basis_preserved: true });
 }
@@ -130,6 +132,7 @@ for (const [name, basis, delivery] of [['historical-update', original, 'delta'],
   const existingLog = fs.readFileSync(log, 'utf8');
   assert(existingLog.slice(existingLog.lastIndexOf('["moon"')).includes('EEXIST'));
   assert.equal(sha(bytes(restored)), before);
+  assert.deepEqual(bytes(basisPath), bytes(basis));
   report.controls.push({ name: name + ':existing-output', existing_output_preserved: true });
 }
 assert.equal(sha(bytes(original)), fixtures[0].sha256);
