@@ -39,6 +39,8 @@ moon run cmd/moonrdiff --target native -- --help
 
 Commands: signature, delta, patch, verify and manifest. Existing output paths are refused; input/output limits default to 64 MiB. See [CLI](docs/CLI.md), [format contract](docs/FORMAT.md), and [binding manifests](docs/BINDING.md).
 
+In the 0.1.3 source, writing commands stage data in a new directory beside the destination, synchronize/close it, then publish with a no-replace rename. Success JSON follows publication and empty-directory cleanup. Failure retains staging evidence. A finalization error after publication exits 2 and reports that the final output already exists; inspect reported paths before deciding whether to retry. These are failure-handling improvements, not a crash-durability or filesystem-atomicity guarantee.
+
 Windows Server 2025 and Ubuntu 24.04 release CLI builds passed five synthetic 128 MiB cases with explicitly raised budgets, plus bound restore/verify of the modified-file case. Native verify compares paired reads of at most 64 KiB, validates both input budgets and rechecks sizes; JSON fields and exit codes are unchanged. Inputs must remain stable. This is sample acceptance, not general larger-file support, a process-memory cap or a snapshot guarantee.
 
 ## Compatibility and limits

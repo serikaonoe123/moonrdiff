@@ -16,6 +16,8 @@ Updated 2026-11-18. Mooncakes 0.1.2 is published from 287872c; Windows/Linux reg
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
 | Release | User-approved 0.1.0/0.1.1/0.1.2 published/registry-verified; local original/fresh Native consumers and packaged CLI now pass without security/flag changes | Historical D8050 is not currently reproduced; root cause remains unconfirmed |
 
+Main now prepares unpublished 0.1.3 (native CLI staged output); candidate package/full CI acceptance and a fixed release inventory are in progress. Registry examples and resource-cache application continue to use published 0.1.2. See RELEASE-PROPOSAL-0.1.3.md; no 0.1.3 registry upload is authorized yet.
+
 Benchmark schema-3 path isolation passed controlled run 44082843263: both versions passed 15 cases and 20 distinct-path budget controls. Eight report-copy compatibility/rejection checks passed. This updates acceptance stability, not algorithm performance.
 
 The project plan records original dates and milestone gates; historical early checkboxes are not an assertion that current features are absent. T02/T03/T04/T06 now have algorithm, version, contract and vector evidence in FORMAT.md and VALIDATION.md. Public search has not found an identical MoonBit project, but cannot establish exclusivity against unpublished work.

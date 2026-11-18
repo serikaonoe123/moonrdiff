@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Prepare 0.1.3 with same-parent native CLI staging and explicit post-publication failure diagnostics; public root API, wire formats and dependency versions remain unchanged. Publication is pending approval and registry acceptance.
+- Add an independent MoonBit resource-cache application using published 0.1.2 and fixed MoonFFI Lab source data; verify both delivery modes, trusted identities and 17 refusal controls. The application remains repository-only.
+- Correct Git archive timestamp generation with explicit UTC dates and verify actual TAR timestamps/members. Preserve earlier measurements separately; repository demos remain outside the published package.
+
 - Isolate all benchmark budget-control output paths, record their identities in schema-3 reports and reject repeated/misassociated paths in comparisons. Historical schema-2 reports remain supported; fixture generation, measurement protocol and product behavior are unchanged.
 
 - Replace scripts/check.py with the MoonBit cmd/check JS entry point, retaining all 14 ordered checks and stopping on the first failure. Stream child output and retain structured reports, with explicit local link-skip forwarding. Node process/filesystem adapters avoid Windows native self-relinking and normalize signed exit codes.
