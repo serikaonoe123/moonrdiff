@@ -18,6 +18,8 @@ moon run cmd/source-demo --target native
 
 2026-11-18 归档核查发现，旧 `git-archive-mtime0-v1` 使用的 `--mtime=@0` 实际产生运行时间，并未达到固定零时间的意图。现在使用已验证有效的完整 UTC 日期，并在 MoonBit 中检查 TAR 头部的零时间戳；旧运行的还原和成本记录保留，但不作为固定时间或跨运行同一输入的证据。ZIP 不声明为 1970 年，避免用不可表示的年份构造 DOS 日期。
 
+修复提交 `ea251d0` 已通过 [Windows/Linux 完整 CI 44264366022](https://github.com/serikaonoe123/moonrdiff/actions/runs/44264366022) 及 [128 MiB 回归 44264366140](https://github.com/serikaonoe123/moonrdiff/actions/runs/44264366140)。两平台三种归档均通过绑定还原及原文件保留，报告明确标记新的日期后端。独立本地检查还核对了六份输入归档的成员字节/摘要、TAR/TAR.GZ 零时间及 ZIP 扩展时间 `315532800`；ZIP 的 DOS 表示仍可能受时区影响。
+
 演示使用小型输入，将归档读入内存做内容比较；归档生成后拒绝超过 64 MiB 的结果，文件读取前检查同一大小上限。这不是严格限制 Git 子进程输出内存的机制，也不是核心 CLI 的大文件或内存性能测试。程序不解压归档，不覆盖已有文件，不发布软件包。
 
 ## 数据流与校验
