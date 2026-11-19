@@ -1,6 +1,8 @@
 # MoonRdiff development status
 
-Updated 2026-11-18. Mooncakes 0.1.3 is published from 79a958d; Windows/Linux registry acceptance 44272240210 passed. See RELEASE-0.1.3.md. Original 0.1.0/0.1.1/0.1.2 evidence remains retained.
+Updated 2026-11-19. Mooncakes 0.1.3 is published from 79a958d. Windows/Linux registry acceptance 44272240210 passed. See RELEASE-0.1.3.md for this release and the archive of earlier results.
+
+The walkthrough covers a fresh registry consumer, bound file restore, and the resource-cache application. Its compatibility table points to the platform reports. [Acceptance guide](ACCEPTANCE.md)
 
 | Area | Current evidence | Remaining work |
 | --- | --- | --- |
@@ -14,7 +16,7 @@ Updated 2026-11-18. Mooncakes 0.1.3 is published from 79a958d; Windows/Linux reg
 | Check entry point | MoonBit cmd/check on Node22 preserves all 14 ordered steps; default Windows/Linux CI 44081050069 passed with links enabled and independent oracles retained | Other Python packaging/reference/benchmark tools remain |
 | Packaging | Published 0.1.3: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | User-approved 0.1.0/0.1.1/0.1.2/0.1.3 published/registry-verified; local original/fresh Native consumers and packaged CLI pass without security/flag changes | Historical D8050 is not currently reproduced; root cause remains unconfirmed |
+| Release | User-approved 0.1.0/0.1.1/0.1.2/0.1.3 published and verified from the registry | Local MSVC D8050 reappeared during the Git Bash walkthrough. The same checkout built in PowerShell. Root cause remains unconfirmed. See NATIVE-WINDOWS-DIAGNOSTIC.md. |
 
 Published 0.1.3 is frozen at 79a958d. Full CI 44267566097, 128 MiB acceptance 44267566157 and old-0.1.2 registry regression 44267638263 passed Windows/Linux. Registry 44272240210 verifies 0.1.3 on both platforms and all three backends. The registry workflow, basic consumer and resource-cache example use 0.1.3. See RELEASE-0.1.3.md and RESOURCE-CACHE.md.
 

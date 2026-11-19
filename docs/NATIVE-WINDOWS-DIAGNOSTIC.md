@@ -1,6 +1,6 @@
 # Local MSVC D8050: diagnostic and recovery record
 
-Updated 2026-11-11. The original failed consumer and a fresh extracted-archive consumer now pass Native builds and tests locally. The earlier D8050 is not currently reproduced; its root cause remains unconfirmed and no targeted compiler fix has been established. The initial inspection was read-only; the subsequent user-requested revalidation below ran normal builds without changing ACLs, integrity labels, security settings, TEMP/TMP overrides or compiler flags, and without elevating the compiler.
+Updated 2026-11-19. D8050 reappeared during a Git Bash build of the 0.1.3 walkthrough. A PowerShell build in the same checkout succeeded. The root cause remains unconfirmed. The initial inspection and earlier local recovery are recorded below.
 
 ## Observed evidence
 
@@ -28,6 +28,10 @@ The user requested continued diagnosis. With the same fixed MoonBit 0.10.17+d971
 
 The fresh archive report is results/package-d561c1ecff234317a06d66a544b7fa0d/report.json, SHA-256 `1b76bd7a306cac744d3e89cad6468edab3a4f9b662fde9c3e3a97066226800fd`. The combined local record is results/native-d8050-20261111/recovery-summary.json. These are local working-source/archive results, not a new registry-only 0.1.1 installation or a new publication. Existing Windows/Linux registry evidence remains separately recorded.
 
-The current operational status is **local Native paths recovered; historical D8050 root cause unconfirmed**. No ACL/security change, compiler replacement, TEMP/TMP override or compiler-flag workaround was applied to obtain this result.
+The November 11 revalidation recovered the local Native paths. It used the same compiler, access settings, compiler flags and temporary-directory configuration.
 
 Official OpenAI documentation's [Windows sandbox guidance](https://learn.chatgpt.com/docs/windows/windows-sandbox) describes inspecting effective permissions/configuration and retaining managed sandbox boundaries. It does not document D8050 or establish a fix for this machine. No sandbox-mode or product-configuration changes were made based on that guidance.
+
+## November 19 walkthrough
+
+The new checkout at `d911258` reported D8050 while compiling runtime C objects from Git Bash with the pinned toolchain. The same `moon build cmd/moonrdiff --target native --release --deny-warn` in PowerShell compiled the runtime and CLI in that checkout. The resulting executable passed a bound restore, byte comparison and the mismatch exit-code check. This observed difference does not isolate the cause. The walkthrough uses PowerShell for the Windows Native build. Local logs are under `results/guide-0.1.3/`. [Acceptance guide](ACCEPTANCE.md)
