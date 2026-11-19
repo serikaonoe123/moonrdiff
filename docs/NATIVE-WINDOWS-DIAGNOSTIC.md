@@ -1,6 +1,6 @@
 # Local MSVC D8050: diagnostic and recovery record
 
-Updated 2026-11-19. D8050 reappeared during a Git Bash build of the 0.1.3 walkthrough. A PowerShell build in the same checkout succeeded. The root cause remains unconfirmed. The initial inspection and earlier local recovery are recorded below.
+Updated 2026-11-19. D8050 can affect both Git Bash and PowerShell when launching a full MoonBit build in the same diagnostic execution context. A fresh build from the normal local PowerShell context succeeded. The root cause remains unconfirmed.
 
 ## Observed evidence
 
@@ -35,3 +35,16 @@ Official OpenAI documentation's [Windows sandbox guidance](https://learn.chatgpt
 ## November 19 walkthrough
 
 The new checkout at `d911258` reported D8050 while compiling runtime C objects from Git Bash with the pinned toolchain. The same `moon build cmd/moonrdiff --target native --release --deny-warn` in PowerShell compiled the runtime and CLI in that checkout. The resulting executable passed a bound restore, byte comparison and the mismatch exit-code check. This observed difference does not isolate the cause. The walkthrough uses PowerShell for the Windows Native build. Local logs are under `results/guide-0.1.3/`. [Acceptance guide](ACCEPTANCE.md)
+
+## November 19 controlled follow-up
+
+The standalone test invoked the same `cl.exe` with identical arguments and a one-line C fixture. All four runs used `/Z7`. The MoonBit comparison built the same checkout `d911258` with `0.10.17+d971670cd` and fresh, equal-length output directory names on the workspace drive. The Git Bash launcher and native launch from PowerShell ran within the same diagnostic invocation. The normal PowerShell run used a separate invocation. [Microsoft reference for `/Z7`](https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170)
+
+| Local test | Observed result |
+| --- | --- |
+| Standalone C compilation from both shells | Two passes per shell, with four object files produced |
+| Full MoonBit Native build from both shells in the diagnostic invocation | D8050 during runtime C object compilation in both cases |
+| Full build with default parallelism and with `--jobs 1` in a follow-up diagnostic invocation | D8050 in both cases |
+| Full build in normal local PowerShell | Runtime and CLI compiled in a fresh output directory. The resulting CLI returned `matched: true` when comparing the 13-byte guide fixture and its restored copy. |
+
+The successful full build started with 243,748,864 free bytes on C:, below both failures in the first full-build comparison. Available space on C: alone does not explain that difference. The sampled parent processes in the two execution contexts reported different normalized `TEMP` and `TMP` paths. That observation does not identify the failing file operation or establish the temporary directory as the cause. On recurrence, capture the failing compiler child's environment and first failed operation before comparing with a successful run. Local logs and the comparison report are under `results/d8050-followup-20261119/`.

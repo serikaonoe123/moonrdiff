@@ -52,7 +52,7 @@ git checkout --detach d911258dd40a2deb28a459fbc3fb55c874c7dd48
 moon update
 ```
 
-在仓库根目录构建 CLI。Linux 可继续用当前终端，Windows 用 PowerShell 打开同一个仓库目录。本地验证时 Git Bash 下的编译报 D8050，同目录的 PowerShell 编译通过。[Windows 编译记录](NATIVE-WINDOWS-DIAGNOSTIC.md)
+在仓库根目录构建 CLI。Linux 可继续用当前终端，Windows 用常规 PowerShell 打开同一个仓库目录。跟踪测试中，两种终端在同一个诊断执行环境都出现过 D8050，常规 PowerShell 的全新构建通过。[Windows 编译记录](NATIVE-WINDOWS-DIAGNOSTIC.md)
 
 ```text
 moon build cmd/moonrdiff --target native --release --deny-warn
