@@ -66,7 +66,7 @@ curl -fS https://www.lua.org/ftp/lua-5.4.8.tar.gz -o results/lua-release-inputs/
 node scripts/check_resource_cache.mjs ../moonffi-lab results/lua-release-inputs
 ```
 
-Windows 本地验收共通过 5 个场景和 42 项拒绝检查。以下只比较相同存储格式内的传输量，所有数字均含清单，首次差量和实际交换还计入已发送的请求。
+Linux 和 Windows 各通过 5 个场景和 42 项拒绝检查，两个 Lua 场景的交付选择、传输量和还原文件 SHA-256 均一致。下表按目标存储格式分别比较传输量。所有数字均含清单，首次差量和实际交换还计入已发送的请求。[两平台验收报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44688437344)
 
 | Lua 5.4.7 → 5.4.8 | 首次差量方案 | 直接完整下载 | 交付选择 | 实际交换 |
 | --- | ---: | ---: | --- | ---: |
