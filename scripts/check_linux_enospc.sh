@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export LC_ALL=C
 
 cli=$(realpath -- "${1:?native MoonRdiff executable required}")
 test -x "$cli"
@@ -28,7 +29,8 @@ cmp -- "$basis" "$report_dir/control.bin"
 sudo -n mount -t tmpfs -o "size=$capacity,mode=0700,uid=$(id -u),gid=$(id -g),nodev,nosuid,noexec" tmpfs "$limited"
 trap 'sudo -n umount -- "$limited"' EXIT
 test "$(findmnt --noheadings --output FSTYPE --mountpoint "$limited")" = tmpfs
-test "$(stat --file-system --format='%b %S' -- "$limited" | awk '{print $1 * $2}')" -eq "$capacity"
+read -r blocks block_bytes < <(stat --file-system --format='%b %S' -- "$limited")
+test "$((blocks * block_bytes))" -eq "$capacity"
 printf 'existing data\n' > "$limited/existing.txt"
 cp -- "$limited/existing.txt" "$report_dir/existing.txt"
 
@@ -44,7 +46,7 @@ stage_dirs=("$destination".moonrdiff-stage-*)
 test "${#stage_dirs[@]}" -eq 1
 stage="${stage_dirs[0]}"
 test -f "$stage/data"
-grep -Fx "Output was not published. Staging evidence: $stage" "$report_dir/enospc.stderr"
+grep -Fx "moonrdiff: Output was not published. Staging evidence: $stage" "$report_dir/enospc.stderr"
 partial_bytes=$(stat --format=%s -- "$stage/data")
 test "$partial_bytes" -gt 0
 test "$partial_bytes" -lt "$target_bytes"
