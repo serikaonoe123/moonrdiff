@@ -43,3 +43,11 @@ The Ubuntu job runs `scripts/check_linux_enospc.sh` with the release CLI. It fir
 [Run 44690063732](https://github.com/serikaonoe123/moonrdiff/actions/runs/44690063732) recorded exit status 2, empty stdout and a diagnostic containing the staging path. The final file was absent. The staging file contained 1,044,480 bytes matching the prefix of the expected result. The input SHA-256 hashes and the preexisting file on the small filesystem were unchanged. The script unmounts the temporary filesystem after the checks and publishes the summary and logs as CI artifacts.
 
 This case covers native `patch` reaching the fixed capacity of Linux tmpfs during a write. Linux disk-backed filesystems, Windows volume exhaustion, sync failures and crash recovery are outside this test's scope.
+
+## Windows NTFS capacity failure
+
+The Windows job runs `scripts/check_windows_disk_full.ps1` on a GitHub-hosted runner. It creates a new 32 MiB VHD and checks that the attached disk belongs to that image before partitioning and formatting it. The script verifies a bound 48 MiB restore on the runner's normal filesystem, then restores to the small NTFS volume. It dismounts the test image after the checks and uploads the diagnostic, control and summary as CI artifacts.
+
+[Run 44698968496](https://github.com/serikaonoe123/moonrdiff/actions/runs/44698968496) observed a 32,436,224-byte NTFS volume. The bound restore returned exit status 2 with the Windows disk-full diagnostic and empty stdout. The final path remained absent. The 22,171,648-byte staging file matched the expected prefix by SHA-256. The input hashes and the preexisting file on the test volume matched their original values.
+
+This observed failure occurred during the native `patch` write on NTFS. Sync failures and crash recovery remain open on both platforms.
