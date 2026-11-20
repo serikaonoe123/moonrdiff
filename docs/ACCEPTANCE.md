@@ -111,4 +111,4 @@ TAR 直接完整下载含清单为 102,701 字节，历史更新节省约 49.3%�
 | rdiff 2.3.4 互操作 | Linux | RK/BLAKE2 摘要和 rdiff 补丁，双实现交叉生成与还原，共 330 项 | [固定发布提交的完整 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44267566097) |
 | 真实资源缓存 | Windows、Linux，JS / Node.js 22 | 0.1.3、TAR 历史更新、空缓存和 gzip 更新，每平台 25 项拒绝检查 | [资源缓存 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238) |
 
-JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rdiff` 互操作覆盖 RK/BLAKE2 摘要与标准补丁指令。存储故障方面已有四项边界模拟，实际磁盘写满、同步失败与断电恢复仍待测试。[格式说明](FORMAT.md) · [发布边界](RELEASE-0.1.3.md)
+JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rdiff` 互操作覆盖 RK/BLAKE2 摘要与标准补丁指令。Linux 已验证原生 `patch` 在限额临时文件系统写满时的退出码、诊断和暂存行为。Windows 写满、同步失败与断电恢复仍待验证。[格式说明](FORMAT.md) · [Linux 写满验收](LARGE-FILES.md#linux-filesystem-capacity-failure)

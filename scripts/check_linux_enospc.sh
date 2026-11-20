@@ -41,7 +41,7 @@ test "$status" -eq 2
 test ! -s "$report_dir/enospc.stdout"
 test ! -e "$destination"
 test ! -L "$destination"
-grep -Ei 'ENOSPC|No space left on device' "$report_dir/enospc.stderr"
+grep -F 'No space left on device' "$report_dir/enospc.stderr"
 stage_dirs=("$destination".moonrdiff-stage-*)
 test "${#stage_dirs[@]}" -eq 1
 stage="${stage_dirs[0]}"
