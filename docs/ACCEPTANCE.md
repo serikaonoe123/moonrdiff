@@ -91,14 +91,15 @@ node scripts/check_resource_cache.mjs ../moonffi-lab
 
 已有 MoonFFI Lab 克隆时，可跳过 `git clone`，将最后一个参数替换为该克隆的路径。脚本会验证两个固定提交和归档内容。
 
-成功时显示 `Resource cache accepted: 2 real-data cases, 17 rejection controls.`。终端同时给出 `results/resource-cache-*/report.json` 的实际路径。报告应标记 `passed: true`，`registry_inventory.files_verified` 为 34，且两种交付都还原出相同的目标哈希。每条流程的预期传输量如下。[输入来源与复现细节](RESOURCE-CACHE.md)
+终端会显示通过的场景数、拒绝检查数和 `results/resource-cache-*/report.json` 的实际路径。报告应有三个场景，`passed` 为 true，`registry_inventory.files_verified` 为 34。前两项还原同一份 TAR，第三项还原本次运行生成的 gzip 压缩文件。下表的字节数在 Windows 和 Linux 上实测一致。gzip 文件的字节数和摘要以各次运行的报告为准。[输入来源与复现细节](RESOURCE-CACHE.md)
 
 | 情景 | 交付方式 | 含清单和已发送摘要的总字节数 |
 | --- | --- | ---: |
 | 已有旧源码包 | 差量 | 52,031 |
 | 空缓存 | 完整文件 | 102,854 |
+| 已有旧的 gzip 源码包 | 完整文件 | 21,710 |
 
-直接完整下载含清单为 102,701 字节。这组历史更新节省约 49.3%。空缓存流程多计 153 字节的已发送请求。[两平台报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44277494308)
+TAR 直接完整下载含清单为 102,701 字节，历史更新节省约 49.3%。空缓存流程多计 153 字节的已发送请求。gzip 样本直接完整下载含清单为 20,689 字节，实际交换额外计入 1,021 字节的已发送请求。[三个场景的两平台报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238)
 
 ## 兼容性与证据
 
@@ -108,6 +109,6 @@ node scripts/check_resource_cache.mjs ../moonffi-lab
 | 原生 CLI | Windows、Linux，debug / release | 摘要、差量、绑定还原、逐字节校验与拒绝覆盖 | [固定发布提交的完整 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44267566097) |
 | 原生 CLI 大文件 | Windows、Linux，release | 五类 128 MiB 级样本，修改样本的绑定还原，默认预算拒绝 | [128 MiB 验收](https://github.com/serikaonoe123/moonrdiff/actions/runs/44267566157) |
 | rdiff 2.3.4 互操作 | Linux | RK/BLAKE2 摘要和 rdiff 补丁，双实现交叉生成与还原，共 330 项 | [固定发布提交的完整 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44267566097) |
-| 真实资源缓存 | Windows、Linux，JS / Node.js 22 | 0.1.3、两个源码包更新场景、17 项拒绝检查 | [资源缓存 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44277494308) |
+| 真实资源缓存 | Windows、Linux，JS / Node.js 22 | 0.1.3、TAR 历史更新、空缓存和 gzip 更新，每平台 25 项拒绝检查 | [资源缓存 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238) |
 
 JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rdiff` 互操作覆盖 RK/BLAKE2 摘要与标准补丁指令。存储故障方面已有四项边界模拟，实际磁盘写满、同步失败与断电恢复仍待测试。[格式说明](FORMAT.md) · [发布边界](RELEASE-0.1.3.md)
