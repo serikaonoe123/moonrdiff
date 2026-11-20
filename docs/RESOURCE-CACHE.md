@@ -25,7 +25,7 @@ cd ../..
 node scripts/check_resource_cache.mjs ../moonffi-lab
 ```
 
-已有包含这两个提交的克隆可直接传入路径。脚本要求从 Mooncakes 解析并安装 0.1.3，校验发布清单中 34 个已安装文件的大小和 SHA-256，再运行真实文件流程。当前报告使用 schema 4，在原有清单哈希、发布提交和验收文件数的基础上，记录 gzip 压缩级别、zlib 版本及两个压缩文件的大小和 SHA-256。失败时可查看同目录的命令日志。[0.1.3 发布清单](../packaging/candidate-0.1.3.json)
+已有包含这两个提交的克隆可直接传入路径。脚本要求从 Mooncakes 解析并安装 0.1.3，校验发布清单中 34 个已安装文件的大小和 SHA-256，再运行真实文件流程。当前报告使用 schema 5，记录 gzip 版本和文件摘要，可选的 Lua 输入清单，以及每个成功场景中三条 `moon run` 命令的实测耗时。失败时可查看同目录的命令日志。[0.1.3 发布清单](../packaging/candidate-0.1.3.json)
 
 ## 三步应用流程
 
@@ -54,6 +54,26 @@ moon run . --target js --release -- apply OLD_CACHE MANIFEST_JSON PAYLOAD_BIN TR
 第三个场景用 gzip 级别 9 分别压缩同一对 TAR，并解压核对原始字节。旧缓存与目标都以压缩形式参与更新。Windows 本地使用 Node.js 24.16.0 时，差量方案需要 21,721 字节，直接下载含清单需要 20,689 字节，应用选择完整交付。计入已发送的 1,021 字节请求后，实际交换 21,710 字节。验收按本次生成文件的大小检查交付选择，并逐字节核对还原的压缩包。
 
 三个场景均检查原缓存保留，并覆盖错误可信摘要、损坏内容、错误目标大小或摘要、未知清单版本或交付类型、超预算以及已有目标不覆盖。差量交付另测错误旧缓存。提交 `ca18c7b` 的 GitHub Actions 在 Windows 和 Linux 上分别通过 25 项拒绝检查。两边的交付方式和交换字节数一致。压缩包摘要因运行环境而异，每边都逐字节还原了本次生成的目标压缩包。[两平台报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238)
+
+## 独立项目样本
+
+可追加 Lua 5.4.7 到 5.4.8 的更新。下面两份文件来自 Lua 项目的官方发布，采用 MIT 许可证。脚本先核对官网公布的文件长度和 SHA-256，再以 8 MiB 输出上限解压。它对原始 gzip 和解压后的 TAR 分别验收，过程只读写归档字节。输入文件保存在本地验收目录。[Lua 官方下载与校验值](https://www.lua.org/ftp/) · [Lua 许可证](https://www.lua.org/license.html)
+
+```sh
+mkdir -p results/lua-release-inputs
+curl -fS https://www.lua.org/ftp/lua-5.4.7.tar.gz -o results/lua-release-inputs/lua-5.4.7.tar.gz
+curl -fS https://www.lua.org/ftp/lua-5.4.8.tar.gz -o results/lua-release-inputs/lua-5.4.8.tar.gz
+node scripts/check_resource_cache.mjs ../moonffi-lab results/lua-release-inputs
+```
+
+Windows 本地验收共通过 5 个场景和 42 项拒绝检查。以下只比较相同存储格式内的传输量，所有数字均含清单，首次差量和实际交换还计入已发送的请求。
+
+| Lua 5.4.7 → 5.4.8 | 首次差量方案 | 直接完整下载 | 交付选择 | 实际交换 |
+| --- | ---: | ---: | --- | ---: |
+| 官方 `.tar.gz` | 401,154 B | 374,633 B | 完整文件 | 401,143 B |
+| 解压后的 TAR | 213,342 B | 1,392,942 B | 差量 | 213,342 B |
+
+TAR 场景的缓存与目标均保存为 TAR，实际交换减少约 84.7%。官方压缩包场景多发送了 26,510 字节的请求，直接完整下载更省流量。报告中的 `moon_run_wall_ms` 含工具启动时间，适于复核单次运行。
 
 ## 边界
 
