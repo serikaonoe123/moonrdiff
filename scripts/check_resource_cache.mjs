@@ -9,7 +9,9 @@ import { gzipSync, gunzipSync } from 'node:zlib';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const source = process.argv[2];
-assert(source, 'Usage: node scripts/check_resource_cache.mjs MOONFFI_GIT_CHECKOUT');
+const luaArchives = process.argv[3];
+assert(source && process.argv.length <= 4,
+  'Usage: node scripts/check_resource_cache.mjs MOONFFI_GIT_CHECKOUT [LUA_ARCHIVE_DIRECTORY]');
 const revisions = ['23893d5bb3a231a21df10db506d8da821a7e984d', '20b608d6d8546873d5d66786dc8e12642dd70e9c'];
 const out = path.join(root, 'results', 'resource-cache-' + randomUUID());
 fs.mkdirSync(out, { recursive: true });
@@ -109,8 +111,42 @@ function compressedArchive(tar) {
 }
 const compressedBasis = compressedArchive(original);
 const compressedTarget = compressedArchive(target);
+const cases = [
+  ['historical-update', original, target, 'delta'],
+  ['empty-cache', empty, target, 'full'],
+  ['gzip-update', compressedBasis, compressedTarget, null],
+];
+const luaFixtures = [];
+if (luaArchives) {
+  const luaReleases = [
+    ['5.4.7', 374097, '9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30'],
+    ['5.4.8', 374332, '4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae'],
+  ];
+  for (const [version, expectedBytes, expectedHash] of luaReleases) {
+    const filename = `lua-${version}.tar.gz`;
+    const input = path.join(luaArchives, filename);
+    assert.equal(fs.statSync(input).size, expectedBytes, filename);
+    const gzip = bytes(input);
+    assert.equal(gzip.length, expectedBytes, filename);
+    assert.equal(sha(gzip), expectedHash, filename);
+    const tar = gunzipSync(gzip, { maxOutputLength: 8 * 1024 * 1024 });
+    const tarName = filename.slice(0, -3);
+    fs.writeFileSync(path.join(out, filename), gzip);
+    fs.writeFileSync(path.join(out, tarName), tar);
+    luaFixtures.push({
+      version, url: `https://www.lua.org/ftp/${filename}`, license: 'https://www.lua.org/license.html',
+      gzip: { archive: filename, bytes: gzip.length, sha256: expectedHash },
+      tar: { archive: tarName, bytes: tar.length, sha256: sha(tar) },
+    });
+  }
+  const [oldLua, newLua] = luaFixtures;
+  cases.push(
+    ['lua-gzip-update', path.join(out, oldLua.gzip.archive), path.join(out, newLua.gzip.archive), null],
+    ['lua-tar-update', path.join(out, oldLua.tar.archive), path.join(out, newLua.tar.archive), null],
+  );
+}
 const report = {
-  schema_version: 4, application: 'independent MoonBit JS resource-cache consumer',
+  schema_version: 5, application: 'independent MoonBit JS resource-cache consumer',
   package: `${approved.module}@${approved.version}`, resolution: 'registry',
   registry_inventory: {
     source_commit: approved.source_commit,
@@ -129,7 +165,7 @@ const report = {
     })) },
   moon_version: run('moon', ['version', '--all']).trim(),
   git_version: run('git', ['--version']).trim(),
-  fixtures, cases: [], controls: [], passed: false,
+  fixtures, lua_fixtures: luaFixtures, cases: [], controls: [], passed: false,
 };
 function reject(name, args, output, diagnostic) {
   assert(!fs.existsSync(output));
@@ -142,22 +178,25 @@ function reject(name, args, output, diagnostic) {
   assert.equal(sha(bytes(original)), fixtures[0].sha256);
   report.controls.push({ name, diagnostic, output_absent: true, basis_preserved: true });
 }
-for (const [name, basis, targetFile, expectedDelivery] of [
-  ['historical-update', original, target, 'delta'],
-  ['empty-cache', empty, target, 'full'],
-  ['gzip-update', compressedBasis, compressedTarget, null],
-]) {
+for (const [name, basis, targetFile, expectedDelivery] of cases) {
   const expectedHash = sha(bytes(targetFile));
+  const commandMs = {};
+  const measure = (phase, args) => {
+    const started = performance.now();
+    const result = app(args);
+    commandMs[phase] = Math.round(performance.now() - started);
+    return result;
+  };
   const client = path.join(out, name + '-client');
   const publisher = path.join(out, name + '-publisher');
   fs.mkdirSync(client); fs.mkdirSync(publisher);
   const basisPath = path.join(client, 'basis.tar'); fs.copyFileSync(basis, basisPath);
   const clientOffer = path.join(client, 'offer.json');
-  app(['offer', basisPath, clientOffer]);
+  measure('offer', ['offer', basisPath, clientOffer]);
   const serverOffer = path.join(publisher, 'offer.json'); fs.copyFileSync(clientOffer, serverOffer);
   const serverTarget = path.join(publisher, 'target.tar'); fs.copyFileSync(targetFile, serverTarget);
   assert.deepEqual(fs.readdirSync(publisher).sort(), ['offer.json', 'target.tar']);
-  const transfer = app(['build', serverOffer, serverTarget, publisher]);
+  const transfer = measure('build', ['build', serverOffer, serverTarget, publisher]);
   assert.equal(transfer.target_bytes, bytes(targetFile).length);
   assert.equal(transfer.offer_bytes, bytes(clientOffer).length);
   const delivery = transfer.delivery;
@@ -171,11 +210,12 @@ for (const [name, basis, targetFile, expectedDelivery] of [
   fs.copyFileSync(path.join(publisher, 'payload.bin'), payload);
   assert.equal(transfer.actual_exchange_bytes, bytes(clientOffer).length + bytes(manifest).length + bytes(payload).length);
   const restored = path.join(client, 'cache-next.tar');
-  const applied = app(['apply', basisPath, manifest, payload, expectedHash, restored]);
+  const applied = measure('apply', ['apply', basisPath, manifest, payload, expectedHash, restored]);
   assert(applied.verified);
   assert.deepEqual(bytes(restored), bytes(targetFile));
   assert.deepEqual(bytes(basisPath), bytes(basis));
-  report.cases.push({ name, ...transfer, restored_sha256: sha(bytes(restored)), basis_preserved: true, publisher_basis_file_absent: true });
+  report.cases.push({ name, ...transfer, restored_sha256: sha(bytes(restored)), basis_preserved: true,
+    publisher_basis_file_absent: true, moon_run_wall_ms: commandMs });
   // Every failed apply gets a distinct output. Keep all evidence on failure.
   const args = output => ['apply', basisPath, manifest, payload, expectedHash, output];
   let output = path.join(client, 'wrong-trust-output');

@@ -101,6 +101,8 @@ node scripts/check_resource_cache.mjs ../moonffi-lab
 
 TAR 直接完整下载含清单为 102,701 字节，历史更新节省约 49.3%。空缓存流程多计 153 字节的已发送请求。gzip 样本直接完整下载含清单为 20,689 字节，实际交换额外计入 1,021 字节的已发送请求。[三个场景的两平台报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238)
 
+需要验证独立项目的数据时，可追加 Lua 官方发布包。脚本验证官网公布的 SHA-256，并分别跑原始 gzip 和解压后的 TAR。[Lua 样本复现](RESOURCE-CACHE.md#独立项目样本)
+
 ## 兼容性与证据
 
 | 验收项 | 通过的平台或后端 | 验证范围 | 记录 |
