@@ -91,14 +91,15 @@ node scripts/check_resource_cache.mjs ../moonffi-lab
 
 已有 MoonFFI Lab 克隆时，可跳过 `git clone`，将最后一个参数替换为该克隆的路径。脚本会验证两个固定提交和归档内容。
 
-成功时显示 `Resource cache accepted: 2 real-data cases, 17 rejection controls.`。终端同时给出 `results/resource-cache-*/report.json` 的实际路径。报告应标记 `passed: true`，`registry_inventory.files_verified` 为 34，且两种交付都还原出相同的目标哈希。每条流程的预期传输量如下。[输入来源与复现细节](RESOURCE-CACHE.md)
+终端会显示通过的场景数、拒绝检查数和 `results/resource-cache-*/report.json` 的实际路径。报告应有三个场景，`passed` 为 true，`registry_inventory.files_verified` 为 34。前两项还原同一份 TAR，第三项还原其 gzip 压缩文件。下表列出 Windows 本次实测字节数，gzip 结果随压缩器版本可能变化。[输入来源与复现细节](RESOURCE-CACHE.md)
 
 | 情景 | 交付方式 | 含清单和已发送摘要的总字节数 |
 | --- | --- | ---: |
 | 已有旧源码包 | 差量 | 52,031 |
 | 空缓存 | 完整文件 | 102,854 |
+| 已有旧的 gzip 源码包 | 完整文件 | 21,710 |
 
-直接完整下载含清单为 102,701 字节。这组历史更新节省约 49.3%。空缓存流程多计 153 字节的已发送请求。[两平台报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44277494308)
+TAR 直接完整下载含清单为 102,701 字节，历史更新节省约 49.3%。空缓存流程多计 153 字节的已发送请求。gzip 样本直接完整下载含清单为 20,689 字节，实际交换额外计入 1,021 字节的已发送请求。[前两项的两平台报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44277494308)
 
 ## 兼容性与证据
 

@@ -5,6 +5,7 @@ import * as fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { gzipSync, gunzipSync } from 'node:zlib';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const source = process.argv[2];
@@ -99,9 +100,17 @@ for (const [i, revision] of revisions.entries()) {
 const empty = path.join(out, 'empty-cache'); fs.writeFileSync(empty, '');
 const target = path.join(out, 'new-source.tar');
 const original = path.join(out, 'old-source.tar');
-const expectedHash = sha(bytes(target));
+function compressedArchive(tar) {
+  const data = bytes(tar);
+  const file = tar + '.gz';
+  fs.writeFileSync(file, gzipSync(data, { level: 9 }));
+  assert.deepEqual(gunzipSync(bytes(file)), data);
+  return file;
+}
+const compressedBasis = compressedArchive(original);
+const compressedTarget = compressedArchive(target);
 const report = {
-  schema_version: 3, application: 'independent MoonBit JS resource-cache consumer',
+  schema_version: 4, application: 'independent MoonBit JS resource-cache consumer',
   package: `${approved.module}@${approved.version}`, resolution: 'registry',
   registry_inventory: {
     source_commit: approved.source_commit,
@@ -114,6 +123,10 @@ const report = {
   archive_backend: 'git-archive-explicit-epoch-v2',
   source_commit: run('git', ['rev-parse', 'HEAD']).trim(),
   node_version: process.version,
+  gzip: { level: 9, zlib_version: process.versions.zlib,
+    archives: [compressedBasis, compressedTarget].map(file => ({
+      archive: path.basename(file), bytes: bytes(file).length, sha256: sha(bytes(file)),
+    })) },
   moon_version: run('moon', ['version', '--all']).trim(),
   git_version: run('git', ['--version']).trim(),
   fixtures, cases: [], controls: [], passed: false,
@@ -129,7 +142,12 @@ function reject(name, args, output, diagnostic) {
   assert.equal(sha(bytes(original)), fixtures[0].sha256);
   report.controls.push({ name, diagnostic, output_absent: true, basis_preserved: true });
 }
-for (const [name, basis, delivery] of [['historical-update', original, 'delta'], ['empty-cache', empty, 'full']]) {
+for (const [name, basis, targetFile, expectedDelivery] of [
+  ['historical-update', original, target, 'delta'],
+  ['empty-cache', empty, target, 'full'],
+  ['gzip-update', compressedBasis, compressedTarget, null],
+]) {
+  const expectedHash = sha(bytes(targetFile));
   const client = path.join(out, name + '-client');
   const publisher = path.join(out, name + '-publisher');
   fs.mkdirSync(client); fs.mkdirSync(publisher);
@@ -137,13 +155,16 @@ for (const [name, basis, delivery] of [['historical-update', original, 'delta'],
   const clientOffer = path.join(client, 'offer.json');
   app(['offer', basisPath, clientOffer]);
   const serverOffer = path.join(publisher, 'offer.json'); fs.copyFileSync(clientOffer, serverOffer);
-  const serverTarget = path.join(publisher, 'target.tar'); fs.copyFileSync(target, serverTarget);
+  const serverTarget = path.join(publisher, 'target.tar'); fs.copyFileSync(targetFile, serverTarget);
   assert.deepEqual(fs.readdirSync(publisher).sort(), ['offer.json', 'target.tar']);
   const transfer = app(['build', serverOffer, serverTarget, publisher]);
-  assert.equal(transfer.delivery, delivery);
+  assert.equal(transfer.target_bytes, bytes(targetFile).length);
+  assert.equal(transfer.offer_bytes, bytes(clientOffer).length);
+  const delivery = transfer.delivery;
+  assert.equal(delivery, transfer.first_delta_bytes < transfer.direct_full_bytes ? 'delta' : 'full');
+  if (expectedDelivery !== null) assert.equal(delivery, expectedDelivery);
   assert.equal(transfer.first_delta_bytes, transfer.offer_bytes + transfer.delta_bytes + transfer.delta_manifest_bytes);
   assert.equal(transfer.direct_full_bytes, transfer.target_bytes + transfer.full_manifest_bytes);
-  assert.equal(transfer.delivery === 'delta', transfer.first_delta_bytes < transfer.direct_full_bytes);
   const manifest = path.join(client, 'manifest.json');
   const payload = path.join(client, 'payload.bin');
   fs.copyFileSync(path.join(publisher, 'manifest.json'), manifest);
@@ -152,7 +173,7 @@ for (const [name, basis, delivery] of [['historical-update', original, 'delta'],
   const restored = path.join(client, 'cache-next.tar');
   const applied = app(['apply', basisPath, manifest, payload, expectedHash, restored]);
   assert(applied.verified);
-  assert.deepEqual(bytes(restored), bytes(target));
+  assert.deepEqual(bytes(restored), bytes(targetFile));
   assert.deepEqual(bytes(basisPath), bytes(basis));
   report.cases.push({ name, ...transfer, restored_sha256: sha(bytes(restored)), basis_preserved: true, publisher_basis_file_absent: true });
   // Every failed apply gets a distinct output. Keep all evidence on failure.
@@ -189,5 +210,5 @@ for (const [name, basis, delivery] of [['historical-update', original, 'delta'],
 assert.equal(sha(bytes(original)), fixtures[0].sha256);
 report.passed = true;
 fs.writeFileSync(path.join(out, 'report.json'), JSON.stringify(report, null, 2) + '\n');
-console.log('Resource cache accepted: 2 real-data cases, ' + report.controls.length + ' rejection controls.');
+console.log('Resource cache accepted: ' + report.cases.length + ' real-data cases, ' + report.controls.length + ' rejection controls.');
 console.log('Report: ' + path.join(out, 'report.json'));
