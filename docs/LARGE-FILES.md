@@ -35,3 +35,11 @@ Original acceptance and generator reports are preserved without modification:
 The snapshot directory has a Git -text attribute so Windows CRLF bytes survive commits/checkouts. Regular Windows/Linux CI audits all four original SHA-256 values with scripts/check_evidence.py; parsing equivalent JSON is not a substitute for that byte check.
 
 This closes the planned Windows 128 MiB sample gap for these release CLI paths. It does not establish debug-build 128 MiB acceptance, every Windows/Linux environment, larger files or bound restoration of every fixture type. Bind/verify large-file paths were checked on the modified fixture; unbound restore covered all five types.
+
+## Linux filesystem capacity failure
+
+The Ubuntu job runs `scripts/check_linux_enospc.sh` with the release CLI. It first restores a 2 MiB file with a binding manifest on the runner's normal filesystem and compares every byte. It then restores the same file to a private 1 MiB tmpfs so that the write returns a kernel ENOSPC error.
+
+[Run 44690063732](https://github.com/serikaonoe123/moonrdiff/actions/runs/44690063732) recorded exit status 2, empty stdout and a diagnostic containing the staging path. The final file was absent. The staging file contained 1,044,480 bytes matching the prefix of the expected result. The input SHA-256 hashes and the preexisting file on the small filesystem were unchanged. The script unmounts the temporary filesystem after the checks and publishes the summary and logs as CI artifacts.
+
+This case covers native `patch` reaching the fixed capacity of Linux tmpfs during a write. Linux disk-backed filesystems, Windows volume exhaustion, sync failures and crash recovery are outside this test's scope.

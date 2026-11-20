@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['**.mbt', 'moon.mod', '**/moon.pkg', 'scripts/check_large_files.py', 'scripts/benchmark.py', '.github/workflows/large-files.yml']
+    paths: ['**.mbt', 'moon.mod', '**/moon.pkg', 'scripts/check_large_files.py', 'scripts/check_linux_enospc.sh', 'scripts/benchmark.py', '.github/workflows/large-files.yml']
   pull_request:
 permissions:
   contents: read
@@ -28,6 +28,9 @@ jobs:
           core-version: '0.10.17+d971670cd'
       - run: moon update
       - run: moon build cmd/moonrdiff --target native --release --deny-warn
+      - name: Linux filesystem capacity failure
+        if: runner.os == 'Linux'
+        run: bash scripts/check_linux_enospc.sh _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
       - run: python scripts/check_large_files.py
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
@@ -38,3 +41,7 @@ jobs:
             results/large-files-*/report.json
             results/large-files-*/commands.log
             results/benchmark-*/report.json
+            results/linux-enospc-*/summary.txt
+            results/linux-enospc-*/control.json
+            results/linux-enospc-*/enospc.stderr
+            results/linux-enospc-*/enospc.stdout
