@@ -124,13 +124,30 @@ jobs:
             results/package-*/resolution.json
             results/package-*/commands.log
             results/package-*/serikaonoe123-moonrdiff-*.zip
-      - name: Install reference tool from Ubuntu signed repository
+      - name: Install reference and tracing tools from Ubuntu signed repository
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y rdiff time
+          sudo apt-get install -y rdiff time strace
           mkdir -p results
           dpkg-query -W rdiff librsync2 > results/oracle-packages.txt
+      - name: Linux native output sync failure
+        if: runner.os == 'Linux'
+        run: bash scripts/check_linux_sync_failure.sh _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
+      - name: Keep Linux sync-failure evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          archive: true
+          name: linux-sync-failure-evidence
+          path: |
+            results/linux-sync-failure-*/summary.txt
+            results/linux-sync-failure-*/strace-version.txt
+            results/linux-sync-failure-*/control.json
+            results/linux-sync-failure-*/*.trace
+            results/linux-sync-failure-*/sync-failure.stdout
+            results/linux-sync-failure-*/sync-failure.stderr
+          if-no-files-found: ignore
       - name: Independent rdiff 2.3.4 interoperability
         if: runner.os == 'Linux'
         run: python scripts/interop.py
@@ -147,4 +164,5 @@ jobs:
             results/
             !results/resource-cache-*/**
             !results/lua-release-inputs/**
+            !results/linux-sync-failure-*/**
           if-no-files-found: ignore

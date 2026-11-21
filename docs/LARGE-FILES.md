@@ -50,4 +50,12 @@ The Windows job runs `scripts/check_windows_disk_full.ps1` on a GitHub-hosted ru
 
 [Run 44698968496](https://github.com/serikaonoe123/moonrdiff/actions/runs/44698968496) observed a 32,436,224-byte NTFS volume. The bound restore returned exit status 2 with the Windows disk-full diagnostic and empty stdout. The final path remained absent. The 22,171,648-byte staging file matched the expected prefix by SHA-256. The input hashes and the preexisting file on the test volume matched their original values.
 
-This observed failure occurred during the native `patch` write on NTFS. Sync failures and crash recovery remain open on both platforms.
+This observed failure occurred during the native `patch` write on NTFS. Windows sync failures and crash recovery remain open.
+
+## Linux file sync failure
+
+The Linux verification job runs `scripts/check_linux_sync_failure.sh` against the release CLI. A bound 256 KiB restore serves as the control. The trace confirms that `fsync` succeeds on its staging file, and the published result matches the input byte for byte.
+
+For the failure case, `strace` launches a second restore and injects `EIO` into its `fsync` call. The job checks that the injection occurred exactly once on the staging file's descriptor. [Run 44700198155](https://github.com/serikaonoe123/moonrdiff/actions/runs/44700198155) recorded exit status 2, empty stdout and a diagnostic identifying the retained staging directory and sync error. The final path remained absent, the staging file held all 262,144 expected bytes, and all input hashes matched their original values.
+
+This validates error propagation at the Linux system-call boundary. Physical-device I/O failure, Windows sync failure and crash recovery remain unverified.
