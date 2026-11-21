@@ -43,12 +43,12 @@ cd ..
 
 ## 2. 用原生命令还原文件并检查失败结果
 
-从验收目录克隆仓库并检出示例验证提交 `d911258`。该提交包含下面的资源缓存验收，原生 CLI 源码与发布的 0.1.3 一致。
+从验收目录克隆仓库并检出 `92507c0`。该提交包含下文的 TAR、gzip 和 Lua 验收脚本。核心库、原生 CLI 和依赖版本与 Mooncakes 0.1.3 发布提交一致。[固定验收源码](https://github.com/serikaonoe123/moonrdiff/tree/92507c0afffa5e342fe10a323ce04d747b887f75)
 
 ```bash
 git clone https://github.com/serikaonoe123/moonrdiff.git
 cd moonrdiff
-git checkout --detach d911258dd40a2deb28a459fbc3fb55c874c7dd48
+git checkout --detach 92507c0afffa5e342fe10a323ce04d747b887f75
 moon update
 ```
 
@@ -91,7 +91,7 @@ node scripts/check_resource_cache.mjs ../moonffi-lab
 
 已有 MoonFFI Lab 克隆时，可跳过 `git clone`，将最后一个参数替换为该克隆的路径。脚本会验证两个固定提交和归档内容。
 
-终端会显示通过的场景数、拒绝检查数和 `results/resource-cache-*/report.json` 的实际路径。报告应有三个场景，`passed` 为 true，`registry_inventory.files_verified` 为 34。前两项还原同一份 TAR，第三项还原本次运行生成的 gzip 压缩文件。下表的字节数在 Windows 和 Linux 上实测一致。gzip 文件的字节数和摘要以各次运行的报告为准。[输入来源与复现细节](RESOURCE-CACHE.md)
+终端应显示 `Resource cache accepted: 3 real-data cases, 25 rejection controls.`，并给出 `results/resource-cache-*/report.json` 的路径。报告的 `passed` 为 true，`registry_inventory.files_verified` 为 34。前两项还原同一份 TAR，第三项还原本次运行生成的 gzip 压缩文件。下表的字节数在 Windows 和 Linux 上实测一致。gzip 文件的字节数和摘要以各次运行的报告为准。[输入来源与复现细节](RESOURCE-CACHE.md)
 
 | 情景 | 交付方式 | 含清单和已发送摘要的总字节数 |
 | --- | --- | ---: |
@@ -101,7 +101,16 @@ node scripts/check_resource_cache.mjs ../moonffi-lab
 
 TAR 直接完整下载含清单为 102,701 字节，历史更新节省约 49.3%。空缓存流程多计 153 字节的已发送请求。gzip 样本直接完整下载含清单为 20,689 字节，实际交换额外计入 1,021 字节的已发送请求。[三个场景的两平台报告](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238)
 
-需要验证独立项目的数据时，可追加 Lua 官方发布包。脚本验证官网公布的 SHA-256，并分别跑原始 gzip 和解压后的 TAR。[Lua 样本复现](RESOURCE-CACHE.md#独立项目样本)
+需要验证独立项目的数据时，可选做 Lua 官方发布包验收。在同一个仓库目录执行，需安装 `curl`。
+
+```bash
+mkdir -p results/lua-release-inputs
+curl -fS https://www.lua.org/ftp/lua-5.4.7.tar.gz -o results/lua-release-inputs/lua-5.4.7.tar.gz
+curl -fS https://www.lua.org/ftp/lua-5.4.8.tar.gz -o results/lua-release-inputs/lua-5.4.8.tar.gz
+node scripts/check_resource_cache.mjs ../moonffi-lab results/lua-release-inputs
+```
+
+脚本核对官网公布的 SHA-256，并分别还原原始 gzip 和解压后的 TAR。终端应显示 `Resource cache accepted: 5 real-data cases, 42 rejection controls.`。[Lua 样本数据与两平台验收](RESOURCE-CACHE.md#独立项目样本)
 
 ## 兼容性与证据
 
