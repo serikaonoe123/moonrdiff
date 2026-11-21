@@ -58,4 +58,12 @@ The Linux verification job runs `scripts/check_linux_sync_failure.sh` against th
 
 For the failure case, `strace` launches a second restore and injects `EIO` into its `fsync` call. The job checks that the injection occurred exactly once on the staging file's descriptor. [Run 44700198155](https://github.com/serikaonoe123/moonrdiff/actions/runs/44700198155) recorded exit status 2, empty stdout and a diagnostic identifying the retained staging directory and sync error. The final path remained absent, the staging file held all 262,144 expected bytes, and all input hashes matched their original values.
 
-This validates error propagation at the Linux system-call boundary. Physical-device I/O failure, Windows sync failure and crash recovery remain unverified.
+This validates error propagation at the Linux system-call boundary. Physical-device I/O failure and crash recovery remain unverified.
+
+## Windows file sync failure
+
+The Windows verification job runs `scripts/check_windows_sync_failure.ps1` on a GitHub-hosted runner. The release CLI serves as the control for a bound 256 KiB restore. The script makes a separate source copy, verifies the pinned async worker's SHA-256, and builds a test-only CLI that calls `FlushFileBuffers` with an invalid handle. The test exercises the original Win32 error-return and propagation path. The original worker and release binary hashes are checked again at the end.
+
+[Run 44855992093](https://github.com/serikaonoe123/moonrdiff/actions/runs/44855992093) recorded the Windows invalid-handle sync diagnostic, exit status 2 and empty stdout. The final path remained absent. The staging file held all 262,144 expected bytes with the same SHA-256, and the inputs retained their hashes. The published control result also matched the expected SHA-256.
+
+This verifies the Windows sync-error path with a deliberately invalid handle. Physical storage failures and recovery after power loss are outside the scope of this test.
