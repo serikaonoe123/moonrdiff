@@ -151,6 +151,22 @@ jobs:
       - name: Independent rdiff 2.3.4 interoperability
         if: runner.os == 'Linux'
         run: python scripts/interop.py
+      - name: Windows native output sync failure
+        if: runner.os == 'Windows'
+        run: ./scripts/check_windows_sync_failure.ps1 _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
+      - name: Keep Windows sync-failure evidence
+        if: always() && runner.os == 'Windows'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          archive: true
+          name: windows-sync-failure-evidence
+          path: |
+            results/windows-sync-failure-*/summary.json
+            results/windows-sync-failure-*/build.log
+            results/windows-sync-failure-*/control.json
+            results/windows-sync-failure-*/sync-failure.stdout
+            results/windows-sync-failure-*/sync-failure.stderr
+          if-no-files-found: ignore
       - name: Measure incremental signature delta and patch memory
         if: runner.os == 'Linux'
         run: python scripts/measure_signature.py
@@ -165,4 +181,5 @@ jobs:
             !results/resource-cache-*/**
             !results/lua-release-inputs/**
             !results/linux-sync-failure-*/**
+            !results/windows-sync-failure-*/**
           if-no-files-found: ignore
