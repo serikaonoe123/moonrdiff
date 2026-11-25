@@ -123,3 +123,5 @@ node scripts/check_resource_cache.mjs ../moonffi-lab results/lua-release-inputs
 | 真实资源缓存 | Windows、Linux，JS / Node.js 22 | 0.1.3、TAR 历史更新、空缓存和 gzip 更新，每平台 25 项拒绝检查 | [资源缓存 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238) |
 
 JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rdiff` 互操作覆盖 RK/BLAKE2 摘要与标准补丁指令。Linux tmpfs 和 Windows 虚拟磁盘上的 NTFS 均已验证原生 `patch` 写满时的退出码、诊断和暂存行为。Linux 测试向 `fsync` 注入 `EIO`，Windows 测试构建用无效句柄触发 `FlushFileBuffers` 错误。两项同步失败测试均核对完整暂存内容和最终路径。物理设备故障与断电恢复仍待验证。[Linux 同步失败验收](LARGE-FILES.md#linux-file-sync-failure) · [Windows 同步失败验收](LARGE-FILES.md#windows-file-sync-failure)
+
+Linux CI 还覆盖发布前后两种进程突然退出的情况。发布前中断保留完整暂存文件，重试可完成还原。发布后中断保留最终文件，重试拒绝覆盖。[Linux 进程中断验收](LARGE-FILES.md#linux-process-interruption-at-publication)
