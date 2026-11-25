@@ -151,6 +151,23 @@ jobs:
       - name: Independent rdiff 2.3.4 interoperability
         if: runner.os == 'Linux'
         run: python scripts/interop.py
+      - name: Linux interruption at output publication
+        if: runner.os == 'Linux'
+        run: bash scripts/check_linux_publication_interruption.sh _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
+      - name: Keep Linux publication interruption evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          archive: true
+          name: linux-publication-interruption-evidence
+          path: |
+            results/linux-publication-interruption-*/summary.txt
+            results/linux-publication-interruption-*/*.trace
+            results/linux-publication-interruption-*/*.exit
+            results/linux-publication-interruption-*/*.stdout
+            results/linux-publication-interruption-*/*.stderr
+            results/linux-publication-interruption-*/before-retry.json
+          if-no-files-found: ignore
       - name: Windows native output sync failure
         if: runner.os == 'Windows'
         run: ./scripts/check_windows_sync_failure.ps1 _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
@@ -181,5 +198,6 @@ jobs:
             !results/resource-cache-*/**
             !results/lua-release-inputs/**
             !results/linux-sync-failure-*/**
+            !results/linux-publication-interruption-*/**
             !results/windows-sync-failure-*/**
           if-no-files-found: ignore
