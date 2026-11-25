@@ -62,7 +62,7 @@ This validates error propagation at the Linux system-call boundary. Physical-dev
 
 ## Windows file sync failure
 
-The Windows verification job runs `scripts/check_windows_sync_failure.ps1` on a GitHub-hosted runner. The release CLI serves as the control for a bound 256 KiB restore. The script makes a separate source copy, verifies the pinned async worker's SHA-256, and builds a test-only CLI that calls `FlushFileBuffers` with an invalid handle. The test exercises the original Win32 error-return and propagation path. The original worker and release binary hashes are checked again at the end.
+The Windows verification job runs `scripts/check_windows_output_faults.ps1` on a GitHub-hosted runner. The release CLI serves as the control for a bound 256 KiB restore. The script makes a separate source copy, verifies the pinned async worker's SHA-256, and builds a test-only CLI that can call `FlushFileBuffers` with an invalid handle. The test exercises the original Win32 error-return and propagation path. The original worker and release binary hashes are checked again at the end.
 
 [Run 44855992093](https://github.com/serikaonoe123/moonrdiff/actions/runs/44855992093) recorded the Windows invalid-handle sync diagnostic, exit status 2 and empty stdout. The final path remained absent. The staging file held all 262,144 expected bytes with the same SHA-256, and the inputs retained their hashes. The published control result also matched the expected SHA-256.
 
@@ -75,3 +75,9 @@ The Linux verification job uses `strace` to terminate two separate bound 256 KiB
 In [run 45597010772](https://github.com/serikaonoe123/moonrdiff/actions/runs/45597010772), both processes ended with status 137 and empty stdout. The first retained the complete staging file and a new invocation successfully published the expected result while preserving the old staging file. The second retained the full published output and an empty staging directory. A new invocation returned status 2 and refused to overwrite the output. Both cases verified the restored bytes and the original input hashes.
 
 This check covers abrupt loss of the CLI process on the running Linux host. Recovery after filesystem or host power loss remains unverified.
+
+## Windows process interruption at publication
+
+The Windows test-only CLI terminates its own process in two separate bound restores. The first stops after sync and before the rename call. The second stops after rename and before removing the empty staging directory. The unmodified release CLI performs both retries.
+
+[Run 45616502687](https://github.com/serikaonoe123/moonrdiff/actions/runs/45616502687) recorded the test's exit codes 73 and 74 with empty stdout. The pre-rename case retained all 262,144 bytes in staging and the retry restored the final file while preserving the old staging data. The post-rename case retained the complete final file and an empty staging directory. Retrying returned 2 and refused to overwrite the output. Both paths checked the resulting SHA-256 and verified that the inputs and release binary remained unchanged. The Windows sync-error case passed again in the same job.
