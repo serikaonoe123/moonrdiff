@@ -168,21 +168,25 @@ jobs:
             results/linux-publication-interruption-*/*.stderr
             results/linux-publication-interruption-*/before-retry.json
           if-no-files-found: ignore
-      - name: Windows native output sync failure
+      - name: Windows native output sync failure and interruption
         if: runner.os == 'Windows'
-        run: ./scripts/check_windows_sync_failure.ps1 _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
-      - name: Keep Windows sync-failure evidence
+        run: ./scripts/check_windows_output_faults.ps1 _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
+      - name: Keep Windows output-failure evidence
         if: always() && runner.os == 'Windows'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           archive: true
-          name: windows-sync-failure-evidence
+          name: windows-output-failure-evidence
           path: |
             results/windows-sync-failure-*/summary.json
             results/windows-sync-failure-*/build.log
             results/windows-sync-failure-*/control.json
             results/windows-sync-failure-*/sync-failure.stdout
             results/windows-sync-failure-*/sync-failure.stderr
+            results/windows-sync-failure-*/before-interruption.*
+            results/windows-sync-failure-*/after-interruption.*
+            results/windows-sync-failure-*/before-retry.json
+            results/windows-sync-failure-*/after-retry.*
           if-no-files-found: ignore
       - name: Measure incremental signature delta and patch memory
         if: runner.os == 'Linux'

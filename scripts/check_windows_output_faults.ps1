@@ -20,6 +20,18 @@ function Get-Sha256([string]$Path) {
     (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash
 }
 
+function Invoke-TestPatch([string]$Mode, [string]$Destination, [string]$Log) {
+    $oldMode = $env:MOONRDIFF_TEST_OUTPUT_FAULT
+    try {
+        $env:MOONRDIFF_TEST_OUTPUT_FAULT = $Mode
+        & $testCli patch $basis $delta $Destination --manifest $manifest > "$Log.stdout" 2> "$Log.stderr"
+        $LASTEXITCODE
+    }
+    finally {
+        $env:MOONRDIFF_TEST_OUTPUT_FAULT = $oldMode
+    }
+}
+
 $normalCli = (Resolve-Path -LiteralPath $Cli).ProviderPath
 $normalCliHash = Get-Sha256 $normalCli
 $id = [guid]::NewGuid().ToString('N')
@@ -37,15 +49,36 @@ Invoke-SetupCommand 'tar.exe' @('-xf', $archive, '-C', $source) (Join-Path $repo
 Copy-Item -LiteralPath '.mooncakes' -Destination (Join-Path $source '.mooncakes') -Recurse
 
 $worker = Join-Path $source $dependency
-$normalCall = 'FlushFileBuffers(fsync_job->fd)'
-$testCall = 'FlushFileBuffers(NULL)'
 $workerText = [IO.File]::ReadAllText($worker)
-if ((Get-Sha256 $worker) -ne $approvedHash -or
-    [regex]::Matches($workerText, [regex]::Escape($normalCall)).Count -ne 1) {
-    throw 'The copied worker does not have the expected Windows sync call.'
+if ((Get-Sha256 $worker) -ne $approvedHash) { throw 'The worker copy has unexpected bytes.' }
+
+# This code is compiled only in the isolated test copy.
+$faultSelector = @'
+#ifdef _WIN32
+static int moonrdiff_test_output_fault(WCHAR expected) {
+  WCHAR mode[2];
+  return GetEnvironmentVariableW(L"MOONRDIFF_TEST_OUTPUT_FAULT", mode, 2) == 1
+    && mode[0] == expected;
 }
-# Keep the real Win32 error return and propagation in the test build.
-[IO.File]::WriteAllText($worker, $workerText.Replace($normalCall, $testCall))
+#endif
+'@
+$lf = [char]10
+$syncWorker = "static${lf}void fsync_job_worker"
+$windowsRename = '  BOOL ret = SetFileInformationByHandle(handle, FileRenameInfoEx, info, buffer_size);'
+$windowsCleanup = '  if (!RemoveDirectoryW((LPCWSTR)rmdir_job->path))'
+$edits = [ordered]@{
+    $syncWorker = $faultSelector + $lf + $lf + $syncWorker
+    'FlushFileBuffers(fsync_job->fd)' = "FlushFileBuffers(moonrdiff_test_output_fault(L's') ? NULL : fsync_job->fd)"
+    $windowsRename = "  if (moonrdiff_test_output_fault(L'b')) TerminateProcess(GetCurrentProcess(), 73);" + $lf + $windowsRename
+    $windowsCleanup = "  if (moonrdiff_test_output_fault(L'a')) TerminateProcess(GetCurrentProcess(), 74);" + $lf + $windowsCleanup
+}
+foreach ($original in $edits.Keys) {
+    if ([regex]::Matches($workerText, [regex]::Escape($original)).Count -ne 1) {
+        throw "Expected exactly one Windows test-build substitution: $original"
+    }
+    $workerText = $workerText.Replace($original, $edits[$original])
+}
+[IO.File]::WriteAllText($worker, $workerText)
 $testWorkerHash = Get-Sha256 $worker
 Push-Location -LiteralPath $source
 try {
@@ -89,8 +122,7 @@ if (!$controlReport.manifest_verified -or (Get-Sha256 $control) -ne $inputHashes
 
 $stdout = Join-Path $report 'sync-failure.stdout'
 $stderr = Join-Path $report 'sync-failure.stderr'
-& $testCli patch $basis $delta $destination --manifest $manifest > $stdout 2> $stderr
-$status = $LASTEXITCODE
+$status = Invoke-TestPatch 's' $destination (Join-Path $report 'sync-failure')
 $diagnostic = [IO.File]::ReadAllText($stderr)
 Write-Host $diagnostic
 if ($status -ne 2 -or [IO.FileInfo]::new($stdout).Length -ne 0 -or (Test-Path -LiteralPath $destination)) {
@@ -106,6 +138,42 @@ if ($stages.Length -ne 1 -or ($diagnostic -split '\r?\n') -cnotcontains
 }
 $staged = [IO.Path]::Combine($stages[0], 'data')
 if ((Get-Sha256 $staged) -ne $inputHashes[$basis]) { throw 'The staged file differs from the expected full output.' }
+
+$before = Join-Path $report 'before.bin'
+$beforeLog = Join-Path $report 'before-interruption'
+$beforeStatus = Invoke-TestPatch 'b' $before $beforeLog
+$beforeStages = [IO.Directory]::GetDirectories($report, 'before.bin.moonrdiff-stage-*')
+if ($beforeStatus -ne 73 -or [IO.FileInfo]::new("$beforeLog.stdout").Length -ne 0 -or
+    (Test-Path -LiteralPath $before) -or $beforeStages.Length -ne 1) {
+    throw 'Expected interruption after sync and before publication.'
+}
+$beforeStaged = [IO.Path]::Combine($beforeStages[0], 'data')
+if ((Get-Sha256 $beforeStaged) -ne $inputHashes[$basis]) { throw 'The interrupted staging file is incomplete.' }
+$beforeRetry = Join-Path $report 'before-retry.json'
+Invoke-SetupCommand $normalCli @('patch', $basis, $delta, $before, '--manifest', $manifest) $beforeRetry
+if (!(Get-Content -Raw -LiteralPath $beforeRetry | ConvertFrom-Json).manifest_verified -or
+    (Get-Sha256 $before) -ne $inputHashes[$basis] -or (Get-Sha256 $beforeStaged) -ne $inputHashes[$basis]) {
+    throw 'Retry before publication did not restore the output and preserve the older staging file.'
+}
+
+$after = Join-Path $report 'after.bin'
+$afterLog = Join-Path $report 'after-interruption'
+$afterStatus = Invoke-TestPatch 'a' $after $afterLog
+$afterStages = [IO.Directory]::GetDirectories($report, 'after.bin.moonrdiff-stage-*')
+if ($afterStatus -ne 74 -or [IO.FileInfo]::new("$afterLog.stdout").Length -ne 0 -or
+    $afterStages.Length -ne 1 -or [IO.Directory]::GetFileSystemEntries($afterStages[0]).Length -ne 0 -or
+    (Get-Sha256 $after) -ne $inputHashes[$basis]) {
+    throw 'Expected interruption after publication and before removal of the empty stage.'
+}
+$retryLog = Join-Path $report 'after-retry'
+& $normalCli patch $basis $delta $after --manifest $manifest > "$retryLog.stdout" 2> "$retryLog.stderr"
+$afterRetryStatus = $LASTEXITCODE
+if ($afterRetryStatus -ne 2 -or [IO.FileInfo]::new("$retryLog.stdout").Length -ne 0 -or
+    ![IO.File]::ReadAllText("$retryLog.stderr").Contains('Output already exists') -or
+    (Get-Sha256 $after) -ne $inputHashes[$basis]) {
+    throw 'Retry after publication did not refuse to overwrite the existing output.'
+}
+
 foreach ($inputPath in $inputHashes.Keys) {
     if ((Get-Sha256 $inputPath) -ne $inputHashes[$inputPath]) { throw "Input changed: $inputPath" }
 }
@@ -116,10 +184,14 @@ if ((Get-Sha256 $dependency) -ne $approvedHash -or (Get-Sha256 $normalCli) -ne $
 [ordered]@{
     result            = 'passed'
     commit            = (git rev-parse HEAD).Trim()
-    sync_call         = $testCall
+    sync_call         = 'FlushFileBuffers(NULL)'
     error             = 'ERROR_INVALID_HANDLE'
     exit_status       = $status
     staged_bytes      = [IO.FileInfo]::new($staged).Length
     worker_sha256     = $approvedHash
     test_worker_sha256 = $testWorkerHash
+    before_exit_status = $beforeStatus
+    before_retry       = 'restored'
+    after_exit_status  = $afterStatus
+    after_retry        = 'refused'
 } | ConvertTo-Json | Tee-Object -FilePath (Join-Path $report 'summary.json')
