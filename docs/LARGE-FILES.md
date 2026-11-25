@@ -67,3 +67,11 @@ The Windows verification job runs `scripts/check_windows_sync_failure.ps1` on a 
 [Run 44855992093](https://github.com/serikaonoe123/moonrdiff/actions/runs/44855992093) recorded the Windows invalid-handle sync diagnostic, exit status 2 and empty stdout. The final path remained absent. The staging file held all 262,144 expected bytes with the same SHA-256, and the inputs retained their hashes. The published control result also matched the expected SHA-256.
 
 This verifies the Windows sync-error path with a deliberately invalid handle. Physical storage failures and recovery after power loss are outside the scope of this test.
+
+## Linux process interruption at publication
+
+The Linux verification job uses `strace` to terminate two separate bound 256 KiB restores. In the first case, the staging file has completed `fsync` and the process is stopped at `renameat2` before the final name appears. In the second case, the rename has succeeded and the process is stopped at `rmdir` before it can remove the empty staging directory.
+
+In [run 45597010772](https://github.com/serikaonoe123/moonrdiff/actions/runs/45597010772), both processes ended with status 137 and empty stdout. The first retained the complete staging file and a new invocation successfully published the expected result while preserving the old staging file. The second retained the full published output and an empty staging directory. A new invocation returned status 2 and refused to overwrite the output. Both cases verified the restored bytes and the original input hashes.
+
+This check covers abrupt loss of the CLI process on the running Linux host. Recovery after filesystem or host power loss remains unverified.
