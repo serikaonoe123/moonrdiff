@@ -50,6 +50,14 @@ The same Ubuntu job also uses a fresh 16 MiB file-backed ext4 image. It verifies
 
 [Run 45935855496](https://github.com/serikaonoe123/moonrdiff/actions/runs/45935855496) recorded 11,513,856 bytes of filesystem capacity and a write-stage `ENOSPC`. The CLI returned 2 with empty stdout and reported the staging path. The final path remained absent. All 11,149,312 bytes in the staged file matched the expected prefix. The original input hashes and the preexisting file on ext4 matched their original values. CI also reran the tmpfs and Windows NTFS capacity checks.
 
+### Linux block device read error
+
+The Ubuntu job compares two read-only mounts of the same disposable ext4 image. The normal mount gives a byte-for-byte bound restore. The second mount passes through a device-mapper table that returns `EIO` for one 4 KiB data block in the basis file. A separate read confirms the targeted error while a neighboring fixture file remains readable.
+
+The first run exposed a diagnostic gap. A read spanning the failing block returned a readable prefix, and the CLI reported `ReaderClosed`. The unreleased CLI now continues positive short reads so the next read propagates the OS error. [First run](https://github.com/serikaonoe123/moonrdiff/actions/runs/45944343125)
+
+[Run 45944675076](https://github.com/serikaonoe123/moonrdiff/actions/runs/45944675076) passed both cases. The bound restore stopped while checking its input and left an empty staging directory. The unbound restore stopped while copying and retained the first 32 KiB in staging. Each returned 2 with an I/O error, empty stdout and no final file. The test checked the staged prefix, input hashes and the unchanged read-only image. Physical media faults and power-loss recovery remain unverified.
+
 ## Windows NTFS capacity failure
 
 The Windows job runs `scripts/check_windows_disk_full.ps1` on a GitHub-hosted runner. It creates a new 32 MiB VHD and checks that the attached disk belongs to that image before partitioning and formatting it. The script verifies a bound 48 MiB restore on the runner's normal filesystem, then restores to the small NTFS volume. It dismounts the test image after the checks and uploads the diagnostic, control and summary as CI artifacts.

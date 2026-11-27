@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Continue native CLI positional reads after a short read so an underlying I/O error reaches the diagnostic. An actual end of file still reports `ReaderClosed`.
+
 ## 0.1.3 — 2026-11-18
 
 - Publish 0.1.3 with same-parent native CLI staging and explicit post-publication failure diagnostics; public root API, wire formats and dependency versions remain unchanged. Approved 34-file contents passed Windows/Linux registry acceptance; see docs/RELEASE-0.1.3.md.

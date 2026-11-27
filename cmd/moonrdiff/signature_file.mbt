@@ -48,7 +48,7 @@ async fn signature_file(
     } else {
       chunk_size
     }
-    let bytes = source.read_exactly_at(n, position~)
+    let bytes = read_file_exactly_at(source, n, position~)
     output.write(encoder.push(bytes))
     position += n.to_int64()
   }
