@@ -2,6 +2,8 @@
 
 这份指南依次验收 Mooncakes 安装、原生命令的带清单还原，以及真实源码包的差量更新。请从一个新的空目录开始。命令使用 Bash，Windows 可用 Git Bash，并在 PowerShell 中运行原生构建。Windows 和 Linux 都需要 Git、MoonBit `0.10.17+d971670cd` 和 Node.js。CI 使用 Node.js 22。原生步骤需要 MoonBit Native 能找到的 C 编译器。最后一步需要支持 `git archive --mtime` 的 Git。
 
+下文沿用已完整复验的 0.1.3 固定提交和资源缓存输入。当前发布版是 0.1.4，其双平台独立安装证据单列在发布记录中。[0.1.4 发布记录](RELEASE-0.1.4.md)
+
 ## 1. 从 Mooncakes 安装并运行库示例
 
 创建最小消费者。`moon.pkg` 将根包导入为 `@rdiff`，测试生成旧文件摘要和补丁，再对还原字节做断言。
@@ -135,4 +137,4 @@ JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rd
 
 Linux 和 Windows 的 CI 均覆盖发布前后两种进程突然退出的情况。发布前中断保留完整暂存文件，重试可完成还原。发布后中断保留最终文件，重试拒绝覆盖。[Linux 进程中断验收](LARGE-FILES.md#linux-process-interruption-at-publication) · [Windows 进程中断验收](LARGE-FILES.md#windows-process-interruption-at-publication)
 
-开发版还在只读 ext4 镜像上验证了块设备读取错误。带清单还原在校验输入时停止，普通还原保留已写入的正确前缀。两种情况均报告底层读错，最终路径均未生成文件。这项短读处理修复尚未发布到 Mooncakes。[Linux 块设备读错验收](LARGE-FILES.md#linux-block-device-read-error)
+0.1.4 的短读处理在只读 ext4 镜像上通过了块设备读取错误验收。带清单还原在校验输入时停止，普通还原保留已写入的正确前缀。两种情况均报告底层读错，最终路径均未生成文件。[Linux 块设备读错验收](LARGE-FILES.md#linux-block-device-read-error)
