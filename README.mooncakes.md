@@ -2,7 +2,7 @@
 
 MoonBit library for rdiff-compatible signatures, automatic deltas, and patch decoding. Core APIs support JavaScript, Native and Wasm-GC. The native file CLI supports Windows/Linux and optional BLAKE2b-256 file binding manifests.
 
-See the format contract for reviewed root API defaults and lifecycle. Linux synthetic benchmarks cover 1/16/128 MiB; signature/delta performance needs improvement. Tested compiler baseline: 0.10.17+d971670cd. Publication status and registry acceptance for each version are recorded in the GitHub repository.
+See the format contract for reviewed root API defaults and lifecycle. Linux synthetic benchmarks cover 1/16/128 MiB; signature/delta performance needs improvement. The current repository source uses MoonBit 1.0.0-rc1+3c0520448. Publication status and registry acceptance for each version are recorded in the GitHub repository.
 
 ## Library usage
 
@@ -51,6 +51,6 @@ Supports the RK/BLAKE2 signature profile and standard rdiff literal/COPY/END del
 
 ## License
 
-Original MoonRdiff code is MIT. The adapted BLAKE2 package retains Apache-2.0, its full [license](third_party/mooncry_blake2/LICENSE) and [source/modification notice](third_party/mooncry_blake2/NOTICE.md). Native CLI dependency moonbitlang/async@0.19.3 is Apache-2.0. librsync is an external interoperability oracle and is not bundled.
+Original MoonRdiff code is MIT. The adapted BLAKE2 package retains Apache-2.0, its full [license](third_party/mooncry_blake2/LICENSE) and [source/modification notice](third_party/mooncry_blake2/NOTICE.md). Native CLI dependency moonbitlang/async@0.22.11 is Apache-2.0. librsync is an external interoperability oracle and is not bundled.
 
 Source and development verification: [GitHub](https://github.com/serikaonoe123/moonrdiff).

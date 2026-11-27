@@ -21,12 +21,12 @@ pub fn Signature::block_count(self : Signature) -> Int32 {
 /// Serialize a validated signature without changing its record order.
 pub fn Signature::to_bytes(self : Signature) -> Bytes {
   let out = @buffer.Buffer()
-  out.write_bytes(b"rs\x01G")
+  out.write_bytesview(b"rs\x01G")
   write_u32(out, self.block_size)
   write_u32(out, self.strong_length)
   for block in self.blocks {
     write_weak(out, block.weak)
-    out.write_bytes(block.strong)
+    out.write_bytesview(block.strong)
   }
   out.to_bytes()
 }
@@ -81,7 +81,7 @@ pub fn signature(
     raise Invalid("Signature block budget exceeded")
   }
   let out = @buffer.Buffer()
-  out.write_bytes(b"rs\x01G")
+  out.write_bytesview(b"rs\x01G")
   write_u32(out, block_size)
   write_u32(out, strong_length)
   let mut offset = 0
@@ -92,7 +92,7 @@ pub fn signature(
     write_weak(out, rk_checksum(block))
     // Hash output size is always 32; truncation happens afterwards.
     let strong = @crypto.blake2b(block.to_owned(), 32)
-    out.write_bytes(strong[0:strong_length])
+    out.write_bytesview(strong[0:strong_length])
     offset += length
   }
   out.to_bytes()

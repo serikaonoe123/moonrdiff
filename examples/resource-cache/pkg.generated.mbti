@@ -10,11 +10,14 @@ import {
 // Errors
 
 // Types and methods
-type Manifest derive(ToJson, @json.FromJson)
+#derive(@json.FromJson, @json.ToJson)
+type Manifest
 
-type Offer derive(ToJson, @json.FromJson)
+#derive(@json.FromJson, @json.ToJson)
+type Offer
 
-type ReadResult derive(@json.FromJson)
+#derive(@json.FromJson)
+type ReadResult
 
 // Type aliases
 

@@ -39,10 +39,10 @@ New-Item -ItemType Directory -Path results -Force | Out-Null
 $report = (New-Item -ItemType Directory -Path "results/windows-sync-failure-$id").FullName
 $source = (New-Item -ItemType Directory -Path (Join-Path $env:RUNNER_TEMP "rdiff-sync-$id")).FullName
 $archive = Join-Path $report 'source.tar'
-$dependency = '.mooncakes/moonbitlang/async/src/internal/event_loop/thread_pool.c'
-$approvedHash = '2ADBE825D6E7F23F0FFBB2E9D9514B9E597FEF91BA52DC8628CEE0BA180B3F3D'
+$dependency = '.mooncakes/moonbitlang/async/src/internal/event_loop/fs.c'
+$approvedHash = 'DB9DF2345018AF2B36BD4DB39D20780E5052C67CD33DD5D14759C25AD54F1062'
 
-if ((Get-Sha256 $dependency) -ne $approvedHash) { throw 'Unexpected async 0.19.3 worker bytes.' }
+if ((Get-Sha256 $dependency) -ne $approvedHash) { throw 'Unexpected async 0.22.11 worker bytes.' }
 Write-Host "Windows sync-failure evidence: $report"
 Invoke-SetupCommand 'git' @('archive', '--format=tar', '-o', $archive, 'HEAD') (Join-Path $report 'setup.log')
 Invoke-SetupCommand 'tar.exe' @('-xf', $archive, '-C', $source) (Join-Path $report 'extract.log')
@@ -63,12 +63,12 @@ static int moonrdiff_test_output_fault(WCHAR expected) {
 #endif
 '@
 $lf = [char]10
-$syncWorker = "static${lf}void fsync_job_worker"
+$syncWorker = "static${lf}int32_t moonbitlang_async_fsync_sync"
 $windowsRename = '  BOOL ret = SetFileInformationByHandle(handle, FileRenameInfoEx, info, buffer_size);'
-$windowsCleanup = '  if (!RemoveDirectoryW((LPCWSTR)rmdir_job->path))'
+$windowsCleanup = '  return RemoveDirectoryW(path) ? 0 : -1;'
 $edits = [ordered]@{
     $syncWorker = $faultSelector + $lf + $lf + $syncWorker
-    'FlushFileBuffers(fsync_job->fd)' = "FlushFileBuffers(moonrdiff_test_output_fault(L's') ? NULL : fsync_job->fd)"
+    'FlushFileBuffers(fd)' = "FlushFileBuffers(moonrdiff_test_output_fault(L's') ? NULL : fd)"
     $windowsRename = "  if (moonrdiff_test_output_fault(L'b')) TerminateProcess(GetCurrentProcess(), 73);" + $lf + $windowsRename
     $windowsCleanup = "  if (moonrdiff_test_output_fault(L'a')) TerminateProcess(GetCurrentProcess(), 74);" + $lf + $windowsCleanup
 }

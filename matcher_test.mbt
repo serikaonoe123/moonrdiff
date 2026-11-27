@@ -43,10 +43,10 @@ test "generated edits with reproducible inputs" {
     let basis = basis_buffer.to_bytes()
     let cut = basis.length() / 3
     let target_buffer = @buffer.Buffer()
-    target_buffer.write_bytes(b"prefix")
-    target_buffer.write_bytes(basis[cut:basis.length()])
-    target_buffer.write_bytes(b"insert")
-    target_buffer.write_bytes(basis[0:cut])
+    target_buffer.write_bytesview(b"prefix")
+    target_buffer.write_bytesview(basis[cut:basis.length()])
+    target_buffer.write_bytesview(b"insert")
+    target_buffer.write_bytesview(basis[0:cut])
     let target = target_buffer.to_bytes()
     for block_size in [1, 4, 8, 32, 128] {
       ignore(roundtrip(basis, target, block_size))
@@ -106,7 +106,7 @@ test "weak checksum alone never authorizes copy" {
   let basis = b"abcdefgh"
   let original = @moonrdiff.signature(basis, block_size=8)
   let bad = @buffer.Buffer()
-  bad.write_bytes(original[0:16])
+  bad.write_bytesview(original[0:16])
   for _ in 0..<32 {
     bad.write_byte(b'\x00')
   }

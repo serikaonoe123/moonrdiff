@@ -38,16 +38,16 @@ async fn run_demo(arguments : Array[String]) -> Unit {
   let input = @buffer.Buffer()
   for i in 0..<256 {
     let padding = if i < 10 { "000" } else if i < 100 { "00" } else { "0" }
-    input.write_bytes(
+    input.write_bytesview(
       @utf8.encode("row \{padding}\{i}: example resource content\n"),
     )
   }
   let old = input.to_bytes()
   let updated = @buffer.Buffer()
-  updated.write_bytes(b"New version header\n")
-  updated.write_bytes(old[:4096])
-  updated.write_bytes(b"An inserted record\n")
-  updated.write_bytes(old[4096:])
+  updated.write_bytesview(b"New version header\n")
+  updated.write_bytesview(old[:4096])
+  updated.write_bytesview(b"An inserted record\n")
+  updated.write_bytesview(old[4096:])
   let new = updated.to_bytes()
   let basis = directory + "/old.bin"
   let target = directory + "/new.bin"

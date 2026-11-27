@@ -1,9 +1,6 @@
 name: Check patch timing
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['scripts/measure_patch_comparison.py', '.github/workflows/patch-performance.yml']
 permissions:
   contents: read
 jobs:
@@ -13,6 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # Reproduce the pre-RC1 comparison with the same compiler on both sources.
+          ref: 4c9facb307d965eb6c9d454eef6dc420a59aed1e
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:

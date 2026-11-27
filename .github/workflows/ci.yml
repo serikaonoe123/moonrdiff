@@ -35,8 +35,8 @@ jobs:
         run: python scripts/check_evidence.py
       - uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f # v1.22
         with:
-          version: '0.10.17+d971670cd'
-          core-version: '0.10.17+d971670cd'
+          version: '1.0.0-rc1+3c0520448'
+          core-version: '1.0.0-rc1+3c0520448'
       - name: Refresh official dependency index
         run: moon update
       - name: Check, build and test

@@ -60,11 +60,13 @@ async fn run_check(arguments : Array[String]) -> Unit {
   errdefer {
     fields["status"] = @json.to_json("failed")
     fields["checks"] = @json.to_json(checks)
-    @fs.write_file(
-      path,
-      report.stringify(indent=2),
-      create_mode=TruncateExisting,
-    )
+    @async.protect_from_cancel(() => {
+      @fs.write_file(
+        path,
+        report.stringify(indent=2),
+        create_mode=TruncateExisting,
+      )
+    })
   }
   let harness : Harness = { executable, directory, log, checks, }
   harness.accept(skip_links)

@@ -14,18 +14,18 @@ test "public incremental API across separate input and output batches" {
   let target = b"!ijkabcdefgh!"
   let signer = @rdiff.SignatureEncoder::new(block_size=4)
   let sig = @buffer.Buffer()
-  sig.write_bytes(signer.push(basis[0:3]))
-  sig.write_bytes(signer.push(basis[3:basis.length()]))
-  sig.write_bytes(signer.finish())
+  sig.write_bytesview(signer.push(basis[0:3]))
+  sig.write_bytesview(signer.push(basis[3:basis.length()]))
+  sig.write_bytesview(signer.finish())
   let encoder = @rdiff.DeltaEncoder::new(
     @rdiff.parse_signature(sig.to_bytes()),
     basis_size=basis.length(),
   )
   let delta = @buffer.Buffer()
   for byte in target {
-    delta.write_bytes(encoder.push(Bytes::make(1, byte)))
+    delta.write_bytesview(encoder.push(Bytes::make(1, byte)))
   }
-  delta.write_bytes(encoder.finish())
+  delta.write_bytesview(encoder.finish())
   let decoder = @rdiff.PatchDecoder::new(
     basis_size=basis.length(),
     max_output=target.length(),
@@ -34,9 +34,9 @@ test "public incremental API across separate input and output batches" {
   for byte in delta.to_bytes() {
     for part in decoder.push(Bytes::make(1, byte)) {
       match part {
-        @rdiff.Literal(bytes) => restored.write_bytes(bytes)
+        @rdiff.Literal(bytes) => restored.write_bytesview(bytes)
         @rdiff.Copy(offset~, length~) =>
-          restored.write_bytes(basis[offset:offset + length])
+          restored.write_bytesview(basis[offset:offset + length])
       }
     }
   }
@@ -67,7 +67,8 @@ test "public defaults counters and empty stream completion" {
   assert_eq(parsed.block_count(), 0)
   assert_eq(parsed.to_bytes(), expected)
   let encoder = @rdiff.DeltaEncoder::new(
-    @rdiff.parse_signature(expected), basis_size=0,
+    @rdiff.parse_signature(expected),
+    basis_size=0,
   )
   let delta = encoder.finish()
   assert_eq(delta, b"rs\x02\x36\x00")
@@ -85,31 +86,32 @@ test "public typed errors and failed or finished instance rejection" {
   ignore(signer.finish())
   assert_eq(signer.buffered_bytes(), 0)
   assert_eq(signer.output_bytes(), 48)
-  assert_true(is_invalid(() => { ignore(signer.push(b"")) }))
-  assert_true(is_invalid(() => { ignore(signer.finish()) }))
+  assert_true(is_invalid(() => ignore(signer.push(b""))))
+  assert_true(is_invalid(() => ignore(signer.finish())))
   let failed = @rdiff.SignatureEncoder::new()
-  assert_true(is_invalid(() => { ignore(failed.push(Bytes::make(65537, b'x'))) }))
-  assert_true(is_invalid(() => { ignore(failed.finish()) }))
+  assert_true(is_invalid(() => ignore(failed.push(Bytes::make(65537, b'x')))))
+  assert_true(is_invalid(() => ignore(failed.finish())))
   let decoder = @rdiff.PatchDecoder::new(basis_size=0, max_output=2)
   let delta = @rdiff.encode([@rdiff.Literal(b"ab")])
   // Received bytes are provisional: the mandatory END was not supplied.
   assert_eq(decoder.push(delta[0:delta.length() - 1]).length(), 1)
-  assert_true(is_invalid(() => { decoder.finish() }))
-  assert_true(is_invalid(() => { ignore(decoder.push(b"\x00")) }))
+  assert_true(is_invalid(() => decoder.finish()))
+  assert_true(is_invalid(() => ignore(decoder.push(b"\x00"))))
 }
 
 ///|
 test "public budgets accumulate across push boundaries" {
   let encoder = @rdiff.DeltaEncoder::new(
     @rdiff.parse_signature(@rdiff.signature(b"")),
-    basis_size=0, max_target_size=3,
+    basis_size=0,
+    max_target_size=3,
   )
   ignore(encoder.push(b"ab"))
-  assert_true(is_invalid(() => { ignore(encoder.push(b"cd")) }))
-  assert_true(is_invalid(() => { ignore(encoder.finish()) }))
+  assert_true(is_invalid(() => ignore(encoder.push(b"cd"))))
+  assert_true(is_invalid(() => ignore(encoder.finish())))
   let delta = @rdiff.encode([@rdiff.Literal(b"ab"), @rdiff.Literal(b"cd")])
   let decoder = @rdiff.PatchDecoder::new(basis_size=0, max_output=3)
   assert_eq(decoder.push(delta[0:7]).length(), 1)
-  assert_true(is_invalid(() => { ignore(decoder.push(delta[7:delta.length()])) }))
-  assert_true(is_invalid(() => { decoder.finish() }))
+  assert_true(is_invalid(() => ignore(decoder.push(delta[7:delta.length()]))))
+  assert_true(is_invalid(() => decoder.finish()))
 }

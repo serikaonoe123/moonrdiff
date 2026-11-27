@@ -2,7 +2,7 @@
 
 纯 MoonBit 远程差量基础库，处于早期开发阶段。
 
-Mooncakes 已发布 `serikaonoe123/moonrdiff@0.1.4`。当前进度见 [状态清单](docs/STATUS.md)，归档内容见 [打包验收](docs/PACKAGING.md)，性能方法与实测记录见 [基准说明](docs/BENCHMARKS.md)。[发布及注册表安装验收记录](docs/RELEASE-0.1.4.md)
+Mooncakes 已发布 `serikaonoe123/moonrdiff@0.1.4`。仓库源码的验收工具链固定为 `1.0.0-rc1+3c0520448`。[RC1 快速验收](docs/ACCEPTANCE.md#moonbit-10-rc1-快速验收) · [0.1.4 发布记录](docs/RELEASE-0.1.4.md) · [项目状态](docs/STATUS.md)
 
 0.1.4 修复原生 CLI 遇到短读时丢失底层 I/O 诊断的问题。Windows 和 Linux 均已从注册表安装并核对全部 34 个文件。[已批准方案](docs/RELEASE-PROPOSAL-0.1.4.md)
 
@@ -35,9 +35,9 @@ moon run cmd/demo --target native
 
 BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-2.0 许可、来源与修改记录，见 [第三方说明](third_party/mooncry_blake2/NOTICE.md)。其整块边界修复经过 Python hashlib 与 rdiff 对照验证；当前无需外部注册表依赖。
 
-原生文件 CLI 另使用 `moonbitlang/async@0.19.3`（Apache-2.0），从官方注册表安装。
+当前源码的原生文件 CLI 使用 `moonbitlang/async@0.22.11`（Apache-2.0），从官方注册表安装。
 
-固定环境：MoonBit `0.10.17+d971670cd`，Node.js 22，测试辅助 Python 3.12+。
+固定环境为 MoonBit `1.0.0-rc1+3c0520448`、Node.js 22 和 Python 3.12+（测试辅助）。
 
 ```sh
 moon update
@@ -67,7 +67,7 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 // restored == b"world!hello"
 ```
 
-导入模块 `serikaonoe123/moonrdiff` 为 `@rdiff`；上述函数会抛出 `DeltaError`，由调用者处理。Mooncakes 依赖版本为 `0.1.3`。
+导入模块 `serikaonoe123/moonrdiff` 为 `@rdiff`。上述函数会抛出 `DeltaError`，由调用者处理。Mooncakes 依赖版本为 `0.1.4`。
 
 单个长度、偏移和输出预算上限为 Int32 正数范围，同时受实际后端可分配内存限制。格式中的更大整数会明确报错；内存便利接口会持有传入的数据，分块接口的缓冲与索引行为见下文。严格拒绝 end 后的多余数据。
 

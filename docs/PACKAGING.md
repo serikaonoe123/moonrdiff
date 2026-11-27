@@ -13,7 +13,7 @@ python scripts/check_package.py
 
 The script runs moon package --frozen, then inspects the actual ZIP against the exhaustive committed packaging/files.txt allowlist. There are 34 files: core library/tests, native CLI source, three user documents, the consumer README, original MIT license, and attributed Apache-2.0 BLAKE2 code/license/notice. Development scripts, internal probe, examples, execution results and local publishing helpers are excluded by .moonignore. Every archive file is compared byte-for-byte with its source; file and archive SHA-256 values are recorded.
 
-The script creates a new workspace containing only the extracted archive and a copy of examples/consumer. Dependency resolution is inspected: MoonRdiff must resolve to that extraction, never the original checkout; async must resolve to registry 0.19.3. Five public-API consumer tests execute on JS, Native and Wasm-GC. The archive's native CLI is built and runs signature → delta → manifest → bound patch → verify on generated files.
+The script creates a new workspace containing only the extracted archive and a copy of examples/consumer. MoonRdiff must resolve to that extraction, and async must resolve to registry 0.22.11 for the current source archive. Five public-API consumer tests execute on JS, Native and Wasm-GC. The archive's native CLI is built and runs signature → delta → manifest → bound patch → verify on generated files.
 
 The module metadata declares MIT AND Apache-2.0. The original root license and the full third-party license/notice remain in the archive; the official async dependency is not vendored. README relative links are checked against package contents.
 

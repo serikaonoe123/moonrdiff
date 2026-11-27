@@ -1,10 +1,10 @@
 # 文件命令行使用说明
 
-MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，文件适配使用固定版本 `moonbitlang/async@0.19.3`（Apache-2.0）。signature、delta、patch 命令均已逐块处理文件。delta 仍在内存中保留摘要与索引；当前开发版 verify 按固定 64 KiB 分块比较两个文件。默认每个输入和结果均限制为 64 MiB。Windows Server 2025 和 Ubuntu 24.04 云端 release 构建均已通过五类 128 MiB 级样本的摘要、差量和还原验收，运行时显式提高预算；不代表更大文件或所有运行环境均已验证。
+MoonRdiff 原生命令行支持 Windows 和 Linux。核心算法由 MoonBit 实现，当前源码的文件适配使用 `moonbitlang/async@0.22.11`（Apache-2.0）。signature、delta、patch 命令均已逐块处理文件。delta 仍在内存中保留摘要与索引。当前开发版 verify 按固定 64 KiB 分块比较两个文件。默认每个输入和结果均限制为 64 MiB。Windows Server 2025 和 Ubuntu 24.04 云端 release 构建均已通过五类 128 MiB 级样本的摘要、差量和还原验收，运行时显式提高预算。
 
 ## 构建与示例
 
-使用固定工具链 `0.10.17+d971670cd`，在仓库目录执行：
+使用固定工具链 `1.0.0-rc1+3c0520448`，在仓库目录执行：
 
 ```sh
 moon update

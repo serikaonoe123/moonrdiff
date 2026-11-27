@@ -75,7 +75,7 @@ assert engine[0]['version']==VERSION
 assert Path(engine[0]['source']['path']).resolve()==package.resolve()
 assert all(Path(x['source']['path']).resolve()!=ROOT for x in modules if x['source']['kind']=='local')
 dependency=[x for x in modules if x['name']=='moonbitlang/async']
-assert len(dependency)==1 and dependency[0]['version']=='0.19.3' and dependency[0]['source']['kind']=='registry'
+assert len(dependency)==1 and dependency[0]['version']=='0.22.11' and dependency[0]['source']['kind']=='registry'
 results=[]
 for target in args.targets:
     log=run(['moon','test','--package','moonrdiff-example/consumer','--target',target,'--deny-warn'],consumer)
