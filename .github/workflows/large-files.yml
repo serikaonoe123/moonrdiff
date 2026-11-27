@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['**.mbt', 'moon.mod', '**/moon.pkg', 'scripts/check_large_files.py', 'scripts/check_linux_enospc.sh', 'scripts/check_windows_disk_full.ps1', 'scripts/benchmark.py', '.github/workflows/large-files.yml']
+    paths: ['**.mbt', 'moon.mod', '**/moon.pkg', 'scripts/check_large_files.py', 'scripts/check_linux_enospc.sh', 'scripts/check_linux_block_read_error.sh', 'scripts/check_windows_disk_full.ps1', 'scripts/benchmark.py', '.github/workflows/large-files.yml']
   pull_request:
 permissions:
   contents: read
@@ -34,6 +34,9 @@ jobs:
           cli=_build/native/release/build/cmd/moonrdiff/moonrdiff.exe
           bash scripts/check_linux_enospc.sh "$cli" tmpfs
           bash scripts/check_linux_enospc.sh "$cli" ext4
+      - name: Linux block device read error
+        if: runner.os == 'Linux'
+        run: bash scripts/check_linux_block_read_error.sh _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
       - name: Windows filesystem capacity failure
         if: runner.os == 'Windows'
         run: ./scripts/check_windows_disk_full.ps1 _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
@@ -51,6 +54,12 @@ jobs:
             results/linux-enospc-*/control.json
             results/linux-enospc-*/enospc.stderr
             results/linux-enospc-*/enospc.stdout
+            results/linux-block-read-error-*/summary.txt
+            results/linux-block-read-error-*/fixture.log
+            results/linux-block-read-error-*/table.txt
+            results/linux-block-read-error-*/control.json
+            results/linux-block-read-error-*/*.stderr
+            results/linux-block-read-error-*/*.stdout
             results/windows-disk-full-*/summary.json
             results/windows-disk-full-*/control.json
             results/windows-disk-full-*/diskpart.log
