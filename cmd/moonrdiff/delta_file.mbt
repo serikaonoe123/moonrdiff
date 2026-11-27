@@ -52,7 +52,7 @@ async fn delta_file(
       } else {
         chunk_size
       }
-      let batch = encoder.push(target.read_exactly_at(n, position~))
+      let batch = encoder.push(read_file_exactly_at(target, n, position~))
       if output is Some(file) {
         file.write(batch)
         written += batch.length()

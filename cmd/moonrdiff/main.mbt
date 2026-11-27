@@ -23,6 +23,24 @@ fn number(value : String) -> Int32 raise CliError {
 }
 
 ///|
+async fn read_file_exactly_at(
+  file : @fs.File,
+  length : Int32,
+  position~ : Int64,
+) -> Bytes {
+  let buffer = FixedArray::make(length, b'\x00')
+  let mut offset = 0
+  // A read that reaches a failing block may return the readable prefix first.
+  // Continue from the next byte so the OS error is not mistaken for EOF.
+  while offset < length {
+    let n = file.read_at(buffer, offset~, position=position + offset.to_int64())
+    guard n > 0 else { raise @io.ReaderClosed }
+    offset += n
+  }
+  buffer.unsafe_reinterpret_as_bytes()
+}
+
+///|
 async fn read_regular(path : String, limit : Int32) -> Bytes {
   guard @fs.kind(path) is @fs.Regular else {
     raise Usage("Input must be a regular file: " + path)
@@ -36,7 +54,7 @@ async fn read_regular(path : String, limit : Int32) -> Bytes {
   guard size >= 0L && size <= limit.to_int64() else {
     raise Usage("Input byte limit exceeded: " + path)
   }
-  let data = file.read_exactly_at(size.to_int(), position=0L)
+  let data = read_file_exactly_at(file, size.to_int(), position=0L)
   guard file.size() == size else {
     raise Usage("Input size changed while reading: " + path)
   }
@@ -85,8 +103,8 @@ async fn verify_files(
   while matched && position < expected_size {
     let remaining = expected_size - position
     let n = if remaining < 65536L { remaining.to_int() } else { 65536 }
-    let a = first.read_exactly_at(n, position~)
-    let b = second.read_exactly_at(n, position~)
+    let a = read_file_exactly_at(first, n, position~)
+    let b = read_file_exactly_at(second, n, position~)
     matched = a == b
     position += n.to_int64()
   }

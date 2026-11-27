@@ -75,7 +75,7 @@ async fn digest_handle(file : @fs.File, size : Int64) -> String {
   while position < size {
     let left = size - position
     let n = if left < 65536L { left.to_int() } else { 65536 }
-    hash.push(file.read_exactly_at(n, position~))
+    hash.push(read_file_exactly_at(file, n, position~))
     position += n.to_int64()
   }
   guard file.size() == size else {

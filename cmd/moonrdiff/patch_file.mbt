@@ -78,7 +78,7 @@ async fn patch_file(
       } else {
         chunk_size
       }
-      let bytes = delta.read_exactly_at(n, position~)
+      let bytes = read_file_exactly_at(delta, n, position~)
       if delta_hash is Some(hash) {
         hash.push(bytes)
       }
@@ -100,7 +100,8 @@ async fn patch_file(
               while copied < length {
                 let left = length - copied
                 let amount = if left < chunk_size { left } else { chunk_size }
-                let data = basis.read_exactly_at(
+                let data = read_file_exactly_at(
+                  basis,
                   amount,
                   position=(offset + copied).to_int64(),
                 )
