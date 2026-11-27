@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.4 — 2026-11-27
 
 - Continue native CLI positional reads after a short read so an underlying I/O error reaches the diagnostic. An actual end of file still reports `ReaderClosed`.
 

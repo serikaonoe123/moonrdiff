@@ -77,4 +77,12 @@ registry_013 = {
 }
 for name, sha in registry_013.items():
     assert hashlib.sha256((ROOT/'packaging/registry-0.1.3'/name).read_bytes()).hexdigest() == sha, name
+registry_014 = {
+    'linux-report.json': '432aba37492ff1fd7659f0b1c6d3b6e7ee29c7603f6691f2a112ee82456602e6',
+    'linux-resolution.json': '421c74f7c07b52db7219409d0212928d784419bb1014078cdc3a40f8f606c432',
+    'windows-report.json': 'cba62497750a0b04478e5c7c02151c35b18b1b0d3ef67ceab18aa9fe703e15e7',
+    'windows-resolution.json': 'cf16c6fb8505f6fb563b150f7ce5d6a8c2939c6e247a7a8a0a4f21ccca374f3d',
+}
+for name, sha in registry_014.items():
+    assert hashlib.sha256((ROOT/'packaging/registry-0.1.4'/name).read_bytes()).hexdigest() == sha, name
 print('Original large-file, source-update, candidate and published registry evidence bytes retained.')

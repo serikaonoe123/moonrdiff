@@ -1,6 +1,6 @@
 # MoonRdiff development status
 
-Updated 2026-11-19. Mooncakes 0.1.3 is published from 79a958d. Windows/Linux registry acceptance 44272240210 passed. See RELEASE-0.1.3.md for this release and the archive of earlier results.
+Updated 2026-11-27. Mooncakes 0.1.4 is published from 2cd1671. Windows and Linux registry acceptance passed in run 45951491168. [Release record](RELEASE-0.1.4.md)
 
 The walkthrough covers a fresh registry consumer, bound file restore, and the resource-cache application. Its compatibility table points to the platform reports. [Acceptance guide](ACCEPTANCE.md)
 
@@ -8,17 +8,17 @@ The walkthrough covers a fresh registry consumer, bound file restore, and the re
 | --- | --- | --- |
 | Format/core | RK/BLAKE2 signatures, rdiff patch codec, full four-way interoperability | Broader adversarial/randomized and boundary evaluation |
 | Incremental APIs | SignatureEncoder, DeltaEncoder, PatchDecoder with state/budget checks; Windows/Linux release 128 MiB sample paths passed; new 38-case partitioned-pipeline and exact-budget regression passed all three backends on both platforms in CI 42963384904 (4013e9c) | Wider resource boundaries and larger real application inputs |
-| Native CLI | Published 0.1.3 includes staged outputs, late destination conflicts and explicit post-publication errors. CI covers capacity and sync errors, interruption and retry behavior. The unreleased CLI now preserves Linux block-layer read errors after a short read. | Physical media failures and recovery after power loss |
+| Native CLI | Published 0.1.4 preserves the OS diagnostic after a short read. CI covers capacity and sync errors, interruption and retry behavior. | Physical media failures and recovery after power loss |
 | Binding | Strict optional manifest, standard BLAKE2b-256, preflight/replay checks; both native platforms passed 128 MiB modified-file bound restore | Distributed manifest creation and publisher authentication not provided |
 | Examples | Both original user-facing demos run in MoonBit without Python; TAR/ZIP/TAR.GZ explicit-date backend passed Windows/Linux CI 44264366022 after correcting abbreviated-time parsing | External application integrations and broader real application data; continue evaluating Python development-tool migrations |
 | Resource-cache consumer | Registry 0.1.3, 34 installed files verified. The optional Lua 5.4.7 → 5.4.8 acceptance extends the suite to five exact restores and 42 rejection controls on each of Windows and Linux, including both official gzip and decoded TAR fixtures in CI [44688437344](https://github.com/serikaonoe123/moonrdiff/actions/runs/44688437344). | Production cache durability |
 | Development tooling | Native CLI acceptance runs in MoonBit with a small independent Python hashlib/struct oracle; Windows debug/release each passed 125 checks and Linux each passed 126 with default links, in CI 44055861932 | Other Python development tools remain; 128 MiB CI 44055861763 passed after isolating negative-control output paths |
 | Check entry point | MoonBit cmd/check on Node22 preserves all 14 ordered steps; default Windows/Linux CI 44081050069 passed with links enabled and independent oracles retained | Other Python packaging/reference/benchmark tools remain |
-| Packaging | Published 0.1.3: approved 34-file content matches registry installation; both platforms and all consumer backends passed | Preserve inventories for future versions |
+| Packaging | The published 0.1.4 archive and both registry consumers match the approved 34-file content inventory. | Preserve inventories for future versions |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | User-approved 0.1.0/0.1.1/0.1.2/0.1.3 published and verified from the registry | D8050 appeared in both shells in the same diagnostic context. A fresh build passed in normal local PowerShell. Root cause remains unconfirmed. See NATIVE-WINDOWS-DIAGNOSTIC.md. |
+| Release | Versions 0.1.0 through 0.1.4 were published and verified from the registry. | D8050 appeared in both shells in the same diagnostic context. A fresh build passed in normal local PowerShell. Root cause remains unconfirmed. See NATIVE-WINDOWS-DIAGNOSTIC.md. |
 
-Published 0.1.3 is frozen at 79a958d. Full CI 44267566097, 128 MiB acceptance 44267566157 and old-0.1.2 registry regression 44267638263 passed Windows/Linux. Registry 44272240210 verifies 0.1.3 on both platforms and all three backends. The registry workflow, basic consumer and resource-cache example use 0.1.3. See RELEASE-0.1.3.md and RESOURCE-CACHE.md.
+The default registry workflow and the basic consumer use 0.1.4. The resource-cache application and walkthrough retain their fixed 0.1.3 baseline. [0.1.3 release record](RELEASE-0.1.3.md) · [Resource-cache inputs](RESOURCE-CACHE.md)
 
 Benchmark schema-3 path isolation passed controlled run 44082843263: both versions passed 15 cases and 20 distinct-path budget controls. Eight report-copy compatibility/rejection checks passed. This updates acceptance stability, not algorithm performance.
 

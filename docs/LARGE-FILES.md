@@ -54,7 +54,7 @@ The same Ubuntu job also uses a fresh 16 MiB file-backed ext4 image. It verifies
 
 The Ubuntu job compares two read-only mounts of the same disposable ext4 image. The normal mount gives a byte-for-byte bound restore. The second mount passes through a device-mapper table that returns `EIO` for one 4 KiB data block in the basis file. A separate read confirms the targeted error while a neighboring fixture file remains readable.
 
-The first run exposed a diagnostic gap. A read spanning the failing block returned a readable prefix, and the CLI reported `ReaderClosed`. The unreleased CLI now continues positive short reads so the next read propagates the OS error. [First run](https://github.com/serikaonoe123/moonrdiff/actions/runs/45944343125)
+The first run exposed a diagnostic gap. A read spanning the failing block returned a readable prefix, and the CLI reported `ReaderClosed`. Starting in 0.1.4, the CLI continues positive short reads so the next read propagates the OS error. [First run](https://github.com/serikaonoe123/moonrdiff/actions/runs/45944343125)
 
 [Run 45944675076](https://github.com/serikaonoe123/moonrdiff/actions/runs/45944675076) passed both cases. The bound restore stopped while checking its input and left an empty staging directory. The unbound restore stopped while copying and retained the first 32 KiB in staging. Each returned 2 with an I/O error, empty stdout and no final file. The test checked the staged prefix, input hashes and the unchanged read-only image. Physical media faults and power-loss recovery remain unverified.
 
