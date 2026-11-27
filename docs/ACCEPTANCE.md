@@ -1,4 +1,22 @@
-# MoonRdiff 0.1.3 文字验收指南
+# MoonRdiff 验收指南
+
+## MoonBit 1.0 RC1 快速验收
+
+当前仓库源码和 CI 固定使用 `moonc v1.0.0-rc1+3c0520448` 与对应 core，原生源码依赖 `moonbitlang/async@0.22.11`。安装 MoonBit 后运行 `moon version --all` 核对构建号。原生示例需要系统 C 编译器。[MoonBit 官方安装说明](https://www.moonbitlang.com/download)
+
+在当前仓库根目录运行。首先从 Mooncakes 解析已发布的 0.1.4 并运行公开库测试，再从当前源码构建原生 CLI 并运行文件更新示例。
+
+```sh
+moon version --all
+moon update
+moon -C examples/consumer test --target js --deny-warn
+moon build cmd/moonrdiff --target native --release --deny-warn
+moon run cmd/demo --target native -- --profile release
+```
+
+独立消费者应通过五组测试。文件更新示例会生成旧文件和目标、计算补丁、带清单还原并逐字节核对结果。需要完整检查、构建和测试时，在具备 Git、Node.js 和 Python 3.12+ 的环境运行 `moon run cmd/check --target js`。CI 同时覆盖 Windows、Linux、128 MiB 文件验收和注册表独立消费者。
+
+## 0.1.3 固定走查
 
 这份指南依次验收 Mooncakes 安装、原生命令的带清单还原，以及真实源码包的差量更新。请从一个新的空目录开始。命令使用 Bash，Windows 可用 Git Bash，并在 PowerShell 中运行原生构建。Windows 和 Linux 都需要 Git、MoonBit `0.10.17+d971670cd` 和 Node.js。CI 使用 Node.js 22。原生步骤需要 MoonBit Native 能找到的 C 编译器。最后一步需要支持 `git archive --mtime` 的 Git。
 

@@ -1,6 +1,6 @@
 # Reproducible end-to-end CLI benchmarks
 
-The benchmark runs on Linux with pinned MoonBit 0.10.17+d971670cd and reference rdiff 2.3.4. It measures commands, including validation/preflight and IO, rather than isolated algorithm speed. MoonRdiff delta/patch use two passes; the reference implementation has different validation behavior. Samples use a fixed order with recently accessed inputs; this is not a statistical performance ranking or network-throughput measurement.
+The historical benchmark and patch-timing workflows run on Linux with MoonBit 0.10.17+d971670cd. They compare the fixed pre-RC1 source at `4c9facb` with the original baselines under the same compiler. The benchmark uses reference rdiff 2.3.4 and measures the command's validation, preflight and I/O. MoonRdiff delta and patch use two passes. The reference implementation validates inputs differently. Samples use a fixed order with recently accessed inputs, so the results describe this setup.
 
 The current workflow compares release builds of the previous optimization milestone `c439ae9dc7631fd627842b73222cbc1b6470133a` and the current commit on the same runner/compiler, with three samples per command. Historical runs below name their own fixed baselines. The original baseline used the default native debug build. Build profiles and validation work differ from Ubuntu's packaged rdiff executable; timing comparisons cannot establish an isolated algorithm ranking. GNU time's hundredth-second resolution can report 0.00 for short commands.
 

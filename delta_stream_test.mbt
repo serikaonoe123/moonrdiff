@@ -13,15 +13,15 @@ fn streamed_delta(
     max_candidate_checks=checks,
   )
   let out = @buffer.Buffer()
-  out.write_bytes(encoder.push(b""))
+  out.write_bytesview(encoder.push(b""))
   let mut pos = 0
   while pos < target.length() {
     let left = target.length() - pos
     let n = if chunk_size < left { chunk_size } else { left }
-    out.write_bytes(encoder.push(target[pos:pos + n]))
+    out.write_bytesview(encoder.push(target[pos:pos + n]))
     pos += n
   }
-  out.write_bytes(encoder.finish())
+  out.write_bytesview(encoder.finish())
   let result = out.to_bytes()
   assert_eq(@moonrdiff.patch(basis, result, max_output=target.length()), target)
   if target.length() < 65536 {
@@ -86,7 +86,7 @@ fn partitioned_update(
     max_output=12 + blocks * (4 + strong_length),
   )
   let signature_bytes = @buffer.Buffer()
-  signature_bytes.write_bytes(signature_encoder.push(b""))
+  signature_bytes.write_bytesview(signature_encoder.push(b""))
   let mut position = 0
   while position < basis.length() {
     state = corpus_next(state)
@@ -97,13 +97,13 @@ fn partitioned_update(
     }
     let left = basis.length() - position
     let n = if size < left { size } else { left }
-    signature_bytes.write_bytes(
+    signature_bytes.write_bytesview(
       signature_encoder.push(basis[position:position + n]),
     )
-    signature_bytes.write_bytes(signature_encoder.push(b""))
+    signature_bytes.write_bytesview(signature_encoder.push(b""))
     position += n
   }
-  signature_bytes.write_bytes(signature_encoder.finish())
+  signature_bytes.write_bytesview(signature_encoder.finish())
   let encoded_signature = signature_bytes.to_bytes()
   assert_eq(
     encoded_signature,
@@ -120,7 +120,7 @@ fn partitioned_update(
     max_target_size=target.length(),
   )
   let delta = @buffer.Buffer()
-  delta.write_bytes(encoder.push(b""))
+  delta.write_bytesview(encoder.push(b""))
   position = 0
   while position < target.length() {
     state = corpus_next(state)
@@ -131,11 +131,11 @@ fn partitioned_update(
     }
     let left = target.length() - position
     let n = if size < left { size } else { left }
-    delta.write_bytes(encoder.push(target[position:position + n]))
-    delta.write_bytes(encoder.push(b""))
+    delta.write_bytesview(encoder.push(target[position:position + n]))
+    delta.write_bytesview(encoder.push(b""))
     position += n
   }
-  delta.write_bytes(encoder.finish())
+  delta.write_bytesview(encoder.finish())
   let bytes = delta.to_bytes()
   assert_eq(@moonrdiff.patch(basis, bytes, max_output=target.length()), target)
   let decoder = @moonrdiff.PatchDecoder::new(
@@ -156,9 +156,9 @@ fn partitioned_update(
     let n = if size < left { size } else { left }
     for part in decoder.push(bytes[position:position + n]) {
       match part {
-        Literal(data) => restored.write_bytes(data)
+        Literal(data) => restored.write_bytesview(data)
         Copy(offset~, length~) =>
-          restored.write_bytes(basis[offset:offset + length])
+          restored.write_bytesview(basis[offset:offset + length])
       }
     }
     assert_true(decoder.push(b"").is_empty())
@@ -180,23 +180,23 @@ test "seeded edit corpus preserves the complete partitioned update pipeline" {
     let basis = corpus_bytes(length, seed.reinterpret_as_uint(), seed % 4 == 3)
     let target = @buffer.Buffer()
     if seed % 4 == 0 {
-      target.write_bytes(basis)
+      target.write_bytesview(basis)
     } else if seed % 4 == 2 {
-      target.write_bytes(
+      target.write_bytesview(
         corpus_bytes(length + 35, (seed + 7919).reinterpret_as_uint(), false),
       )
     } else {
       let cut = length / 3
       let after_deleted = cut + length / 11
       let end = length - length / 7
-      target.write_bytes(b"\x00\xffprefix")
-      target.write_bytes(basis[after_deleted:end])
-      target.write_bytes(
+      target.write_bytesview(b"\x00\xffprefix")
+      target.write_bytesview(basis[after_deleted:end])
+      target.write_bytesview(
         corpus_bytes(17, (seed + 65537).reinterpret_as_uint(), false),
       )
-      target.write_bytes(basis[0:cut])
-      target.write_bytes(basis[end:length])
-      target.write_bytes(basis[0:cut])
+      target.write_bytesview(basis[0:cut])
+      target.write_bytesview(basis[end:length])
+      target.write_bytesview(basis[0:cut])
     }
     let target = target.to_bytes()
     let block_size = if length > 4097 {
@@ -303,10 +303,10 @@ test "streamed matching preserves boundaries tails and global budgets" {
     let basis = basis_buf.to_bytes()
     let target = @buffer.Buffer()
     let cut = basis.length() / 3
-    target.write_bytes(b"prefix")
-    target.write_bytes(basis[cut:basis.length()])
-    target.write_bytes(b"insert")
-    target.write_bytes(basis[0:cut])
+    target.write_bytesview(b"prefix")
+    target.write_bytesview(basis[cut:basis.length()])
+    target.write_bytesview(b"insert")
+    target.write_bytesview(basis[0:cut])
     for block_size in [1, 3, 4, 7, 8, 17, 32] {
       ignore(streamed_delta(basis, target.to_bytes(), block_size, 7, 10000))
     }

@@ -83,7 +83,7 @@ fn DeltaWriter::literal(
     self.out.write_byte(b'\x43')
     write_u32(self.out, bytes.length())
   }
-  self.out.write_bytes(bytes)
+  self.out.write_bytesview(bytes)
   self.size += header + bytes.length()
 }
 
@@ -126,7 +126,7 @@ pub fn delta(
     copy_offset: 0,
     copy_length: 0,
   }
-  writer.out.write_bytes(b"rs\x02\x36")
+  writer.out.write_bytesview(b"rs\x02\x36")
   let power = rk_power(block_size)
   let tail_power = rk_power(tail)
   let mut position = 0

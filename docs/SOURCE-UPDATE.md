@@ -4,7 +4,7 @@
 
 ## 运行
 
-从完整 GitHub 仓库运行，使用固定工具链 MoonBit `0.10.17+d971670cd`、原生 C 编译器，以及支持 `git archive --mtime` 和 TAR/ZIP/TAR.GZ 的 Git。演示入口由 MoonBit 实现，无需 Python：
+从完整 GitHub 仓库运行，使用固定工具链 MoonBit `1.0.0-rc1+3c0520448`、原生 C 编译器，以及支持 `git archive --mtime` 和 TAR/ZIP/TAR.GZ 的 Git。演示入口由 MoonBit 实现，无需 Python：
 
 ```sh
 moon update

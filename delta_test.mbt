@@ -32,7 +32,7 @@ test "all literal and copy parameter widths" {
   for a in 0..<4 {
     for b in 0..<4 {
       let out = @buffer.Buffer()
-      out.write_bytes(b"rs\x02\x36")
+      out.write_bytesview(b"rs\x02\x36")
       out.write_byte((69 + a * 4 + b).to_byte())
       for _ in 0..<((1 << a) - 1) {
         out.write_byte(b'\x00')
@@ -46,13 +46,13 @@ test "all literal and copy parameter widths" {
       assert_eq(@moonrdiff.patch(b"abcd", out.to_bytes(), max_output=2), b"bc")
     }
     let out = @buffer.Buffer()
-    out.write_bytes(b"rs\x02\x36")
+    out.write_bytesview(b"rs\x02\x36")
     out.write_byte((65 + a).to_byte())
     for _ in 0..<((1 << a) - 1) {
       out.write_byte(b'\x00')
     }
     out.write_byte(b'\x01')
-    out.write_bytes(b"z\x00")
+    out.write_bytesview(b"z\x00")
     assert_eq(@moonrdiff.patch(b"", out.to_bytes(), max_output=1), b"z")
   }
 }

@@ -35,8 +35,8 @@ jobs:
           python-version: '3.12'
       - uses: hustcer/setup-moonbit@9199da0ab63ea0c0bab1dc15f03d76e17ed4f75f
         with:
-          version: '0.10.17+d971670cd'
-          core-version: '0.10.17+d971670cd'
+          version: '1.0.0-rc1+3c0520448'
+          core-version: '1.0.0-rc1+3c0520448'
       - run: python scripts/check_evidence.py
       - name: Install only from registry and verify approved bytes
         run: python -c "import os, subprocess; v=os.environ['REGISTRY_ACCEPTANCE_VERSION']; assert v in ['0.1.0','0.1.1','0.1.2','0.1.3','0.1.4']; subprocess.run(['python','scripts/check_registry.py','--approved-inventory','packaging/candidate-'+v+'.json'],check=True)"

@@ -1,18 +1,21 @@
 ///|
+#derive(@json.FromJson)
 struct ReadResult {
   data : String
   error : String
-} derive(@json.FromJson)
+}
 
 ///|
+#derive(ToJson, @json.FromJson)
 struct Offer {
   schema : Int32
   basis_bytes : Int32
   basis_sha256 : String
   signature_hex : String
-} derive(ToJson, @json.FromJson)
+}
 
 ///|
+#derive(ToJson, @json.FromJson)
 struct Manifest {
   schema : Int32
   delivery : String
@@ -20,7 +23,7 @@ struct Manifest {
   target_sha256 : String
   target_bytes : Int32
   payload_sha256 : String
-} derive(ToJson, @json.FromJson)
+}
 
 ///|
 let file_limit : Int32 = 8 * 1024 * 1024

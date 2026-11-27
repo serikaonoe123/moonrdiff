@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Validate and build the repository with MoonBit 1.0 RC1. Migrate the deprecated byte-buffer calls and update the native async dependency to 0.22.11.
+
 ## 0.1.4 — 2026-11-27
 
 - Continue native CLI positional reads after a short read so an underlying I/O error reaches the diagnostic. An actual end of file still reports `ReaderClosed`.

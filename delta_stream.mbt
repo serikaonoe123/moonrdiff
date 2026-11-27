@@ -74,7 +74,7 @@ pub fn DeltaEncoder::new(
     copy_offset: 0,
     copy_length: 0,
   }
-  writer.out.write_bytes(b"rs\x02\x36")
+  writer.out.write_bytesview(b"rs\x02\x36")
   {
     signature,
     index,

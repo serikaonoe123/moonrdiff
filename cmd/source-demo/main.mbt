@@ -264,11 +264,13 @@ async fn run_demo(args : Array[String]) -> Unit {
   errdefer {
     fields["status"] = @json.to_json("failed")
     fields["cases"] = @json.to_json(cases)
-    @fs.write_file(
-      report_path,
-      report.stringify(indent=2),
-      create_mode=TruncateExisting,
-    )
+    @async.protect_from_cancel(() => {
+      @fs.write_file(
+        report_path,
+        report.stringify(indent=2),
+        create_mode=TruncateExisting,
+      )
+    })
   }
   let (old_commit, old_paths, old_inventory) = snapshot(
     log,

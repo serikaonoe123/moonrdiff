@@ -6,7 +6,7 @@
 
 ## 固定数据与复现
 
-环境：MoonBit `0.10.17+d971670cd`、Node.js 22、支持 `archive --mtime` 的 Git。CI 在 Windows/Linux 使用同一固定工具链；本地报告记录实际版本。
+当前仓库示例使用 MoonBit `1.0.0-rc1+3c0520448`、Node.js 22 以及支持 `archive --mtime` 的 Git。CI 在 Windows/Linux 使用同一固定工具链，本地报告记录实际版本。
 
 数据来源为公开 MIT 项目 [MoonFFI Lab](https://github.com/serikaonoe123/moonffi-lab)：
 

@@ -62,7 +62,7 @@ fn SignatureEncoder::header(
   out : @buffer.Buffer,
 ) -> Unit {
   if !self.started {
-    out.write_bytes(b"rs\x01G")
+    out.write_bytesview(b"rs\x01G")
     write_u32(out, self.block_size)
     write_u32(out, self.strong_length)
     self.started = true
@@ -82,7 +82,7 @@ fn SignatureEncoder::record(
   let bytes = Bytes::from_array(self.pending[0:self.used])
   write_weak(out, rk_checksum(bytes))
   let strong = @crypto.blake2b(bytes, 32)
-  out.write_bytes(strong[0:self.strong_length])
+  out.write_bytesview(strong[0:self.strong_length])
   self.blocks += 1
   self.output_size += 4 + self.strong_length
   self.used = 0

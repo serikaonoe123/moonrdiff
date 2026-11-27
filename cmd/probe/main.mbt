@@ -97,10 +97,10 @@ fn main {
             while position < target.length() {
               let left = target.length() - position
               let n = if left < 7 { left } else { 7 }
-              out.write_bytes(encoder.push(target[position:position + n]))
+              out.write_bytesview(encoder.push(target[position:position + n]))
               position += n
             }
-            out.write_bytes(encoder.finish())
+            out.write_bytesview(encoder.finish())
             out.to_bytes()
           }
         } catch {

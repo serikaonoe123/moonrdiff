@@ -15,9 +15,9 @@ fn decode_parts(
     let n = if chunk_size < left { chunk_size } else { left }
     for part in decoder.push(delta[position:position + n]) {
       match part {
-        Literal(bytes) => output.write_bytes(bytes)
+        Literal(bytes) => output.write_bytesview(bytes)
         Copy(offset~, length~) =>
-          output.write_bytes(basis[offset:offset + length])
+          output.write_bytesview(basis[offset:offset + length])
       }
     }
     position += n
@@ -138,7 +138,7 @@ test "incremental parser supports all parameter widths and short literals" {
   for a in 0..<4 {
     for b in 0..<4 {
       let bytes = @buffer.Buffer()
-      bytes.write_bytes(b"rs\x02\x36")
+      bytes.write_bytesview(b"rs\x02\x36")
       bytes.write_byte((69 + a * 4 + b).to_byte())
       for _ in 0..<((1 << a) - 1) {
         bytes.write_byte(b'\x00')
@@ -152,12 +152,12 @@ test "incremental parser supports all parameter widths and short literals" {
       assert_eq(decode_parts(b"abcd", bytes.to_bytes(), 1), b"bc")
     }
     let bytes = @buffer.Buffer()
-    bytes.write_bytes(b"rs\x02\x36")
+    bytes.write_bytesview(b"rs\x02\x36")
     bytes.write_byte((65 + a).to_byte())
     for _ in 0..<((1 << a) - 1) {
       bytes.write_byte(b'\x00')
     }
-    bytes.write_bytes(b"\x01z\x00")
+    bytes.write_bytesview(b"\x01z\x00")
     assert_eq(decode_parts(b"", bytes.to_bytes(), 1), b"z")
   }
   for length in 1..<=64 {

@@ -1,9 +1,6 @@
 name: Benchmark MoonRdiff
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['scripts/benchmark.py', 'scripts/compare_benchmarks.py', '.github/workflows/benchmark.yml']
 permissions:
   contents: read
 jobs:
@@ -13,6 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # Reproduce the pre-RC1 comparison with the same compiler on both sources.
+          ref: 4c9facb307d965eb6c9d454eef6dc420a59aed1e
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -43,7 +42,7 @@ jobs:
           dpkg-query -W rdiff time > results/benchmark-tools.txt
       - name: Benchmark fixed baseline release with three repetitions
         run: python scripts/benchmark.py --profile release --source-root results/baseline-source --label baseline --repetitions 3
-      - name: Benchmark current release with three repetitions
+      - name: Benchmark fixed pre-RC1 source with three repetitions
         run: python scripts/benchmark.py --profile release --label candidate --repetitions 3
       - name: Compare matched inputs and unchanged output bytes
         run: python scripts/compare_benchmarks.py --baseline-commit c439ae9dc7631fd627842b73222cbc1b6470133a

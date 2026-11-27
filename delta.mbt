@@ -21,7 +21,7 @@ fn write_u32(out : @buffer.Buffer, value : Int32) -> Unit {
 /// Encode explicit instructions; this is not yet a matching algorithm.
 pub fn encode(instructions : Array[Instruction]) -> Bytes raise DeltaError {
   let out = @buffer.Buffer()
-  out.write_bytes(b"rs\x02\x36")
+  out.write_bytesview(b"rs\x02\x36")
   for instruction in instructions {
     match instruction {
       Literal(data) =>
@@ -32,7 +32,7 @@ pub fn encode(instructions : Array[Instruction]) -> Bytes raise DeltaError {
             out.write_byte(b'\x43')
             write_u32(out, data.length())
           }
-          out.write_bytes(data)
+          out.write_bytesview(data)
         }
       Copy(offset~, length~) => {
         guard offset >= 0 && length > 0 else {
@@ -114,13 +114,13 @@ pub fn patch(
       guard length <= delta.length() - cursor.position else {
         raise Invalid("Truncated literal")
       }
-      out.write_bytes(delta[cursor.position:cursor.position + length])
+      out.write_bytesview(delta[cursor.position:cursor.position + length])
       cursor.position += length
     } else {
       guard offset <= basis.length() && length <= basis.length() - offset else {
         raise Invalid("Copy outside basis")
       }
-      out.write_bytes(basis[offset:offset + length])
+      out.write_bytesview(basis[offset:offset + length])
     }
     size += length
   }

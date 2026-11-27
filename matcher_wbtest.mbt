@@ -59,7 +59,7 @@ test "stream prefilter collision still requires the original index lookup" {
   assert_true((encoder.prefilter[slot] & bit) != 0U)
   assert_true(encoder.index.get(weak) is None)
   let output = @buffer.Buffer()
-  output.write_bytes(encoder.push(b"abcd"))
-  output.write_bytes(encoder.finish())
+  output.write_bytesview(encoder.push(b"abcd"))
+  output.write_bytesview(encoder.finish())
   assert_eq(output.to_bytes(), encode([Literal(b"abcd")]))
 }

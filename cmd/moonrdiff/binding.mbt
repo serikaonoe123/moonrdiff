@@ -1,17 +1,19 @@
 ///|
+#derive(@json.ToJson, @json.FromJson)
 struct FileIdentity {
   size : Int32
   hash : String
-} derive(@json.ToJson, @json.FromJson)
+}
 
 ///|
+#derive(@json.ToJson, @json.FromJson)
 struct Binding {
   schema_version : Int32
   algorithm : String
   basis : FileIdentity
   target : FileIdentity
   delta : FileIdentity
-} derive(@json.ToJson, @json.FromJson)
+}
 
 ///|
 fn hex_digest(bytes : Bytes) -> String {

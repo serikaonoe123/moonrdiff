@@ -10,16 +10,16 @@ test "signature is independent of input partition including empty pushes" {
       for chunk_size in [1, 7, 128, 65536] {
         let encoder = @moonrdiff.SignatureEncoder::new(block_size~)
         let output = @buffer.Buffer()
-        output.write_bytes(encoder.push(b""))
+        output.write_bytesview(encoder.push(b""))
         let mut position = 0
         while position < length {
           let remaining = length - position
           let n = if chunk_size < remaining { chunk_size } else { remaining }
-          output.write_bytes(encoder.push(bytes[position:position + n]))
+          output.write_bytesview(encoder.push(bytes[position:position + n]))
           assert_true(encoder.buffered_bytes() < block_size)
           position += n
         }
-        output.write_bytes(encoder.finish())
+        output.write_bytesview(encoder.finish())
         assert_eq(output.to_bytes(), @moonrdiff.signature(bytes, block_size~))
         assert_eq(encoder.output_bytes(), output.to_bytes().length())
       }
