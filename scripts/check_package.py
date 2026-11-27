@@ -59,6 +59,12 @@ for link in re.findall(r'\]\(([^)]+)\)',(package/'README.mooncakes.md').read_tex
     if '://' not in link: assert (package/link).is_file(),link
 consumer=OUT/'consumer'
 shutil.copytree(ROOT/'examples/consumer',consumer,ignore=shutil.ignore_patterns('_build','.mooncakes','pkg.generated.mbti'))
+# Only the transient archive consumer follows the candidate under test.
+consumer_mod=consumer/'moon.mod'
+text=consumer_mod.read_text(encoding='utf8')
+text,count=re.subn(r'serikaonoe123/moonrdiff@[^"\s]+','serikaonoe123/moonrdiff@'+VERSION,text)
+assert count==1
+consumer_mod.write_text(text,encoding='utf8')
 (OUT/'moon.work').write_text('members = ["package", "consumer"]\n',encoding='utf8')
 resolution=json.loads(run(['moon','tree','--json'],consumer))
 (OUT/'resolution.json').write_text(json.dumps(resolution,indent=2),encoding='utf8')
