@@ -30,7 +30,10 @@ jobs:
       - run: moon build cmd/moonrdiff --target native --release --deny-warn
       - name: Linux filesystem capacity failure
         if: runner.os == 'Linux'
-        run: bash scripts/check_linux_enospc.sh _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
+        run: |
+          cli=_build/native/release/build/cmd/moonrdiff/moonrdiff.exe
+          bash scripts/check_linux_enospc.sh "$cli" tmpfs
+          bash scripts/check_linux_enospc.sh "$cli" ext4
       - name: Windows filesystem capacity failure
         if: runner.os == 'Windows'
         run: ./scripts/check_windows_disk_full.ps1 _build/native/release/build/cmd/moonrdiff/moonrdiff.exe
