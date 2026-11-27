@@ -134,3 +134,5 @@ node scripts/check_resource_cache.mjs ../moonffi-lab results/lua-release-inputs
 JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rdiff` 互操作覆盖 RK/BLAKE2 摘要与标准补丁指令。Linux tmpfs、磁盘镜像上的 ext4 和 Windows 虚拟磁盘上的 NTFS 均已验证原生 `patch` 写满时的退出码、诊断和暂存行为。Linux 测试向 `fsync` 注入 `EIO`，Windows 测试构建用无效句柄触发 `FlushFileBuffers` 错误。两项同步失败测试均核对完整暂存内容和最终路径。物理设备故障与断电恢复仍待验证。[ext4 写满验收](LARGE-FILES.md#disk-backed-ext4-capacity-failure) · [Linux 同步失败验收](LARGE-FILES.md#linux-file-sync-failure) · [Windows 同步失败验收](LARGE-FILES.md#windows-file-sync-failure)
 
 Linux 和 Windows 的 CI 均覆盖发布前后两种进程突然退出的情况。发布前中断保留完整暂存文件，重试可完成还原。发布后中断保留最终文件，重试拒绝覆盖。[Linux 进程中断验收](LARGE-FILES.md#linux-process-interruption-at-publication) · [Windows 进程中断验收](LARGE-FILES.md#windows-process-interruption-at-publication)
+
+开发版还在只读 ext4 镜像上验证了块设备读取错误。带清单还原在校验输入时停止，普通还原保留已写入的正确前缀。两种情况均报告底层读错，最终路径均未生成文件。这项短读处理修复尚未发布到 Mooncakes。[Linux 块设备读错验收](LARGE-FILES.md#linux-block-device-read-error)
