@@ -112,6 +112,15 @@ node scripts/check_resource_cache.mjs ../moonffi-lab results/lua-release-inputs
 
 脚本核对官网公布的 SHA-256，并分别还原原始 gzip 和解压后的 TAR。终端应显示 `Resource cache accepted: 5 real-data cases, 42 rejection controls.`。[Lua 样本数据与两平台验收](RESOURCE-CACHE.md#独立项目样本)
 
+## 还原失败或中断后如何确认结果
+
+先检查原命令指定的最终路径。退出码 `2` 或缺少成功 JSON 时，最终文件仍可能已经发布，例如进程在重命名完成后中断。
+
+- **最终文件已存在。** 保留它，并用 `verify` 和已知正确的目标文件比对。只有可信摘要时，可直接核对最终文件的摘要。需要重新还原时使用另一个输出路径，原生命令会拒绝覆盖已有目标。
+- **最终文件还未生成。** 保留诊断指向的暂存文件。进程中断未留下诊断时，可在目标旁查找 `<最终文件名>.moonrdiff-stage-*` 目录。解决空间或同步错误后，从原输入重跑 `patch`。暂存文件可能只有部分输出。
+
+[原生命令的文件行为](CLI.md#文件行为) · [Linux 中断验收](LARGE-FILES.md#linux-process-interruption-at-publication) · [Windows 中断验收](LARGE-FILES.md#windows-process-interruption-at-publication)
+
 ## 兼容性与证据
 
 | 验收项 | 通过的平台或后端 | 验证范围 | 记录 |
@@ -122,6 +131,6 @@ node scripts/check_resource_cache.mjs ../moonffi-lab results/lua-release-inputs
 | rdiff 2.3.4 互操作 | Linux | RK/BLAKE2 摘要和 rdiff 补丁，双实现交叉生成与还原，共 330 项 | [固定发布提交的完整 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44267566097) |
 | 真实资源缓存 | Windows、Linux，JS / Node.js 22 | 0.1.3、TAR 历史更新、空缓存和 gzip 更新，每平台 25 项拒绝检查 | [资源缓存 CI](https://github.com/serikaonoe123/moonrdiff/actions/runs/44686979238) |
 
-JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rdiff` 互操作覆盖 RK/BLAKE2 摘要与标准补丁指令。Linux tmpfs 和 Windows 虚拟磁盘上的 NTFS 均已验证原生 `patch` 写满时的退出码、诊断和暂存行为。Linux 测试向 `fsync` 注入 `EIO`，Windows 测试构建用无效句柄触发 `FlushFileBuffers` 错误。两项同步失败测试均核对完整暂存内容和最终路径。物理设备故障与断电恢复仍待验证。[Linux 同步失败验收](LARGE-FILES.md#linux-file-sync-failure) · [Windows 同步失败验收](LARGE-FILES.md#windows-file-sync-failure)
+JS 与 Wasm-GC 的验收范围是库 API。原生文件命令使用 Native。`rdiff` 互操作覆盖 RK/BLAKE2 摘要与标准补丁指令。Linux tmpfs、磁盘镜像上的 ext4 和 Windows 虚拟磁盘上的 NTFS 均已验证原生 `patch` 写满时的退出码、诊断和暂存行为。Linux 测试向 `fsync` 注入 `EIO`，Windows 测试构建用无效句柄触发 `FlushFileBuffers` 错误。两项同步失败测试均核对完整暂存内容和最终路径。物理设备故障与断电恢复仍待验证。[ext4 写满验收](LARGE-FILES.md#disk-backed-ext4-capacity-failure) · [Linux 同步失败验收](LARGE-FILES.md#linux-file-sync-failure) · [Windows 同步失败验收](LARGE-FILES.md#windows-file-sync-failure)
 
 Linux 和 Windows 的 CI 均覆盖发布前后两种进程突然退出的情况。发布前中断保留完整暂存文件，重试可完成还原。发布后中断保留最终文件，重试拒绝覆盖。[Linux 进程中断验收](LARGE-FILES.md#linux-process-interruption-at-publication) · [Windows 进程中断验收](LARGE-FILES.md#windows-process-interruption-at-publication)

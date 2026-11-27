@@ -42,7 +42,13 @@ The Ubuntu job runs `scripts/check_linux_enospc.sh` with the release CLI. It fir
 
 [Run 44690063732](https://github.com/serikaonoe123/moonrdiff/actions/runs/44690063732) recorded exit status 2, empty stdout and a diagnostic containing the staging path. The final file was absent. The staging file contained 1,044,480 bytes matching the prefix of the expected result. The input SHA-256 hashes and the preexisting file on the small filesystem were unchanged. The script unmounts the temporary filesystem after the checks and publishes the summary and logs as CI artifacts.
 
-This case covers native `patch` reaching the fixed capacity of Linux tmpfs during a write. Linux disk-backed filesystems, Windows volume exhaustion, sync failures and crash recovery are outside this test's scope.
+This case covers native `patch` reaching the fixed capacity of Linux tmpfs during a write.
+
+### Disk-backed ext4 capacity failure
+
+The same Ubuntu job also uses a fresh 16 MiB file-backed ext4 image. It verifies the mounted loop device belongs to that image and checks the mounted capacity before attempting a bound 24 MiB restore. A byte-for-byte restore on the runner's normal filesystem serves as the control.
+
+[Run 45935855496](https://github.com/serikaonoe123/moonrdiff/actions/runs/45935855496) recorded 11,513,856 bytes of filesystem capacity and a write-stage `ENOSPC`. The CLI returned 2 with empty stdout and reported the staging path. The final path remained absent. All 11,149,312 bytes in the staged file matched the expected prefix. The original input hashes and the preexisting file on ext4 matched their original values. CI also reran the tmpfs and Windows NTFS capacity checks.
 
 ## Windows NTFS capacity failure
 
