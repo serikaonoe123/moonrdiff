@@ -1,6 +1,6 @@
 # MoonRdiff development status
 
-Updated 2026-11-27. Mooncakes 0.1.4 is published from 2cd1671. Windows and Linux registry acceptance passed in run 45951491168. [Release record](RELEASE-0.1.4.md)
+Updated 2026-11-28. Mooncakes 0.1.5 is published from 14b4e00. Windows and Linux verified the registry package and built its native CLI using MoonBit 1.0 RC1. [Release record](RELEASE-0.1.5.md)
 
 The walkthrough covers a fresh registry consumer, bound file restore, and the resource-cache application. Its compatibility table points to the platform reports. [Acceptance guide](ACCEPTANCE.md)
 
@@ -14,11 +14,11 @@ The walkthrough covers a fresh registry consumer, bound file restore, and the re
 | Resource-cache consumer | Registry 0.1.3, 34 installed files verified. The optional Lua 5.4.7 → 5.4.8 acceptance extends the suite to five exact restores and 42 rejection controls on each of Windows and Linux, including both official gzip and decoded TAR fixtures in CI [44688437344](https://github.com/serikaonoe123/moonrdiff/actions/runs/44688437344). | Production cache durability |
 | Development tooling | Native CLI acceptance runs in MoonBit with a small independent Python hashlib/struct oracle; Windows debug/release each passed 125 checks and Linux each passed 126 with default links, in CI 44055861932 | Other Python development tools remain; 128 MiB CI 44055861763 passed after isolating negative-control output paths |
 | Check entry point | MoonBit cmd/check on Node22 preserves all 14 ordered steps; default Windows/Linux CI 44081050069 passed with links enabled and independent oracles retained | Other Python packaging/reference/benchmark tools remain |
-| Packaging | The published 0.1.4 archive and both registry consumers match the approved 34-file content inventory. | Preserve inventories for future versions |
+| Packaging | The published 0.1.5 archive and both registry consumers match the approved 34-file inventory. | Preserve inventories for future versions |
 | Benchmarks | Same-runner baseline/candidate release comparison: 15 cases each, three samples per command, matching input/output hashes and budget controls | Remaining cost profiling, more independent runs and real application data |
-| Release | Versions 0.1.0 through 0.1.4 were published and verified from the registry. | D8050 appeared in both shells in the same diagnostic context. A fresh build passed in normal local PowerShell. Root cause remains unconfirmed. See NATIVE-WINDOWS-DIAGNOSTIC.md. |
+| Release | Versions 0.1.0 through 0.1.5 were published and verified from the registry. | D8050 appeared in both shells in the same diagnostic context. A fresh build passed in normal local PowerShell. Root cause remains unconfirmed. See NATIVE-WINDOWS-DIAGNOSTIC.md. |
 
-The default registry workflow and the basic consumer use 0.1.4. The resource-cache application and walkthrough retain their fixed 0.1.3 baseline. [0.1.3 release record](RELEASE-0.1.3.md) · [Resource-cache inputs](RESOURCE-CACHE.md)
+The default registry workflow and the basic consumer use 0.1.5. The resource-cache application and historical walkthrough use the fixed 0.1.3 baseline. [0.1.3 release record](RELEASE-0.1.3.md) · [Resource-cache inputs](RESOURCE-CACHE.md)
 
 Benchmark schema-3 path isolation passed controlled run 44082843263: both versions passed 15 cases and 20 distinct-path budget controls. Eight report-copy compatibility/rejection checks passed. This updates acceptance stability, not algorithm performance.
 

@@ -1,5 +1,7 @@
 # MoonRdiff 0.1.5 发布候选
 
+`0.1.5` 已按本方案获批并发布。[正式发布与安装记录](RELEASE-0.1.5.md)
+
 `serikaonoe123/moonrdiff@0.1.5` 将当前仓库对 MoonBit 1.0 RC1 的适配带到 Mooncakes。原生 CLI 使用 `moonbitlang/async@0.22.11`，并迁移已弃用的字节缓冲区调用。公开库接口、rdiff 格式和许可文件沿用 0.1.4。
 
 ## 固定源码和实际归档
