@@ -12,6 +12,8 @@ import uuid
 parser=argparse.ArgumentParser()
 parser.add_argument('--approved-inventory',type=Path,required=True,
                     help='Downloaded successful package report from the approved source commit.')
+parser.add_argument('--check-native-cli',action='store_true',
+                    help='Build the native CLI from a standalone copy of the verified registry sources.')
 args=parser.parse_args()
 ROOT=Path(__file__).resolve().parents[1]
 approved=json.loads(args.approved_inventory.read_text(encoding='utf8'))
@@ -36,8 +38,8 @@ report={'module':approved['module'],'version':VERSION,'status':'running',
         'platform':platform.platform(),'python':platform.python_version(),
         'approved_source_commit':approved['source_commit'],'consumer_results':[]}
 def save(): (OUT/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf8')
-def run(command):
-    result=subprocess.run(command,cwd=consumer,capture_output=True,text=True,encoding='utf8',timeout=300)
+def run(command, cwd=consumer):
+    result=subprocess.run(command,cwd=cwd,capture_output=True,text=True,encoding='utf8',timeout=300)
     with (OUT/'commands.log').open('a',encoding='utf8') as stream:
         stream.write(json.dumps(command)+'\n'+result.stdout+result.stderr+'\n')
     result.check_returncode()
@@ -65,6 +67,16 @@ try:
         assert 'Total tests: 5, passed: 5, failed: 0.' in log
         report['consumer_results'].append({'target':target,'public_consumer_tests':5,'passed':True})
         save()
+    if args.check_native_cli:
+        source=OUT/'registry-source'
+        for item in approved['files']:
+            target=source/item['path']
+            target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(installed/item['path'],target)
+        run(['moon','build','cmd/moonrdiff','--target','native','--release','--deny-warn'],source)
+        exe=source/'_build/native/release/build/cmd/moonrdiff/moonrdiff.exe'
+        assert exe.is_file()
+        report['registry_native_cli_build_passed']=True
     report['status']='success';save()
     print(f'Registry-only {VERSION} consumer and 34-file content acceptance passed: {OUT / "report.json"}')
 except Exception as error:

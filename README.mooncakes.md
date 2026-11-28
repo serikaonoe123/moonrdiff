@@ -2,7 +2,7 @@
 
 MoonBit library for rdiff-compatible signatures, automatic deltas, and patch decoding. Core APIs support JavaScript, Native and Wasm-GC. The native file CLI supports Windows/Linux and optional BLAKE2b-256 file binding manifests.
 
-See the format contract for reviewed root API defaults and lifecycle. Linux synthetic benchmarks cover 1/16/128 MiB; signature/delta performance needs improvement. The current repository source uses MoonBit 1.0.0-rc1+3c0520448. Publication status and registry acceptance for each version are recorded in the GitHub repository.
+See the format contract for reviewed root API defaults and lifecycle. Linux synthetic benchmarks cover 1/16/128 MiB; signature/delta performance needs improvement. Version 0.1.5 uses MoonBit 1.0.0-rc1+3c0520448 and the matching core. Publication status and registry acceptance for each version are recorded in the GitHub repository.
 
 ## Library usage
 
@@ -29,9 +29,10 @@ Incremental applications use SignatureEncoder, DeltaEncoder and PatchDecoder. Pu
 
 ## Native file CLI
 
-Build from an extracted source package or repository:
+Build from an extracted source package or repository with MoonBit 1.0 RC1 and a system C compiler. Check the exact compiler version before building:
 
 ```sh
+moon version --all
 moon update
 moon build cmd/moonrdiff --target native
 moon run cmd/moonrdiff --target native -- --help
