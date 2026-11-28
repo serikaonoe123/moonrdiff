@@ -1,0 +1,28 @@
+{
+  "module": "serikaonoe123/moonrdiff",
+  "version": "0.1.5",
+  "status": "success",
+  "platform": "Linux-7.0.0-1018-aws-x86_64-with-glibc2.39",
+  "python": "3.12.16",
+  "approved_source_commit": "14b4e004c59344aa790e618f457e170e8224427e",
+  "consumer_results": [
+    {
+      "target": "js",
+      "public_consumer_tests": 5,
+      "passed": true
+    },
+    {
+      "target": "native",
+      "public_consumer_tests": 5,
+      "passed": true
+    },
+    {
+      "target": "wasm-gc",
+      "public_consumer_tests": 5,
+      "passed": true
+    }
+  ],
+  "compiler": "moon 0.1.20261126 (ccd306a 2026-11-26) ~/.moon/bin/moon\nmoonc v1.0.0-rc1+3c0520448 (2026-11-26) ~/.moon/bin/moonc\nmoonrun 0.1.20261126 (ccd306a 2026-11-26) ~/.moon/bin/moonrun\n",
+  "registry_content_matches_approved_inventory": true,
+  "registry_native_cli_build_passed": true
+}

@@ -4,7 +4,7 @@
 
 当前仓库源码和 CI 固定使用 `moonc v1.0.0-rc1+3c0520448` 与对应 core，原生源码依赖 `moonbitlang/async@0.22.11`。安装 MoonBit 后运行 `moon version --all` 核对构建号。原生示例需要系统 C 编译器。[MoonBit 官方安装说明](https://www.moonbitlang.com/download)
 
-在当前仓库根目录运行。首先从 Mooncakes 解析已发布的 0.1.4 并运行公开库测试，再从当前源码构建原生 CLI 并运行文件更新示例。
+在当前仓库根目录运行。首先从 Mooncakes 安装 0.1.5 并运行公开库测试，再从当前源码构建原生 CLI 并运行文件更新示例。也可用 RC1 从 0.1.5 发布包构建原生 CLI。[发布包验收](RELEASE-0.1.5.md)
 
 ```sh
 moon version --all
@@ -20,7 +20,7 @@ moon run cmd/demo --target native -- --profile release
 
 这份指南依次验收 Mooncakes 安装、原生命令的带清单还原，以及真实源码包的差量更新。请从一个新的空目录开始。命令使用 Bash，Windows 可用 Git Bash，并在 PowerShell 中运行原生构建。Windows 和 Linux 都需要 Git、MoonBit `0.10.17+d971670cd` 和 Node.js。CI 使用 Node.js 22。原生步骤需要 MoonBit Native 能找到的 C 编译器。最后一步需要支持 `git archive --mtime` 的 Git。
 
-下文沿用已完整复验的 0.1.3 固定提交和资源缓存输入。当前发布版是 0.1.4，其双平台独立安装证据单列在发布记录中。[0.1.4 发布记录](RELEASE-0.1.4.md)
+下文沿用已完整复验的 0.1.3 固定提交和资源缓存输入。当前发布版 0.1.5 的双平台安装和原生构建证据见发布记录。[0.1.5 发布记录](RELEASE-0.1.5.md)
 
 ## 1. 从 Mooncakes 安装并运行库示例
 

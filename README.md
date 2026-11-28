@@ -2,13 +2,13 @@
 
 纯 MoonBit 远程差量基础库，处于早期开发阶段。
 
-Mooncakes 已发布 `serikaonoe123/moonrdiff@0.1.4`。仓库源码的验收工具链固定为 `1.0.0-rc1+3c0520448`。[RC1 快速验收](docs/ACCEPTANCE.md#moonbit-10-rc1-快速验收) · [0.1.4 发布记录](docs/RELEASE-0.1.4.md) · [项目状态](docs/STATUS.md)
+Mooncakes 已发布 `serikaonoe123/moonrdiff@0.1.5`。发布包和仓库源码均使用 `1.0.0-rc1+3c0520448` 验收。[RC1 快速验收](docs/ACCEPTANCE.md#moonbit-10-rc1-快速验收) · [0.1.5 发布记录](docs/RELEASE-0.1.5.md) · [项目状态](docs/STATUS.md)
 
-0.1.4 修复原生 CLI 遇到短读时丢失底层 I/O 诊断的问题。Windows 和 Linux 均已从注册表安装并核对全部 34 个文件。[已批准方案](docs/RELEASE-PROPOSAL-0.1.4.md)
+0.1.5 可在 MoonBit 1.0 RC1 下从 Mooncakes 下载的源码构建原生 CLI。Windows 和 Linux 均已从注册表安装并核对全部 34 个文件。[已批准方案](docs/RELEASE-PROPOSAL-0.1.5.md)
 
 从空目录即可复现 Mooncakes 安装、原生命令还原和真实资源缓存更新，指南附预期输出与兼容性表。[文字验收指南](docs/ACCEPTANCE.md)
 
-在应用的 `moon.mod` 的 `import` 块中加入 `"serikaonoe123/moonrdiff@0.1.4"`，然后运行 `moon check --target js` 安装并检查。包别名配置与使用代码见下方库示例。独立消费者已在 Windows 和 Linux 的三个后端验收。[独立消费者](examples/consumer/consumer_test.mbt)
+在应用的 `moon.mod` 的 `import` 块中加入 `"serikaonoe123/moonrdiff@0.1.5"`，然后运行 `moon check --target js` 安装并检查。独立消费者已在 Windows 和 Linux 的三个后端验收。[包别名配置](examples/consumer/moon.pkg) · [独立消费者](examples/consumer/consumer_test.mbt)
 
 原生性能运行建议用 `moon build cmd/moonrdiff --target native --release`，执行文件在 `_build/native/release/build/cmd/moonrdiff/moonrdiff.exe`。最新同机、同为 release 的三次采样中，128 MiB 随机目标的差量耗时从 8.74 秒降到 3.80 秒（约减少 56.5%），压缩样本约减少 28%。这来自最多 64 KiB 的查找预筛选表，输出字节保持一致；随机补丁仍比整文件传输大，命令仍慢于参考 rdiff。报告保留其他场景的小幅退化及计时异常。
 
@@ -33,7 +33,7 @@ moon run cmd/demo --target native
 ## 完整开发验收
 
 
-BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-2.0 许可、来源与修改记录，见 [第三方说明](third_party/mooncry_blake2/NOTICE.md)。其整块边界修复经过 Python hashlib 与 rdiff 对照验证；当前无需外部注册表依赖。
+BLAKE2b-256 复用自 `cc06b/mooncry@0.71.0` 的最小修正版，保留 Apache-2.0 许可、来源与修改记录。该实现已随源码提供，其整块边界修复经过 Python hashlib 与 rdiff 对照验证。[第三方说明](third_party/mooncry_blake2/NOTICE.md)
 
 当前源码的原生文件 CLI 使用 `moonbitlang/async@0.22.11`（Apache-2.0），从官方注册表安装。
 
@@ -67,7 +67,7 @@ let restored = @rdiff.patch(b"hello world", delta, max_output=11)
 // restored == b"world!hello"
 ```
 
-导入模块 `serikaonoe123/moonrdiff` 为 `@rdiff`。上述函数会抛出 `DeltaError`，由调用者处理。Mooncakes 依赖版本为 `0.1.4`。
+导入模块 `serikaonoe123/moonrdiff` 为 `@rdiff`。上述函数会抛出 `DeltaError`，由调用者处理。Mooncakes 依赖版本为 `0.1.5`。
 
 单个长度、偏移和输出预算上限为 Int32 正数范围，同时受实际后端可分配内存限制。格式中的更大整数会明确报错；内存便利接口会持有传入的数据，分块接口的缓冲与索引行为见下文。严格拒绝 end 后的多余数据。
 

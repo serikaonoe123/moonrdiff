@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.1.5 — 2026-11-28
 
-- Validate and build the repository with MoonBit 1.0 RC1. Migrate the deprecated byte-buffer calls and update the native async dependency to 0.22.11.
+- Build the packaged native CLI with MoonBit 1.0 RC1. Migrate deprecated byte-buffer calls and update the native async dependency to 0.22.11.
 
 ## 0.1.4 — 2026-11-27
 

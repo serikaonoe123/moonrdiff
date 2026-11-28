@@ -1,6 +1,6 @@
 # Packaging and independent-consumer acceptance
 
-The current release is `serikaonoe123/moonrdiff@0.1.4`, from fixed source `2cd1671`. The approved 34-file inventory and both registry acceptance runs are linked from the release record. [0.1.4 release record](RELEASE-0.1.4.md)
+The current release is `serikaonoe123/moonrdiff@0.1.5`, from fixed source `14b4e00`. The release record links the approved 34-file inventory and both platform reports. [0.1.5 release record](RELEASE-0.1.5.md)
 
 `check_package.py` derives the archive version from `moon.mod` and pins its temporary consumer to the extracted archive. The checked-in consumer declares the published version. `check_registry.py` pins its standalone consumer to the version in the selected approved inventory and verifies registry resolution.
 
@@ -23,7 +23,7 @@ Each test preserves its report, resolution record and complete command output un
 
 Successful package checks also retain that actual ZIP beside the report, which records the source commit and module version read from moon.mod. This supports review of a concrete candidate archive and its 34-file content inventory.
 
-After publication, use `python scripts/check_registry.py --approved-inventory PATH_TO_SUCCESSFUL_PACKAGE_REPORT`. It creates a fresh standalone consumer, requires registry resolution of exactly the version in the selected inventory, compares all approved source-file hashes in the downloaded module and runs five public tests on all three backends. Windows and Linux registry acceptance passed for 0.1.0 through 0.1.4. The workflow defaults to 0.1.4 and retains manual historical-version options.
+After publication, use `python scripts/check_registry.py --approved-inventory PATH_TO_SUCCESSFUL_PACKAGE_REPORT`. It creates a fresh standalone consumer, resolves the exact published version, checks all approved hashes and runs five public tests on each backend. Add `--check-native-cli` to build the release CLI from the verified registry sources. Windows and Linux registry acceptance passed for 0.1.0 through 0.1.5. The workflow defaults to 0.1.5 and checks its native CLI.
 
 Before public publication: select a concrete tested commit/version; recheck package inventory and metadata; finish representative benchmark/large-file acceptance; review API status and release notes; then obtain the applicable publication authorization. After publication, run a new consumer that resolves from Mooncakes, without a local MoonRdiff workspace member. The current consumer deliberately cannot prove registry availability.
 
